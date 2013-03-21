@@ -163,8 +163,8 @@ namespace phat {
             thread_local_storage< std::vector< index > > cur_col_values_buffer;
             #pragma omp parallel for schedule( guided, 1 )
             for( index idx = 0; idx < (index)global_columns.size(); idx++ ) {
-				std::vector< std::pair < index, index > >& stack =  stack_buffer();
-				std::vector< index >& cur_col_values = cur_col_values_buffer();
+                std::vector< std::pair < index, index > >& stack =  stack_buffer();
+                std::vector< index >& cur_col_values = cur_col_values_buffer();
                 bool pop_next = false;
                 index start_col = global_columns[ idx ];
                 stack.push_back( std::pair< index, index >( start_col, -1 ) );

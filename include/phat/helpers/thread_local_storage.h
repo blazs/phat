@@ -31,21 +31,21 @@ public:
 
     thread_local_storage() : per_thread_storage( omp_get_max_threads() * PHAT_TLS_SPACING_FACTOR ) {};
 
-	T& operator()() {
-		return per_thread_storage[ omp_get_thread_num() * PHAT_TLS_SPACING_FACTOR ];
-	}
+    T& operator()() {
+        return per_thread_storage[ omp_get_thread_num() * PHAT_TLS_SPACING_FACTOR ];
+    }
 
     const T& operator()() const {
-		return per_thread_storage[ omp_get_thread_num() * PHAT_TLS_SPACING_FACTOR ];
-	}
+        return per_thread_storage[ omp_get_thread_num() * PHAT_TLS_SPACING_FACTOR ];
+    }
 
-	T& operator[]( int tid ) {
-		return per_thread_storage[ tid * PHAT_TLS_SPACING_FACTOR ];
-	}
+    T& operator[]( int tid ) {
+        return per_thread_storage[ tid * PHAT_TLS_SPACING_FACTOR ];
+    }
 
     const T& operator[]( int tid ) const {
-		return per_thread_storage[ tid * PHAT_TLS_SPACING_FACTOR ];
-	}
+        return per_thread_storage[ tid * PHAT_TLS_SPACING_FACTOR ];
+    }
 
 protected:
     std::vector< T > per_thread_storage; 

@@ -84,8 +84,8 @@ void parse_command_line( int argc, char** argv, bool& use_binary, Representation
 template<typename Representation, typename Algorithm>
 void generic_compute_pairing( std::string input_filename,
                               std::string output_filename,
-	                          bool use_binary,
-	                          bool verbose,
+                              bool use_binary,
+                              bool verbose,
                               bool dualize ) {
 
     phat::boundary_matrix< Representation > matrix;
@@ -93,7 +93,7 @@ void generic_compute_pairing( std::string input_filename,
 
     double read_timer = omp_get_wtime();
     if( use_binary ) {
-	    LOG( "Reading input file " << input_filename << " in binary mode" )
+        LOG( "Reading input file " << input_filename << " in binary mode" )
         read_successful = matrix.load_binary( input_filename );
     } else {
         LOG( "Reading input file " << input_filename << " in ascii mode" )
