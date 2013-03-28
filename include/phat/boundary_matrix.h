@@ -166,9 +166,12 @@ namespace phat {
                 return false;
 
             index number_of_columns = 0;
-            while( getline( dummy, cur_line ) )
+            while( getline( dummy, cur_line ) ) {
+                cur_line.erase(cur_line.find_last_not_of(" \t\n\r\f\v") + 1);
                 if( cur_line != "" && cur_line[ 0 ] != '#' )
                     number_of_columns++;
+
+            }
             this->set_num_cols( number_of_columns );
             dummy.close();
 
@@ -179,6 +182,7 @@ namespace phat {
             column temp_col;
             index cur_col = -1;
             while( getline( input_stream, cur_line ) ) {
+                cur_line.erase(cur_line.find_last_not_of(" \t\n\r\f\v") + 1);
                 if( cur_line != "" && cur_line[ 0 ] != '#' ) {
                     cur_col++;
                     std::stringstream ss( cur_line );
