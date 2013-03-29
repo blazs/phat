@@ -30,7 +30,7 @@
 
 int main( int argc, char** argv )
 {
-    std::string test_data = argc > 1 ? argv[ 1 ] : "torus.bin";
+    std::string test_data = argc > 1 ? argv[ 1 ] : "examples/torus.bin";
     
     typedef phat::sparse_pivot_column Sparse;
     typedef phat::full_pivot_column Full;
