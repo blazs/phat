@@ -21,15 +21,16 @@
 #include <phat/representations/vector_vector.h>
 #include <phat/representations/vector_set.h>
 #include <phat/representations/sparse_pivot_column.h>
-#include <phat/representations/full_pivot_column.h> 
+#include <phat/representations/full_pivot_column.h>
+#include <phat/representations/bit_tree_pivot_column.h>
 
 #include <phat/algorithms/twist_reduction.h>
-#include <phat/algorithms/standard_reduction.h> 
+#include <phat/algorithms/standard_reduction.h>
 #include <phat/algorithms/row_reduction.h>
 #include <phat/algorithms/chunk_reduction.h>
 
 
-enum Representation_type  {VEC_VEC, VEC_SET, SPARSE_PIVOT, FULL_PIVOT};
+enum Representation_type  {VEC_VEC, VEC_SET, SPARSE_PIVOT, FULL_PIVOT, BIT_TREE_PIVOT};
 enum Algorithm_type  {STANDARD, TWIST, ROW, CHUNK };
 
 void print_help() {
@@ -42,23 +43,23 @@ void print_help() {
     std::cerr << "--help    --  prints this screen" << std::endl;
     std::cerr << "--verbose --  verbose output" << std::endl;
     std::cerr << "--dualize   --  use dualization approach" << std::endl;
-    std::cerr << "--vec-vec, --vec-set, --full-pivot, --sparse-pivot  --  selects a representation data structure for boundary matrices (default is '--sparse-pivot')" << std::endl;
+    std::cerr << "--vec-vec, --vec-set, --full-pivot, --sparse-pivot, --bit-tree-pivot  --  selects a representation data structure for boundary matrices (default is '--sparse-pivot')" << std::endl;
     std::cerr << "--standard, --twist, --chunk, --row  --  selects a reduction algorithm (default is '--twist')" << std::endl;
 }
 
 void print_help_and_exit() {
     print_help();
     exit( EXIT_FAILURE );
-}   
+}
 
 void parse_command_line( int argc, char** argv, bool& use_binary, Representation_type& rep_type, Algorithm_type& reduction,
                          std::string& input_filename, std::string& output_filename, bool& verbose, bool& dualize ) {
-    
+
     if( argc < 3 ) print_help_and_exit();
 
     input_filename = argv[ argc - 2 ];
     output_filename = argv[ argc - 1 ];
-    
+
     for( int idx = 1; idx < argc - 2; idx++ ) {
         const std::string option = argv[ idx ];
 
@@ -68,6 +69,7 @@ void parse_command_line( int argc, char** argv, bool& use_binary, Representation
         else if( option == "--vec-vec" ) rep_type = VEC_VEC;
         else if( option == "--vec-set" ) rep_type = VEC_SET;
         else if( option == "--full-pivot" )  rep_type = FULL_PIVOT;
+		else if( option == "--bit-tree-pivot" )  rep_type = BIT_TREE_PIVOT;
         else if( option == "--sparse-pivot" ) rep_type = SPARSE_PIVOT;
         else if( option == "--standard" ) reduction = STANDARD;
         else if( option == "--twist" ) reduction = TWIST;
@@ -79,13 +81,13 @@ void parse_command_line( int argc, char** argv, bool& use_binary, Representation
     }
 }
 
-#define LOG(msg) if( verbose ) std::cout << msg << std::endl; 
+#define LOG(msg) if( verbose ) std::cout << msg << std::endl;
 
 template<typename Representation, typename Algorithm>
 void generic_compute_pairing( std::string input_filename,
                               std::string output_filename,
-                              bool use_binary,
-                              bool verbose,
+	                          bool use_binary,
+	                          bool verbose,
                               bool dualize ) {
 
     phat::boundary_matrix< Representation > matrix;
@@ -93,7 +95,7 @@ void generic_compute_pairing( std::string input_filename,
 
     double read_timer = omp_get_wtime();
     if( use_binary ) {
-        LOG( "Reading input file " << input_filename << " in binary mode" )
+	    LOG( "Reading input file " << input_filename << " in binary mode" )
         read_successful = matrix.load_binary( input_filename );
     } else {
         LOG( "Reading input file " << input_filename << " in ascii mode" )
@@ -111,7 +113,7 @@ void generic_compute_pairing( std::string input_filename,
     LOG( "Computing persistence pairs ..." )
     if( dualize )
         phat::compute_persistence_pairs_dualized< Algorithm > ( pairs, matrix );
-    else 
+    else
         phat::compute_persistence_pairs < Algorithm > ( pairs, matrix );
     LOG( "Computing persistence pairs took " << omp_get_wtime() - pairs_timer <<"s" )
 
@@ -124,12 +126,12 @@ void generic_compute_pairing( std::string input_filename,
         pairs.save_ascii( output_filename );
     }
     LOG( "Writing output file took " << omp_get_wtime() - write_timer <<"s" )
-    
+
 }
 
 #define CALL_GENERIC_CODE(rep,alg) generic_compute_pairing < rep, alg >( input_filename, output_filename, use_binary, verbose, dualize );
 
-int main( int argc, char** argv ) 
+int main( int argc, char** argv )
 {
     bool use_binary = true; // interpret input as binary or ascii file
     Representation_type rep_type = SPARSE_PIVOT; // representation class
@@ -161,6 +163,13 @@ int main( int argc, char** argv )
                         case TWIST: CALL_GENERIC_CODE(phat::full_pivot_column, phat::twist_reduction) break;
                         case ROW: CALL_GENERIC_CODE(phat::full_pivot_column, phat::row_reduction) break;
                         case CHUNK: CALL_GENERIC_CODE(phat::full_pivot_column, phat::chunk_reduction) break;
+                        } break;
+
+	case BIT_TREE_PIVOT:  switch( reduction ) {
+						case STANDARD: CALL_GENERIC_CODE(phat::bit_tree_pivot_column, phat::standard_reduction) break;
+                        case TWIST: CALL_GENERIC_CODE(phat::bit_tree_pivot_column, phat::twist_reduction) break;
+                        case ROW: CALL_GENERIC_CODE(phat::bit_tree_pivot_column, phat::row_reduction) break;
+                        case CHUNK: CALL_GENERIC_CODE(phat::bit_tree_pivot_column, phat::chunk_reduction) break;
                         } break;
 
     case SPARSE_PIVOT:  switch( reduction ) {
