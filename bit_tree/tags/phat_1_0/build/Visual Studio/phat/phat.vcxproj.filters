@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Header Files\algorithms">
+      <UniqueIdentifier>{68ef1da9-96eb-4f06-b13e-84017b800989}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\helpers">
+      <UniqueIdentifier>{b1c8ddee-de1e-4f15-8a24-1a8d91968add}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\representations">
+      <UniqueIdentifier>{d7afb7ab-b0cc-4472-b536-a55a44880a36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\src\phat.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\include\phat\boundary_matrix.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\phat\persistence_pairs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\phat\helpers\dualize.h">
+      <Filter>Header Files\helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\phat\helpers\misc.h">
+      <Filter>Header Files\helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\phat\helpers\thread_local_storage.h">
+      <Filter>Header Files\helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\phat\representations\abstract_pivot_column.h">
+      <Filter>Header Files\representations</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\phat\representations\full_pivot_column.h">
+      <Filter>Header Files\representations</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\phat\representations\sparse_pivot_column.h">
+      <Filter>Header Files\representations</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\phat\representations\vector_set.h">
+      <Filter>Header Files\representations</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\phat\representations\vector_vector.h">
+      <Filter>Header Files\representations</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\phat\algorithms\chunk_reduction.h">
+      <Filter>Header Files\algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\phat\algorithms\row_reduction.h">
+      <Filter>Header Files\algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\phat\algorithms\standard_reduction.h">
+      <Filter>Header Files\algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\phat\algorithms\twist_reduction.h">
+      <Filter>Header Files\algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\phat\compute_persistence_pairs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
