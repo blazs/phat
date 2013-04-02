@@ -43,7 +43,7 @@ void print_help() {
     std::cerr << "--help    --  prints this screen" << std::endl;
     std::cerr << "--verbose --  verbose output" << std::endl;
     std::cerr << "--dualize   --  use dualization approach" << std::endl;
-    std::cerr << "--vec-vec, --vec-set, --full-pivot, --sparse-pivot, --bit_tree-pivot  --  selects a representation data structure for boundary matrices (default is '--sparse-pivot')" << std::endl;
+    std::cerr << "--vec-vec, --vec-set, --full-pivot, --sparse-pivot, --bit-tree-pivot  --  selects a representation data structure for boundary matrices (default is '--sparse-pivot')" << std::endl;
     std::cerr << "--standard, --twist, --chunk, --row  --  selects a reduction algorithm (default is '--twist')" << std::endl;
 }
 
@@ -69,7 +69,7 @@ void parse_command_line( int argc, char** argv, bool& use_binary, Representation
         else if( option == "--vec-vec" ) rep_type = VEC_VEC;
         else if( option == "--vec-set" ) rep_type = VEC_SET;
         else if( option == "--full-pivot" )  rep_type = FULL_PIVOT;
-		else if( option == "--BIT_TREE-pivot" )  rep_type = BIT_TREE_PIVOT;
+		else if( option == "--bit-tree-pivot" )  rep_type = BIT_TREE_PIVOT;
         else if( option == "--sparse-pivot" ) rep_type = SPARSE_PIVOT;
         else if( option == "--standard" ) reduction = STANDARD;
         else if( option == "--twist" ) reduction = TWIST;
