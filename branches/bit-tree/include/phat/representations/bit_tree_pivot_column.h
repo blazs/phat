@@ -23,17 +23,16 @@
 
 namespace phat {
 
-	// This is a bitset indexed with a 32-ary tree. Each node in the index
-	// has 32 bits; i-th bit says that the i-th subtree is non-empty.
+	// This is a bitset indexed with a 64-ary tree. Each node in the index
+	// has 64 bits; i-th bit says that the i-th subtree is non-empty.
 	// Supports practically O(1), inplace, zero-allocation: insert, remove, max_element
 	// and clear in O(number of ones in the bitset).
 	// 'add_index' is still the real bottleneck in practice.
 	class bit_tree_column
 	{
-		size_t offset; // present_data[i + offset] = ith block of the data-bitset
+		size_t offset; // data[i + offset] = ith block of the data-bitset
 		typedef uint64_t block_type;
-		std::vector<block_type> present_data;
-		block_type *  present; // to prevent error checking in MS's vector...
+		std::vector< block_type > data;
 
 		enum { block_size_in_bits = 64 };
 		enum { block_shift = 6 };
@@ -57,18 +56,9 @@ namespace phat {
 		}
 
 		public:
-		bit_tree_column() : present(0)
+		bit_tree_column() 
 		{
 			init(1);
-		}
-
-		bit_tree_column(const bit_tree_column &other) : present(0)
-		{
-			if (this == &other)
-				return;
-			this->offset = other.offset;
-			this->present_data = other.present_data;
-			*const_cast<block_type**>(&present) = &present_data[0];
 		}
 
 		void init(index num_cols)
@@ -85,22 +75,20 @@ namespace phat {
 			}
 
 			offset = upper_blocks;
-			present_data.resize(upper_blocks + bottom_blocks_needed, 0);
-
-			*const_cast<block_type**>(&present) = &present_data[0];
+			data.resize(upper_blocks + bottom_blocks_needed, 0);
 		}
 
 		inline index max_index() const
 		{
-			if (!present[0])
+			if (!data[0])
 				return -1;
 
-			const size_t size = present_data.size();
+			const size_t size = data.size();
 			size_t n = 0;
 
 			while(true)
 			{
-				const block_type val = present[n];
+				const block_type val = data[n];
 				const size_t index = rightmost_pos(val);
 				const size_t newn = (n << block_shift) + index + 1;
 
@@ -118,7 +106,7 @@ namespace phat {
 
 		inline bool empty() const
 		{
-			return present[0] == 0;
+			return data[0] == 0;
 		}
 
 		inline void add_index(const size_t entry)
@@ -133,11 +121,11 @@ namespace phat {
 
 			while(true)
 			{
-				present[address]^=mask;
+				data[address]^=mask;
 
 				// First we check if we reached the root.
 				// Also, if anyone else was in this block, we don't need to update the path up.
-				if (!address || (present[address] & ~mask))
+				if (!address || (data[address] & ~mask))
 					return;
 
 				index_in_block = index_in_level & block_modulo_mask;
@@ -172,7 +160,7 @@ namespace phat {
 		}
 
         inline bool empty() {
-			return !present[0];
+			return !data[0];
         }
 	};
 
