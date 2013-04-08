@@ -74,5 +74,8 @@
     <ClInclude Include="..\..\..\include\phat\compute_persistence_pairs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\phat\representations\bit_tree_pivot_column.h">
+      <Filter>Header Files\representations</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
