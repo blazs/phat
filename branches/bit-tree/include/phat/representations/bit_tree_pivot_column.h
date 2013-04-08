@@ -33,7 +33,7 @@ namespace phat {
 		size_t offset; // present_data[i + offset] = ith block of the data-bitset
 		typedef uint64_t block_type;
 		std::vector<block_type> present_data;
-		block_type * const present; // to prevent error checking in MS's vector...
+		block_type *  present; // to prevent error checking in MS's vector...
 
 		enum { block_size_in_bits = 64 };
 		enum { block_shift = 6 };
