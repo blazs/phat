@@ -71,11 +71,11 @@ namespace phat {
             // Phase 2+3: Simplify columns and reduce them
             for( dimension cur_dim = max_dim; cur_dim >= 1; cur_dim-- ) {
                 // Phase 2: Simplify columns 
-                thread_local_storage< std::vector< index > > temp_col;
-                #pragma omp parallel for schedule( guided, 1 )
+                std::vector< index > temp_col;
+                #pragma omp parallel for schedule( guided, 1 ), private( temp_col )
                 for( index idx = 0; idx < (index)global_columns.size(); idx++ )
                     if( boundary_matrix.get_dim( global_columns[ idx ] ) == cur_dim )
-                        _global_column_simplification( global_columns[ idx ], boundary_matrix, lowest_one_lookup, column_type, is_active, temp_col() );
+                        _global_column_simplification( global_columns[ idx ], boundary_matrix, lowest_one_lookup, column_type, is_active, temp_col );
                 boundary_matrix.sync();
 
                 // Phase 3: Reduce columns
@@ -159,12 +159,10 @@ namespace phat {
             const index nr_columns = boundary_matrix.get_num_cols();
             std::vector< char > finished( nr_columns, false );
 
-            thread_local_storage< std::vector< std::pair < index, index > > > stack_buffer;
-            thread_local_storage< std::vector< index > > cur_col_values_buffer;
-            #pragma omp parallel for schedule( guided, 1 )
+            std::vector< std::pair < index, index > > stack;
+            std::vector< index > cur_col_values;
+            #pragma omp parallel for schedule( guided, 1 ), private( stack, cur_col_values )
             for( index idx = 0; idx < (index)global_columns.size(); idx++ ) {
-                std::vector< std::pair < index, index > >& stack =  stack_buffer();
-                std::vector< index >& cur_col_values = cur_col_values_buffer();
                 bool pop_next = false;
                 index start_col = global_columns[ idx ];
                 stack.push_back( std::pair< index, index >( start_col, -1 ) );
