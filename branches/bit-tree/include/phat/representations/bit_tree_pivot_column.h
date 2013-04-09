@@ -33,17 +33,26 @@ namespace phat {
 		size_t offset; // data[i + offset] = ith block of the data-bitset
 		typedef uint64_t block_type;
 		std::vector< block_type > data;
+		size_t debrujin_magic_table[64];
 
 		enum { block_size_in_bits = 64 };
 		enum { block_shift = 6 };
 
 		// Some magic: http://graphics.stanford.edu/~seander/bithacks.html
-		// Gets the position of the rightmost bit of 'x'. First (-x)&x isolates the rightmost bit.
-		// This is much faster than calling log2i, and faster than using ScanBitForward/Reverse intrinsic,
-		// which should be one CPU instruction.
+		// Gets the position of the rightmost bit of 'x'. 0 means the most significant bit. 
+		// (-x)&x isolates the rightmost bit.
+		// The whole method is much faster than calling log2i, and very comparable to using ScanBitForward/Reverse intrinsic,
+		// which should be one CPU instruction, but is not portable.
 		inline size_t rightmost_pos(const block_type value) const
+		{				
+			return 64 - 1 - debrujin_magic_table[((value & (-value))*0x07EDD5E59A4E28C2) >> 58];
+		}
+
+		public:		
+
+		void init(index num_cols)
 		{
-				static const size_t tab64[64] = {
+			const size_t debrujin_for_64_bit[64] = {
 					63,  0, 58,  1, 59, 47, 53,  2,
 					60, 39, 48, 27, 54, 33, 42,  3,
 					61, 51, 37, 40, 49, 18, 28, 20,
@@ -52,20 +61,12 @@ namespace phat {
 					50, 36, 17, 19, 29, 10, 13, 21,
 					56, 45, 25, 31, 35, 16,  9, 12,
 					44, 24, 15,  8, 23,  7,  6,  5};
-				return 64 - 1 - tab64[((value & (-value))*0x07EDD5E59A4E28C2) >> 58];
-		}
 
-		public:
-		bit_tree_column() 
-		{
-			init(1);
-		}
+			std::copy(debrujin_for_64_bit, debrujin_for_64_bit+64, debrujin_magic_table);
 
-		void init(index num_cols)
-		{
-			size_t n = 1;
+			int64_t n = 1; // in case of overflow
 			size_t bottom_blocks_needed = (num_cols+block_size_in_bits-1)/block_size_in_bits;
-			size_t upper_blocks = 1;
+			size_t upper_blocks = 1;		
 
 			// How many blocks/nodes of index needed to index the whole bitset?
 			while(n * block_size_in_bits < bottom_blocks_needed)
@@ -111,8 +112,8 @@ namespace phat {
 
 		inline void add_index(const size_t entry)
 		{
-			static const block_type ONE = 1;
-			static const block_type block_modulo_mask = ((ONE << block_shift) - 1);
+			const block_type ONE = 1;
+			const block_type block_modulo_mask = ((ONE << block_shift) - 1);
 			size_t index_in_level = entry >> block_shift;
 			size_t address = index_in_level + offset;
 			size_t index_in_block = entry & block_modulo_mask;
