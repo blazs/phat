@@ -184,6 +184,7 @@
     <ClInclude Include="..\..\..\include\phat\helpers\misc.h" />
     <ClInclude Include="..\..\..\include\phat\helpers\thread_local_storage.h" />
     <ClInclude Include="..\..\..\include\phat\representations\abstract_pivot_column.h" />
+    <ClInclude Include="..\..\..\include\phat\representations\bit_tree_pivot_column.h" />
     <ClInclude Include="..\..\..\include\phat\representations\full_pivot_column.h" />
     <ClInclude Include="..\..\..\include\phat\representations\sparse_pivot_column.h" />
     <ClInclude Include="..\..\..\include\phat\representations\vector_set.h" />
