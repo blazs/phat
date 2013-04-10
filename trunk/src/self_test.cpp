@@ -22,6 +22,7 @@
 #include <phat/representations/vector_set.h>
 #include <phat/representations/sparse_pivot_column.h>
 #include <phat/representations/full_pivot_column.h>
+#include <phat/representations/bit_tree_pivot_column.h>
 
 #include <phat/algorithms/twist_reduction.h>
 #include <phat/algorithms/standard_reduction.h>
@@ -30,20 +31,21 @@
 
 int main( int argc, char** argv )
 {
-    std::string test_data = argc > 1 ? argv[ 1 ] : "examples/torus.bin";
-    
+    std::string test_data = argc > 1 ? argv[ 1 ] : "torus.bin";
+
     typedef phat::sparse_pivot_column Sparse;
     typedef phat::full_pivot_column Full;
+    typedef phat::bit_tree_pivot_column BitTree;
     typedef phat::vector_vector Vec_vec;
     typedef phat::vector_set Vec_set;
-    
+
     std::cout << "Reading test data " << test_data << " in binary format ..." << std::endl;
     phat::boundary_matrix< Full > boundary_matrix;
     if( !boundary_matrix.load_binary( test_data ) ) {
         std::cerr << "Error: test data " << test_data << " not found!" << std::endl;
         return EXIT_FAILURE;
     }
-    
+
     bool error = false;
     std::cout << "Comparing representations using Chunk algorithm ..." << std::endl;
     {
@@ -51,22 +53,27 @@ int main( int argc, char** argv )
         phat::persistence_pairs sparse_pairs;
         phat::boundary_matrix< Sparse > sparse_boundary_matrix = boundary_matrix;
         phat::compute_persistence_pairs< phat::chunk_reduction >( sparse_pairs, sparse_boundary_matrix );
-        
+
         std::cout << "Running Chunk - Full ..." << std::endl;
         phat::persistence_pairs full_pairs;
         phat::boundary_matrix< Full > full_boundary_matrix = boundary_matrix;
         phat::compute_persistence_pairs< phat::chunk_reduction >( full_pairs, full_boundary_matrix );
-        
+
+        std::cout << "Running Chunk - BitTree ..." << std::endl;
+        phat::persistence_pairs bit_tree_pairs;
+        phat::boundary_matrix< BitTree > bit_tree_boundary_matrix = boundary_matrix;
+        phat::compute_persistence_pairs< phat::chunk_reduction >( bit_tree_pairs, bit_tree_boundary_matrix );
+
         std::cout << "Running Chunk - Vec_vec ..." << std::endl;
         phat::persistence_pairs vec_vec_pairs;
         phat::boundary_matrix< Vec_vec > vec_vec_boundary_matrix = boundary_matrix;
         phat::compute_persistence_pairs< phat::chunk_reduction >( vec_vec_pairs, vec_vec_boundary_matrix );
-        
+
         std::cout << "Running Chunk - Vec_set ..." << std::endl;
         phat::persistence_pairs vec_set_pairs;
         phat::boundary_matrix< Vec_set > vec_set_boundary_matrix = boundary_matrix;
         phat::compute_persistence_pairs< phat::chunk_reduction >( vec_set_pairs, vec_set_boundary_matrix );
-        
+
         if( sparse_pairs != full_pairs ) {
             std::cerr << "Error: sparse and full differ!" << std::endl;
             error = true;
@@ -79,37 +86,41 @@ int main( int argc, char** argv )
             std::cerr << "Error: vec_vec and vec_set differ!" << std::endl;
             error = true;
         }
-        if( vec_set_pairs != sparse_pairs ) {
-            std::cerr << "Error: vec_set and sparse differ!" << std::endl;
+        if( vec_set_pairs != bit_tree_pairs ) {
+            std::cerr << "Error: vec_set and bit_tree differ!" << std::endl;
             error = true;
         }
-        
+        if( bit_tree_pairs != sparse_pairs ) {
+            std::cerr << "Error: bit_tree and sparse differ!" << std::endl;
+            error = true;
+        }
+
         if( error ) return EXIT_FAILURE;
         else std::cout << "All results are identical (as they should be)" << std::endl;
     }
-    
+
     std::cout << "Comparing algorithms using full_pivot_column representation ..." << std::endl;
     {
         std::cout << "Running Twist - Full ..." << std::endl;
         phat::persistence_pairs twist_pairs;
         phat::boundary_matrix< Full > twist_boundary_matrix = boundary_matrix;
         phat::compute_persistence_pairs< phat::twist_reduction >( twist_pairs, twist_boundary_matrix );
-        
+
         std::cout << "Running Standard - Full ..." << std::endl;
         phat::persistence_pairs std_pairs;
         phat::boundary_matrix< Full > std_boundary_matrix = boundary_matrix;
         phat::compute_persistence_pairs< phat::standard_reduction >( std_pairs, std_boundary_matrix );
-        
+
         std::cout << "Running Chunk - Full ..." << std::endl;
         phat::persistence_pairs chunk_pairs;
         phat::boundary_matrix< Full > chunk_boundary_matrix = boundary_matrix;
         phat::compute_persistence_pairs< phat::chunk_reduction >( chunk_pairs, chunk_boundary_matrix );
-        
+
         std::cout << "Running Row - Full ..." << std::endl;
         phat::persistence_pairs row_pairs;
         phat::boundary_matrix< Full > row_boundary_matrix = boundary_matrix;
         phat::compute_persistence_pairs< phat::row_reduction >( row_pairs, row_boundary_matrix );
-        
+
         if( twist_pairs != std_pairs ) {
             std::cerr << "Error: twist and standard differ!" << std::endl;
             error = true;
@@ -126,29 +137,29 @@ int main( int argc, char** argv )
             std::cerr << "Error: row and twist differ!" << std::endl;
             error = true;
         }
-        
+
         if( error ) return EXIT_FAILURE;
         else std::cout << "All results are identical (as they should be)" << std::endl;
     }
-    
+
     std::cout << "Comparing primal and dual approach using Chunk - Full ..." << std::endl;
     {
         phat::persistence_pairs primal_pairs;
         phat::boundary_matrix< Full > primal_boundary_matrix = boundary_matrix;
         phat::compute_persistence_pairs< phat::chunk_reduction >( primal_pairs, primal_boundary_matrix );
-        
+
         phat::persistence_pairs dual_pairs;
         phat::boundary_matrix< Full > dual_boundary_matrix = boundary_matrix;
         phat::compute_persistence_pairs_dualized< phat::chunk_reduction >( dual_pairs, dual_boundary_matrix );
-        
+
         if( primal_pairs != dual_pairs ) {
             std::cerr << "Error: primal and dual differ!" << std::endl;
             error = true;
         }
-        
+
         if( error ) return EXIT_FAILURE;
         else std::cout << "All results are identical (as they should be)" << std::endl;
     }
-    
+
     return EXIT_SUCCESS;
 }
