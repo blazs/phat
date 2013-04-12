@@ -390,6 +390,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\include\phat\representations\bit_tree_pivot_column.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\include\phat\representations\full_pivot_column.h"
 					>
 				</File>
