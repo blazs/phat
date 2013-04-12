@@ -1,5 +1,3 @@
-see phat.googlecode.com for the most current version of the file below:
-
 =PHAT (Persistent Homology Algorithm Toolbox)=
 Copyright 2013 IST Austria
 
@@ -16,8 +14,8 @@ contains code for several algorithmic variants:
 
   * The "standard" algorithm (see `[1]`, p.153)
   * The "row" algorithm from `[2]` (called pHrow in there)
-  * The "twist" algorithm, as described in `[3]` (default algorithm)
-  * The "chunk" algorithm presented in `[4]`
+  * The "twist" algorithm, as described in `[3]`
+  * The "chunk" algorithm presented in `[4]` (default algorithm, multi-threaded)
 
 The last two algorithms exploit the special structure of the boundary matrix
 to take shortcuts in the computation. The chunk algorithm makes use of multiple 
@@ -37,6 +35,7 @@ algorithm. We provide the following choices of representation classes:
   * {{{vector_set}}}: Each column is a {{{std::set}}} of integers, with the same meaning as before. The matrix is stored as a {{{std::vector}}} of such columns.
   * {{{sparse_pivot_column}}} (default representation): The matrix is stored as in the vector_vector representation. However, when a column is manipulated, it is first  converted into a {{{std::set}}}, using an extra data field called the "pivot column".  When another column is manipulated later, the pivot column is converted back to  the {{{std::vector}}} representation. This can lead to speed improvements when many columns  are added to a given pivot column consecutively. In a multicore setup, there is one pivot column per core.
   * {{{full_pivot_column}}}: The same idea as in the sparse version. However, instead of a {{{std::set}}}, the pivot column is expanded into a bit vector of size n (the dimension of the matrix). To avoid costly initializations, the class remembers which entries have been manipulated for a pivot column and updates only those entries when another column becomes the pivot.
+  * {{{bit_tree_pivot_column}}}: Default representation for all algorithms, except the "row" algorithm. Similar to the {{{full_pivot_column}}} but the implementation is more efficient. Internally it is an bit-set with fast iteration over present elements, and fast access to the maximum element. The structure is initialized before the reduction algorithm is started and reused.
   
 There are two ways to interface with the library:
 
