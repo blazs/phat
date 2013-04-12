@@ -1,5 +1,5 @@
 /*  Copyright 2013 IST Austria
-    Contributed by: Ulrich Bauer, Michael Kerber, Jan Reininghaus, Hubert Wagner
+    Contributed by: Hubert Wagner
 
     This file is part of PHAT.
 
