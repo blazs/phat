@@ -69,7 +69,7 @@ void parse_command_line( int argc, char** argv, bool& use_binary, Representation
         else if( option == "--vector_vector" ) rep_type = VECTOR_VECTOR;
         else if( option == "--vector_set" ) rep_type = VECTOR_SET;
         else if( option == "--full_pivot_column" )  rep_type = FULL_PIVOT_COLUMN;
-		else if( option == "--bit_tree_pivot_column" )  rep_type = BIT_TREE_PIVOT_COLUMN;
+        else if( option == "--bit_tree_pivot_column" )  rep_type = BIT_TREE_PIVOT_COLUMN;
         else if( option == "--sparse_pivot_column" ) rep_type = SPARSE_PIVOT_COLUMN;
         else if( option == "--standard" ) reduction = STANDARD;
         else if( option == "--twist" ) reduction = TWIST;
@@ -86,8 +86,8 @@ void parse_command_line( int argc, char** argv, bool& use_binary, Representation
 template<typename Representation, typename Algorithm>
 void generic_compute_pairing( std::string input_filename,
                               std::string output_filename,
-	                          bool use_binary,
-	                          bool verbose,
+                              bool use_binary,
+                              bool verbose,
                               bool dualize ) {
 
     phat::boundary_matrix< Representation > matrix;
@@ -95,7 +95,7 @@ void generic_compute_pairing( std::string input_filename,
 
     double read_timer = omp_get_wtime();
     if( use_binary ) {
-	    LOG( "Reading input file " << input_filename << " in binary mode" )
+        LOG( "Reading input file " << input_filename << " in binary mode" )
         read_successful = matrix.load_binary( input_filename );
     } else {
         LOG( "Reading input file " << input_filename << " in ascii mode" )
@@ -134,8 +134,8 @@ void generic_compute_pairing( std::string input_filename,
 int main( int argc, char** argv )
 {
     bool use_binary = true; // interpret input as binary or ascii file
-	Representation_type rep_type = BIT_TREE_PIVOT_COLUMN; // representation class
-	Algorithm_type reduction = CHUNK; // reduction algorithm
+    Representation_type rep_type = BIT_TREE_PIVOT_COLUMN; // representation class
+    Algorithm_type reduction = CHUNK; // reduction algorithm
     std::string input_filename; // name of file that contains the boundary matrix
     std::string output_filename; // name of file that will contain the persistence pairs
     bool verbose = false; // print timings / info
@@ -165,8 +165,8 @@ int main( int argc, char** argv )
                         case CHUNK: CALL_GENERIC_CODE(phat::full_pivot_column, phat::chunk_reduction) break;
                         } break;
 
-	case BIT_TREE_PIVOT_COLUMN:  switch( reduction ) {
-						case STANDARD: CALL_GENERIC_CODE(phat::bit_tree_pivot_column, phat::standard_reduction) break;
+    case BIT_TREE_PIVOT_COLUMN:  switch( reduction ) {
+                        case STANDARD: CALL_GENERIC_CODE(phat::bit_tree_pivot_column, phat::standard_reduction) break;
                         case TWIST: CALL_GENERIC_CODE(phat::bit_tree_pivot_column, phat::twist_reduction) break;
                         case ROW: CALL_GENERIC_CODE(phat::bit_tree_pivot_column, phat::row_reduction) break;
                         case CHUNK: CALL_GENERIC_CODE(phat::bit_tree_pivot_column, phat::chunk_reduction) break;
