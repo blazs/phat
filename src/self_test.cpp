@@ -99,26 +99,26 @@ int main( int argc, char** argv )
         else std::cout << "All results are identical (as they should be)" << std::endl;
     }
 
-    std::cout << "Comparing algorithms using full_pivot_column representation ..." << std::endl;
+    std::cout << "Comparing algorithms using BitTree representation ..." << std::endl;
     {
-        std::cout << "Running Twist - Full ..." << std::endl;
+        std::cout << "Running Twist - BitTree ..." << std::endl;
         phat::persistence_pairs twist_pairs;
-        phat::boundary_matrix< Full > twist_boundary_matrix = boundary_matrix;
+        phat::boundary_matrix< BitTree > twist_boundary_matrix = boundary_matrix;
         phat::compute_persistence_pairs< phat::twist_reduction >( twist_pairs, twist_boundary_matrix );
 
-        std::cout << "Running Standard - Full ..." << std::endl;
+        std::cout << "Running Standard - BitTree ..." << std::endl;
         phat::persistence_pairs std_pairs;
-        phat::boundary_matrix< Full > std_boundary_matrix = boundary_matrix;
+        phat::boundary_matrix< BitTree > std_boundary_matrix = boundary_matrix;
         phat::compute_persistence_pairs< phat::standard_reduction >( std_pairs, std_boundary_matrix );
 
-        std::cout << "Running Chunk - Full ..." << std::endl;
+        std::cout << "Running Chunk - BitTree ..." << std::endl;
         phat::persistence_pairs chunk_pairs;
-        phat::boundary_matrix< Full > chunk_boundary_matrix = boundary_matrix;
+        phat::boundary_matrix< BitTree > chunk_boundary_matrix = boundary_matrix;
         phat::compute_persistence_pairs< phat::chunk_reduction >( chunk_pairs, chunk_boundary_matrix );
 
-        std::cout << "Running Row - Full ..." << std::endl;
+        std::cout << "Running Row - BitTree ..." << std::endl;
         phat::persistence_pairs row_pairs;
-        phat::boundary_matrix< Full > row_boundary_matrix = boundary_matrix;
+        phat::boundary_matrix< BitTree > row_boundary_matrix = boundary_matrix;
         phat::compute_persistence_pairs< phat::row_reduction >( row_pairs, row_boundary_matrix );
 
         if( twist_pairs != std_pairs ) {
