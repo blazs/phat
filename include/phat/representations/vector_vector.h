@@ -80,8 +80,9 @@ namespace phat {
         void _add_to( index source, index target ) {
             column& source_col = matrix[ source ];
             column& target_col = matrix[ target ];
-            column temp_col = target_col;
-            target_col.clear();
+            column temp_col;
+            target_col.swap( temp_col );
+            target_col.reserve( temp_col.size() );
             std::set_symmetric_difference( temp_col.begin(), temp_col.end(),
                                            source_col.begin(), source_col.end(),
                                            std::back_inserter( target_col ) );
