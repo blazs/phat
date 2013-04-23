@@ -46,6 +46,6 @@ namespace phat {
         for( index cur_col = 0; cur_col < nr_of_columns; cur_col++ )
             std::reverse( dual_matrix[ cur_col ].begin(), dual_matrix[ cur_col ].end() );
 
-        boundary_matrix.init( dual_matrix, dual_dims );
+        boundary_matrix.load_vector_vector( dual_matrix, dual_dims );
     }
 }
