@@ -77,5 +77,8 @@
     <ClInclude Include="..\..\..\include\phat\representations\bit_tree_pivot_column.h">
       <Filter>Header Files\representations</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\phat\representations\vector_list.h">
+      <Filter>Header Files\representations</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

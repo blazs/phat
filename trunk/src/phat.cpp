@@ -20,6 +20,7 @@
 
 #include <phat/representations/vector_vector.h>
 #include <phat/representations/vector_set.h>
+#include <phat/representations/vector_list.h>
 #include <phat/representations/sparse_pivot_column.h>
 #include <phat/representations/full_pivot_column.h>
 #include <phat/representations/bit_tree_pivot_column.h>
@@ -30,7 +31,7 @@
 #include <phat/algorithms/chunk_reduction.h>
 
 
-enum Representation_type  {VECTOR_VECTOR, VECTOR_SET, SPARSE_PIVOT_COLUMN, FULL_PIVOT_COLUMN, BIT_TREE_PIVOT_COLUMN};
+enum Representation_type  {VECTOR_VECTOR, VECTOR_SET, SPARSE_PIVOT_COLUMN, FULL_PIVOT_COLUMN, BIT_TREE_PIVOT_COLUMN, VECTOR_LIST};
 enum Algorithm_type  {STANDARD, TWIST, ROW, CHUNK };
 
 void print_help() {
@@ -43,7 +44,7 @@ void print_help() {
     std::cerr << "--help    --  prints this screen" << std::endl;
     std::cerr << "--verbose --  verbose output" << std::endl;
     std::cerr << "--dualize   --  use dualization approach" << std::endl;
-    std::cerr << "--vector_vector, --vector_set, --full_pivot_column, --sparse_pivot_column, --bit_tree_pivot_column  --  selects a representation data structure for boundary matrices (default is '--bit_tree_pivot_column')" << std::endl;
+    std::cerr << "--vector_vector, --vector_set, --vector_list, --full_pivot_column, --sparse_pivot_column, --bit_tree_pivot_column  --  selects a representation data structure for boundary matrices (default is '--bit_tree_pivot_column')" << std::endl;
     std::cerr << "--standard, --twist, --chunk, --row  --  selects a reduction algorithm (default is '--chunk')" << std::endl;
 }
 
@@ -68,6 +69,7 @@ void parse_command_line( int argc, char** argv, bool& use_binary, Representation
         else if( option == "--dualize" ) dualize = true;
         else if( option == "--vector_vector" ) rep_type = VECTOR_VECTOR;
         else if( option == "--vector_set" ) rep_type = VECTOR_SET;
+        else if( option == "--vector_list" ) rep_type = VECTOR_LIST;
         else if( option == "--full_pivot_column" )  rep_type = FULL_PIVOT_COLUMN;
         else if( option == "--bit_tree_pivot_column" )  rep_type = BIT_TREE_PIVOT_COLUMN;
         else if( option == "--sparse_pivot_column" ) rep_type = SPARSE_PIVOT_COLUMN;
@@ -156,6 +158,13 @@ int main( int argc, char** argv )
                         case TWIST: CALL_GENERIC_CODE(phat::vector_set, phat::twist_reduction) break;
                         case ROW: CALL_GENERIC_CODE(phat::vector_set, phat::row_reduction) break;
                         case CHUNK: CALL_GENERIC_CODE(phat::vector_set, phat::chunk_reduction) break;
+                        } break;
+    
+    case VECTOR_LIST:       switch( reduction ) {
+                        case STANDARD: CALL_GENERIC_CODE(phat::vector_list, phat::standard_reduction) break;
+                        case TWIST: CALL_GENERIC_CODE(phat::vector_list, phat::twist_reduction) break;
+                        case ROW: CALL_GENERIC_CODE(phat::vector_list, phat::row_reduction) break;
+                        case CHUNK: CALL_GENERIC_CODE(phat::vector_list, phat::chunk_reduction) break;
                         } break;
 
     case FULL_PIVOT_COLUMN:    switch( reduction ) {

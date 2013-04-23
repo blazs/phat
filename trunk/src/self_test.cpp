@@ -20,6 +20,7 @@
 
 #include <phat/representations/vector_vector.h>
 #include <phat/representations/vector_set.h>
+#include <phat/representations/vector_list.h>
 #include <phat/representations/sparse_pivot_column.h>
 #include <phat/representations/full_pivot_column.h>
 #include <phat/representations/bit_tree_pivot_column.h>
@@ -38,6 +39,7 @@ int main( int argc, char** argv )
     typedef phat::bit_tree_pivot_column BitTree;
     typedef phat::vector_vector Vec_vec;
     typedef phat::vector_set Vec_set;
+    typedef phat::vector_list Vec_list;
 
     std::cout << "Reading test data " << test_data << " in binary format ..." << std::endl;
     phat::boundary_matrix< Full > boundary_matrix;
@@ -74,6 +76,11 @@ int main( int argc, char** argv )
         phat::boundary_matrix< Vec_set > vec_set_boundary_matrix = boundary_matrix;
         phat::compute_persistence_pairs< phat::chunk_reduction >( vec_set_pairs, vec_set_boundary_matrix );
 
+        std::cout << "Running Chunk - Vec_list ..." << std::endl;
+        phat::persistence_pairs vec_list_pairs;
+        phat::boundary_matrix< Vec_list > vec_list_boundary_matrix = boundary_matrix;
+        phat::compute_persistence_pairs< phat::chunk_reduction >( vec_list_pairs, vec_list_boundary_matrix );
+
         if( sparse_pairs != full_pairs ) {
             std::cerr << "Error: sparse and full differ!" << std::endl;
             error = true;
@@ -90,8 +97,12 @@ int main( int argc, char** argv )
             std::cerr << "Error: vec_set and bit_tree differ!" << std::endl;
             error = true;
         }
-        if( bit_tree_pairs != sparse_pairs ) {
-            std::cerr << "Error: bit_tree and sparse differ!" << std::endl;
+         if( bit_tree_pairs != vec_list_pairs ) {
+            std::cerr << "Error: bit_tree and vec_list differ!" << std::endl;
+            error = true;
+        }
+        if( vec_list_pairs != sparse_pairs ) {
+            std::cerr << "Error: vec_list and sparse differ!" << std::endl;
             error = true;
         }
 
