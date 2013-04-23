@@ -115,7 +115,7 @@ namespace phat {
             for( index idx = 0; idx < number_of_columns; idx++ ) {
                 this->get_col( idx, temp_col );
                 other_boundary_matrix.get_col( idx, other_temp_col );
-                if( temp_col != other_temp_col )
+                if( temp_col != other_temp_col || this->get_dim( idx ) != other_boundary_matrix.get_dim( idx ) )
                     return false;
             }
             return true;
@@ -146,12 +146,36 @@ namespace phat {
     public:
 
         // initializes boundary_matrix from (vector<vector>, vector) pair -- untested
-        void init( const std::vector< std::vector< index > >& input_matrix, const std::vector< dimension >& input_dims ) { 
+        template< typename index_type, typename dimemsion_type >
+        void load_vector_vector( const std::vector< std::vector< index_type > >& input_matrix, const std::vector< dimemsion_type >& input_dims ) { 
             const index nr_of_columns = (index)input_matrix.size();
             this->set_num_cols( nr_of_columns );
+            column temp_col;
             for( index cur_col = 0; cur_col <  nr_of_columns; cur_col++ ) {
-                this->set_dim( cur_col, input_dims[ cur_col ] );
-                this->set_col( cur_col, input_matrix[ cur_col ] );
+                this->set_dim( cur_col, (dimension)input_dims[ cur_col ] );
+                
+                index num_rows = input_matrix[ cur_col ].size();
+                temp_col.resize( num_rows );
+                for( index cur_row = 0; cur_row <  num_rows; cur_row++ )
+                    temp_col[ cur_row ] = (index)input_matrix[ cur_col ][ cur_row ];
+                this->set_col( cur_col, temp_col );
+            }
+        }
+
+        template< typename index_type, typename dimemsion_type >
+        void save_vector_vector( std::vector< std::vector< index_type > >& output_matrix, std::vector< dimemsion_type >& output_dims ) { 
+            const index nr_of_columns = get_num_cols();
+            output_matrix.resize( nr_of_columns );
+            output_dims.resize( nr_of_columns );
+            column temp_col;
+            for( index cur_col = 0; cur_col <  nr_of_columns; cur_col++ ) {
+                output_dims[ cur_col ] = (dimemsion_type)get_dim( cur_col );
+                get_col( cur_col, temp_col );
+                index num_rows = temp_col.size();
+                output_matrix[ cur_col ].clear();
+                output_matrix[ cur_col ].resize( num_rows );
+                for( index cur_row = 0; cur_row <  num_rows; cur_row++ )
+                    output_matrix[ cur_col ][ cur_row ] = (index_type)temp_col[ cur_row ];
             }
         }
 

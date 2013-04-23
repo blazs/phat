@@ -161,5 +161,22 @@ int main( int argc, char** argv )
         else std::cout << "All results are identical (as they should be)" << std::endl;
     }
 
+    std::cout << "Testing vector<vector> interface ..." << std::endl;
+    {
+        std::vector< std::vector< int > > vector_vector_matrix;
+        std::vector< int > vector_dims;
+        boundary_matrix.save_vector_vector( vector_vector_matrix, vector_dims );
+        phat::boundary_matrix< BitTree > vector_vector_boundary_matrix;
+        vector_vector_boundary_matrix.load_vector_vector( vector_vector_matrix, vector_dims );
+
+        if( vector_vector_boundary_matrix != boundary_matrix ) {
+            std::cerr << "Error: [load|save]_vector_vector bug" << std::endl;
+            error = true;
+        }
+
+        if( error ) return EXIT_FAILURE;
+        else std::cout << "Test passed!" << std::endl;
+    }
+
     return EXIT_SUCCESS;
 }
