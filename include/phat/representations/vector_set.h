@@ -51,7 +51,6 @@ namespace phat {
             col.clear();
             col.reserve( matrix[idx].size() );
             std::copy (matrix[idx].begin(), matrix[idx].end(), std::back_inserter(col) );
-            std::sort( col.begin(), col.end() );
         }
         void _set_col( index idx, const column& col  ) {
             matrix[ idx ].clear();
@@ -85,11 +84,8 @@ namespace phat {
 
         // adds column 'source' to column 'target'
         void _add_to( index source, index target ) {
-            internal_column& source_col = matrix[ source ];
-            for( internal_column::const_iterator source_it = source_col.begin(); 
-                 source_it != source_col.end(); source_it++ ) {
-                _toggle(target, *source_it);
-            }
+            for( internal_column::iterator it = matrix[ source ].begin(); it != matrix[ source ].end(); it++ )
+                _toggle( target, *it );
         }
 
         //// toggles given index pair
