@@ -47,7 +47,7 @@ namespace phat {
         // which should be one CPU instruction, but is not portable.
         inline size_t rightmost_pos(const block_type value) const
         {                
-            return 64 - 1 - debrujin_magic_table[((value & (-value))*0x07EDD5E59A4E28C2) >> 58];
+            return 64 - 1 - debrujin_magic_table[((value & (-(int64_t)value))*0x07EDD5E59A4E28C2) >> 58];
         }
 
         public:        
@@ -55,8 +55,8 @@ namespace phat {
         void init(index num_cols)
         {
             int64_t n = 1; // in case of overflow
-            size_t bottom_blocks_needed = (num_cols+block_size_in_bits-1)/block_size_in_bits;
-            size_t upper_blocks = 1;        
+            int64_t bottom_blocks_needed = (num_cols+block_size_in_bits-1)/block_size_in_bits;
+            int64_t upper_blocks = 1;        
 
             // How many blocks/nodes of index needed to index the whole bitset?
             while(n * block_size_in_bits < bottom_blocks_needed)
