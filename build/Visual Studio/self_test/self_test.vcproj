@@ -404,6 +404,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\include\phat\representations\vector_list.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\include\phat\representations\vector_set.h"
 					>
 				</File>
