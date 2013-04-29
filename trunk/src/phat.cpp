@@ -53,7 +53,7 @@ void print_help_and_exit() {
     exit( EXIT_FAILURE );
 }
 
-void parse_command_line( int argc, char** argv, bool& use_binary, Representation_type& rep_type, Algorithm_type& reduction,
+void parse_command_line( int argc, char** argv, bool& use_binary, Representation_type& representation, Algorithm_type& algorithm,
                          std::string& input_filename, std::string& output_filename, bool& verbose, bool& dualize) {
 
     if( argc < 3 ) print_help_and_exit();
@@ -67,16 +67,16 @@ void parse_command_line( int argc, char** argv, bool& use_binary, Representation
         if( option == "--ascii" ) use_binary = false;
         else if( option == "--binary" ) use_binary = true;
         else if( option == "--dualize" ) dualize = true;
-        else if( option == "--vector_vector" ) rep_type = VECTOR_VECTOR;
-        else if( option == "--vector_set" ) rep_type = VECTOR_SET;
-        else if( option == "--vector_list" ) rep_type = VECTOR_LIST;
-        else if( option == "--full_pivot_column" )  rep_type = FULL_PIVOT_COLUMN;
-        else if( option == "--bit_tree_pivot_column" )  rep_type = BIT_TREE_PIVOT_COLUMN;
-        else if( option == "--sparse_pivot_column" ) rep_type = SPARSE_PIVOT_COLUMN;
-        else if( option == "--standard" ) reduction = STANDARD;
-        else if( option == "--twist" ) reduction = TWIST;
-        else if( option == "--row" ) reduction = ROW;
-        else if( option == "--chunk" ) reduction = CHUNK;
+        else if( option == "--vector_vector" ) representation = VECTOR_VECTOR;
+        else if( option == "--vector_set" ) representation = VECTOR_SET;
+        else if( option == "--vector_list" ) representation = VECTOR_LIST;
+        else if( option == "--full_pivot_column" )  representation = FULL_PIVOT_COLUMN;
+        else if( option == "--bit_tree_pivot_column" )  representation = BIT_TREE_PIVOT_COLUMN;
+        else if( option == "--sparse_pivot_column" ) representation = SPARSE_PIVOT_COLUMN;
+        else if( option == "--standard" ) algorithm = STANDARD;
+        else if( option == "--twist" ) algorithm = TWIST;
+        else if( option == "--row" ) algorithm = ROW;
+        else if( option == "--chunk" ) algorithm = CHUNK;
         else if( option == "--verbose" ) verbose = true;
         else if( option == "--help" ) print_help_and_exit();
         else print_help_and_exit();
@@ -136,52 +136,52 @@ void generic_compute_pairing( std::string input_filename,
 int main( int argc, char** argv )
 {
     bool use_binary = true; // interpret input as binary or ascii file
-    Representation_type rep_type = BIT_TREE_PIVOT_COLUMN; // representation class
-    Algorithm_type reduction = CHUNK; // reduction algorithm
+    Representation_type representation = BIT_TREE_PIVOT_COLUMN; // representation class
+    Algorithm_type algorithm = CHUNK; // reduction algorithm
     std::string input_filename; // name of file that contains the boundary matrix
     std::string output_filename; // name of file that will contain the persistence pairs
     bool verbose = false; // print timings / info
     bool dualize = false; // toggle for dualization approach
 
-    parse_command_line( argc, argv, use_binary, rep_type, reduction, input_filename, output_filename, verbose, dualize );
+    parse_command_line( argc, argv, use_binary, representation, algorithm, input_filename, output_filename, verbose, dualize );
 
-    switch( rep_type ) {
-    case VECTOR_VECTOR:       switch( reduction ) {
+    switch( representation ) {
+    case VECTOR_VECTOR:       switch( algorithm ) {
                         case STANDARD: CALL_GENERIC_CODE(phat::vector_vector, phat::standard_reduction) break;
                         case TWIST: CALL_GENERIC_CODE(phat::vector_vector, phat::twist_reduction) break;
                         case ROW: CALL_GENERIC_CODE(phat::vector_vector, phat::row_reduction) break;
                         case CHUNK: CALL_GENERIC_CODE(phat::vector_vector, phat::chunk_reduction) break;
                         } break;
 
-    case VECTOR_SET:       switch( reduction ) {
+    case VECTOR_SET:       switch( algorithm ) {
                         case STANDARD: CALL_GENERIC_CODE(phat::vector_set, phat::standard_reduction) break;
                         case TWIST: CALL_GENERIC_CODE(phat::vector_set, phat::twist_reduction) break;
                         case ROW: CALL_GENERIC_CODE(phat::vector_set, phat::row_reduction) break;
                         case CHUNK: CALL_GENERIC_CODE(phat::vector_set, phat::chunk_reduction) break;
                         } break;
     
-    case VECTOR_LIST:       switch( reduction ) {
+    case VECTOR_LIST:       switch( algorithm ) {
                         case STANDARD: CALL_GENERIC_CODE(phat::vector_list, phat::standard_reduction) break;
                         case TWIST: CALL_GENERIC_CODE(phat::vector_list, phat::twist_reduction) break;
                         case ROW: CALL_GENERIC_CODE(phat::vector_list, phat::row_reduction) break;
                         case CHUNK: CALL_GENERIC_CODE(phat::vector_list, phat::chunk_reduction) break;
                         } break;
 
-    case FULL_PIVOT_COLUMN:    switch( reduction ) {
+    case FULL_PIVOT_COLUMN:    switch( algorithm ) {
                         case STANDARD: CALL_GENERIC_CODE(phat::full_pivot_column, phat::standard_reduction) break;
                         case TWIST: CALL_GENERIC_CODE(phat::full_pivot_column, phat::twist_reduction) break;
                         case ROW: CALL_GENERIC_CODE(phat::full_pivot_column, phat::row_reduction) break;
                         case CHUNK: CALL_GENERIC_CODE(phat::full_pivot_column, phat::chunk_reduction) break;
                         } break;
 
-    case BIT_TREE_PIVOT_COLUMN:  switch( reduction ) {
+    case BIT_TREE_PIVOT_COLUMN:  switch( algorithm ) {
                         case STANDARD: CALL_GENERIC_CODE(phat::bit_tree_pivot_column, phat::standard_reduction) break;
                         case TWIST: CALL_GENERIC_CODE(phat::bit_tree_pivot_column, phat::twist_reduction) break;
                         case ROW: CALL_GENERIC_CODE(phat::bit_tree_pivot_column, phat::row_reduction) break;
                         case CHUNK: CALL_GENERIC_CODE(phat::bit_tree_pivot_column, phat::chunk_reduction) break;
                         } break;
 
-    case SPARSE_PIVOT_COLUMN:  switch( reduction ) {
+    case SPARSE_PIVOT_COLUMN:  switch( algorithm ) {
                         case STANDARD: CALL_GENERIC_CODE(phat::sparse_pivot_column, phat::standard_reduction) break;
                         case TWIST: CALL_GENERIC_CODE(phat::sparse_pivot_column, phat::twist_reduction) break;
                         case ROW: CALL_GENERIC_CODE(phat::sparse_pivot_column, phat::row_reduction) break;
