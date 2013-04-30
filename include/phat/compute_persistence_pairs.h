@@ -43,24 +43,8 @@ namespace phat {
     void compute_persistence_pairs_dualized( persistence_pairs& pairs, boundary_matrix< Representation >& boundary_matrix ) {
         ReductionAlgorithm reduce;
         const index nr_columns = boundary_matrix.get_num_cols();
-        
-        double start;
-        
-        start= omp_get_wtime();
-        std::clog << "Dualize ... " << std::endl;
-
         dualize( boundary_matrix );
-        
-        std::clog <<  omp_get_wtime() - start <<"s" << std::endl;
-
-        start= omp_get_wtime();
-        std::clog << "Reduce ... " << std::endl;
-        
         reduce( boundary_matrix );
-        
-        std::clog <<  omp_get_wtime() - start <<"s" << std::endl;
-
-        
         pairs.clear();
         for( index idx = 0; idx < nr_columns; idx++ ) {
             if( !boundary_matrix.is_empty( idx ) ) {
