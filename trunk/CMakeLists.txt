@@ -5,6 +5,7 @@ set(CMAKE_BUILD_TYPE "Release")
 INCLUDE(CheckCXXSourceCompiles)
 
 include_directories (include)
+include_directories (/opt/local/include)
 
 FIND_PACKAGE(OpenMP)
 
@@ -38,3 +39,24 @@ endif()
 add_executable (simple_example src/simple_example.cpp)
 add_executable (self_test src/self_test.cpp)
 add_executable (phat src/phat.cpp)
+add_executable (reduction_test reduction_test.cpp)
+add_executable (benchmark src/benchmark.cpp)
+
+
+set(CMAKE_MODULE_PATH "modules")
+set(CGAL_DIR "/opt/local/lib/cmake")
+
+FIND_PACKAGE(CGAL)
+
+if ( CGAL_FOUND )
+
+  include( ${CGAL_USE_FILE} )
+else()
+  
+    message(STATUS "This program requires the CGAL library, and will not be compiled.")
+  
+endif()
+
+FIND_PACKAGE(Boost)
+
+add_executable (alpha_3 addons/alpha_3.cpp)
