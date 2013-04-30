@@ -32,9 +32,8 @@ namespace phat {
         dual_matrix.resize( nr_of_columns );
         dual_dims.resize( nr_of_columns );
         
-        std::vector< dimension >& dual_sizes = dual_dims;
+        std::vector< index > dual_sizes( nr_of_columns, 0 );
 
-    
         column temp_col;
         for( index cur_col = 0; cur_col < nr_of_columns; cur_col++ ) {
             boundary_matrix.get_col( cur_col, temp_col );
