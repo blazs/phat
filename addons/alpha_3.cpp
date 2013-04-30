@@ -229,8 +229,7 @@ int main(int argc, char** argv)
 
     std::cerr << "Filtration of size " << circumradii.size() << std::endl;
 
-    Matrix M;
-    Dim_container dim_container;
+    phat::boundary_matrix< phat::vector_vector > boundary_matrix;
 
     Vertex_handle v;
     Edge e;
@@ -257,13 +256,13 @@ int main(int argc, char** argv)
 
         if(CGAL::assign(v,obj)) {
             //std::cout << "Vertex " << it->second << std::endl;
-            dim_container.push_back(0);
+            boundary_matrix.set_dim(curr_index, 0);
             v->info().set_index(curr_index);
-            M.push_back(col);
+            boundary_matrix.set_col(curr_index, col);
         }
         if(CGAL::assign(e,obj)) {
             //std::cout << "Edge " << it->second << std::endl;
-            dim_container.push_back(1);
+            boundary_matrix.set_dim(curr_index, 1);
             Vertex_handle v1 = e.first->vertex(e.second);
             CGAL_assertion(v1->info().has_index());
             Vertex_handle v2 = e.first->vertex(e.third);
@@ -276,12 +275,12 @@ int main(int argc, char** argv)
             }
             col.push_back(i1);
             col.push_back(i2);
-            M.push_back(col);
+            boundary_matrix.set_col(curr_index, col);
             set_index_of_edge(dt,e,curr_index);
         }
         if(CGAL::assign(f,obj)) {
             //std::cout << "Facet " << it->second << std::endl;
-            dim_container.push_back(2);
+            boundary_matrix.set_dim(curr_index, 2);
 
             Index i1= f.first->info().edge_index( (f.second+1)%4, (f.second+2)%4 );
             col.push_back(i1);
@@ -290,25 +289,23 @@ int main(int argc, char** argv)
             Index i3= f.first->info().edge_index( (f.second+2)%4, (f.second+3)%4 );
             col.push_back(i3);
             std::sort(col.begin(),col.end());
-            M.push_back(col);
+            boundary_matrix.set_col(curr_index, col);
             set_index_of_facet(dt,f,curr_index);
 
         }
         if(CGAL::assign(c,obj)) {
             //std::cout << "Cell " << it->second << std::endl;
-            dim_container.push_back(3);
+            boundary_matrix.set_dim(curr_index, 3);
             col.push_back(c->info().facet_index(0));
             col.push_back(c->info().facet_index(1));
             col.push_back(c->info().facet_index(2));
             col.push_back(c->info().facet_index(3));
             std::sort(col.begin(),col.end());
-            M.push_back(col);
+            boundary_matrix.set_col(curr_index, col);
         }
         curr_index++;
     }
 
-    phat::boundary_matrix< phat::vector_vector > boundary_matrix;
-    boundary_matrix.init(M, dim_container);
     boundary_matrix.save_binary("alpha_filtration.bin");
     
     //phat::write(std::cout,M,dim_container);
