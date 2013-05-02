@@ -137,7 +137,7 @@ int main( int argc, char** argv )
 {
     bool use_binary = true; // interpret input as binary or ascii file
     Representation_type representation = BIT_TREE_PIVOT_COLUMN; // representation class
-    Algorithm_type algorithm = CHUNK; // reduction algorithm
+    Algorithm_type algorithm = TWIST; // reduction algorithm
     std::string input_filename; // name of file that contains the boundary matrix
     std::string output_filename; // name of file that will contain the persistence pairs
     bool verbose = false; // print timings / info
