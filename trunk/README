@@ -38,9 +38,9 @@ algorithm. We provide the following choices of representation classes:
   * {{{vector_vector}}}: Each column is represented as a sorted {{{std::vector}}} of integers, containing the indices of the non-zero entries of the column. The matrix itself is a {{{std::vector}}} of such columns.
   * {{{vector_set}}}: Each column is a {{{std::set}}} of integers, with the same meaning as above. The matrix is stored as a {{{std::vector}}} of such columns.
   * {{{vector_list}}}: Each column is a sorted {{{std::list}}} of integers, with the same meaning as above. The matrix is stored as a {{{std::vector}}} of such columns.
-  * {{{sparse_pivot_column}}}: The matrix is stored as in the vector_vector representation. However, when a column is manipulated, it is first  converted into a {{{std::set}}}, using an extra data field called the "pivot column".  When another column is manipulated later, the pivot column is converted back to  the {{{std::vector}}} representation. This can lead to speed improvements when many columns  are added to a given pivot column consecutively. In a multicore setup, there is one pivot column per core.
+  * {{{sparse_pivot_column}}}: The matrix is stored as in the vector_vector representation. However, when a column is manipulated, it is first  converted into a {{{std::set}}}, using an extra data field called the "pivot column".  When another column is manipulated later, the pivot column is converted back to  the {{{std::vector}}} representation. This can lead to significant speed improvements when many columns  are added to a given pivot column consecutively. In a multicore setup, there is one pivot column per thread.
   * {{{full_pivot_column}}}: The same idea as in the sparse version. However, instead of a {{{std::set}}}, the pivot column is expanded into a bit vector of size n (the dimension of the matrix). To avoid costly initializations, the class remembers which entries have been manipulated for a pivot column and updates only those entries when another column becomes the pivot.
-  * {{{bit_tree_pivot_column}}} (default representation): Similar to the {{{full_pivot_column}}} but the implementation is more efficient. Internally it is a bit-set with fast iteration over present elements, and fast access to the maximum element. The structure is initialized before the reduction algorithm is started and reused.
+  * {{{bit_tree_pivot_column}}} (default representation): Similar to the {{{full_pivot_column}}} but the implementation is more efficient. Internally it is a bit-set with fast iteration over nonzero elements, and fast access to the maximal element. 
   
 There are two ways to interface with the library:
 
@@ -56,7 +56,7 @@ There are two ways to interface with the library:
     # include all headers found in {{{src/phat.cpp}}}
     # define a boundary matrix object, e.g. 
 {{{
-phat::boundary_matrix< full_pivot_column > boundary_matrix;
+phat::boundary_matrix< bit_tree_pivot_column > boundary_matrix;
 }}}
     # set the number of columns:
 {{{
@@ -73,7 +73,7 @@ phat::persistence_pairs pairs;
 }}}
     # run an algorithm like this:
 {{{
-phat::compute_persistence_pairs< phat::chunk_reduction >( pairs, boundary_matrix );
+phat::compute_persistence_pairs< phat::twist_reduction >( pairs, boundary_matrix );
 }}}
     # examine the result: 
 {{{
