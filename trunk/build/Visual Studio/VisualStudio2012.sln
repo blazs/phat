@@ -9,8 +9,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "simple_example", "simple_ex
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "benchmark", "benchmark\benchmark.vcxproj", "{41BD21B0-A6E5-4446-AF0A-D64BAF097341}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rips", "rips\rips.vcxproj", "{56999E92-DC5A-47CC-8044-B981E069F5B7}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -52,14 +50,6 @@ Global
 		{41BD21B0-A6E5-4446-AF0A-D64BAF097341}.Release|x64.ActiveCfg = Release|x64
 		{41BD21B0-A6E5-4446-AF0A-D64BAF097341}.Release|x64.Build.0 = Release|x64
 		{41BD21B0-A6E5-4446-AF0A-D64BAF097341}.Release|x64.Deploy.0 = Release|x64
-		{56999E92-DC5A-47CC-8044-B981E069F5B7}.Debug|Win32.ActiveCfg = Debug|Win32
-		{56999E92-DC5A-47CC-8044-B981E069F5B7}.Debug|Win32.Build.0 = Debug|Win32
-		{56999E92-DC5A-47CC-8044-B981E069F5B7}.Debug|x64.ActiveCfg = Debug|x64
-		{56999E92-DC5A-47CC-8044-B981E069F5B7}.Debug|x64.Build.0 = Debug|x64
-		{56999E92-DC5A-47CC-8044-B981E069F5B7}.Release|Win32.ActiveCfg = Release|Win32
-		{56999E92-DC5A-47CC-8044-B981E069F5B7}.Release|Win32.Build.0 = Release|Win32
-		{56999E92-DC5A-47CC-8044-B981E069F5B7}.Release|x64.ActiveCfg = Release|x64
-		{56999E92-DC5A-47CC-8044-B981E069F5B7}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
