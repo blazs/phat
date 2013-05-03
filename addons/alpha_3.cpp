@@ -176,7 +176,7 @@ int main(int argc, char** argv)
     std::string next_line;
     while( getline( is, next_line ) ) {
         if( next_line != "" && next_line[ 0 ] != '#' ) {
-            std::cerr << next_line;
+            //std::cerr << next_line;
             std::stringstream sstr(next_line);
             sstr >> p;
             lp.push_back(p);
@@ -239,12 +239,14 @@ int main(int argc, char** argv)
     std::size_t filtration_index = 0;
     std::size_t filtration_size = circumradii.size();
 
+    boundary_matrix.set_num_cols( filtration_size );
+
     Index curr_index = 0;
 
     for(std::vector<Triple>::const_iterator it = circumradii.begin();
         it != circumradii.end(); it++) {
 
-        if(filtration_index % 1000 == 0) {
+        if(filtration_index % 100000 == 0) {
             std::cerr << filtration_index << " of " << filtration_size
                       << std::endl;
         }

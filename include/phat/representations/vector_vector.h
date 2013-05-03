@@ -72,7 +72,7 @@ namespace phat {
 
         // clears given column
         void _clear( index idx ) { 
-            matrix[ idx ].clear(); 
+            matrix[ idx ].clear();
         }
 
         // syncronizes all data structures (essential for openmp stuff)
