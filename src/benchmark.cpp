@@ -30,6 +30,8 @@
 #include <phat/algorithms/row_reduction.h>
 #include <phat/algorithms/chunk_reduction.h>
 
+#include <phat/helpers/dualize.h>
+
 #include <iostream>
 #include <iomanip>
 
@@ -122,16 +124,23 @@ void compute( std::string input_filename,
         print_help_and_exit();
     }
 
-    double pairs_timer = omp_get_wtime();
-    phat::persistence_pairs pairs;
+    Algorithm reduction_algorithm;
+    double reduction_timer = -1; 
     if( ansatz == PRIMAL ) {
         std::cout << " primal";
-        phat::compute_persistence_pairs< Algorithm > ( pairs, matrix );
+        reduction_timer = omp_get_wtime();
+        reduction_algorithm( matrix );
     } else {
         std::cout << " dual";
-        phat::compute_persistence_pairs_dualized< Algorithm > ( pairs, matrix );
+        dualize( matrix );
+        reduction_timer = omp_get_wtime();
+        reduction_algorithm( matrix );
     }
-    std::cout << " " << setiosflags( std::ios::fixed ) << setiosflags( std::ios::showpoint ) << std::setprecision( 1 ) << omp_get_wtime() - pairs_timer <<"s" << std::endl;
+    double running_time = omp_get_wtime() - reduction_timer;
+    double running_time_rounded = floor( running_time * 10.0 + 0.5 ) / 10.0;
+
+    //std::cout << " " << setiosflags( std::ios::fixed ) << setiosflags( std::ios::showpoint ) << std::setprecision( 4 ) << running_time <<"s" << std::endl;
+    std::cout << " " << setiosflags( std::ios::fixed ) << setiosflags( std::ios::showpoint ) << std::setprecision( 1 ) << running_time_rounded <<"s" << std::endl;
 }
 
 
