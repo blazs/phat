@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 
+project("Phat")
+
 set(CMAKE_BUILD_TYPE "Release")
 
 INCLUDE(CheckCXXSourceCompiles)
@@ -40,9 +42,9 @@ endif()
 FILE(GLOB_RECURSE all_headers "include/phat/*.h")
 
 FILE(GLOB general_includes "include/phat/*.h")
-FILE(GLOB algorithms_includes "include/phat/*.h")
-FILE(GLOB helpers_includes "include/phat/*.h")
-FILE(GLOB representations_includes "include/phat/*.h")
+FILE(GLOB algorithms_includes "include/phat/algorithms/*.h")
+FILE(GLOB helpers_includes "include/phat/helpers/*.h")
+FILE(GLOB representations_includes "include/phat/representations/*.h")
 
 add_executable (simple_example src/simple_example.cpp ${all_headers})
 add_executable (self_test src/self_test.cpp ${all_headers})
