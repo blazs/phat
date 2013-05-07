@@ -1,5 +1,5 @@
 /*  Copyright 2013 IST Austria
-    Contributed by: Ulrich Bauer, Michael Kerber, Jan Reininghaus
+    Contributed by: Jan Reininghaus
 
     This file is part of PHAT.
 
