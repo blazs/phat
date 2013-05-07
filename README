@@ -18,8 +18,8 @@ contains code for several algorithmic variants:
 
   * The "standard" algorithm (see `[1]`, p.153)
   * The "row" algorithm from `[2]` (called pHrow in there)
-  * The "twist" algorithm, as described in `[3]` 
-  * The "chunk" algorithm presented in `[4]` (default algorithm)
+  * The "twist" algorithm, as described in `[3]` (default algorithm)
+  * The "chunk" algorithm presented in `[4]` 
 
 The last two algorithms exploit the special structure of the boundary matrix
 to take shortcuts in the computation. The chunk algorithm makes use of multiple 
