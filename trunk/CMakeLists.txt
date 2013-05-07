@@ -12,7 +12,7 @@ set (CMAKE_REQUIRED_FLAGS ${OpenMP_CXX_FLAGS})
 CHECK_CXX_SOURCE_COMPILES("
 #include <omp.h>
 int main() {
-#if (_OPENMP >= 200805)
+#if (_OPENMP >= 200805 || _MSC_VER >= 1500)
   return 0;
 #else
   breaks_on_purpose
@@ -21,6 +21,8 @@ int main() {
 " OPENMP_VERSION)
 
 if(OPENMP_VERSION)
+
+
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
@@ -34,8 +36,20 @@ To use a different compiler, pass it to cmake in the variable CMAKE_CXX_COMPILER
 
 ")
 endif()
+ 
+FILE(GLOB_RECURSE all_headers "include/phat/*.h")
 
-add_executable (simple_example src/simple_example.cpp)
-add_executable (self_test src/self_test.cpp)
-add_executable (phat src/phat.cpp)
-add_executable (benchmark src/benchmark.cpp)
+FILE(GLOB general_includes "include/phat/*.h")
+FILE(GLOB algorithms_includes "include/phat/*.h")
+FILE(GLOB helpers_includes "include/phat/*.h")
+FILE(GLOB representations_includes "include/phat/*.h")
+
+add_executable (simple_example src/simple_example.cpp ${all_headers})
+add_executable (self_test src/self_test.cpp ${all_headers})
+add_executable (phat src/phat.cpp ${all_headers})
+add_executable (benchmark src/benchmark.cpp ${all_headers})
+
+source_group(Header\ Files FILES ${general_includes})
+source_group(Header\ Files\\helpers FILES ${helpers_includes})
+source_group(Header\ Files\\representations FILES ${representations_includes})
+source_group(Header\ Files\\algorithms FILES ${algorithms_includes})
