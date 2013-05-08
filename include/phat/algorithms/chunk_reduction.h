@@ -107,7 +107,12 @@ namespace phat {
             std::vector<index> temp_chunk_boundaries;
             const index nr_columns = boundary_matrix.get_num_cols();
             
+            // size of chuks = sqrt(N)
             const index chunk_size = (index) sqrt( (float)nr_columns );
+
+            // size of chunks = N / num_threads
+            //const index chunk_size = nr_columns / omp_get_max_threads();
+            
             for ( index cur_col = 0; cur_col < nr_columns; cur_col++ )
                 if( cur_col % chunk_size == 0 )
                     temp_chunk_boundaries.push_back( cur_col );
