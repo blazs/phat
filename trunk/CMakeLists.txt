@@ -49,6 +49,7 @@ FILE(GLOB representations_includes "include/phat/representations/*.h")
 add_executable (simple_example src/simple_example.cpp ${all_headers})
 add_executable (self_test src/self_test.cpp ${all_headers})
 add_executable (phat src/phat.cpp ${all_headers})
+add_executable (info src/info.cpp ${all_headers})
 add_executable (benchmark src/benchmark.cpp ${all_headers})
 
 source_group(Header\ Files FILES ${general_includes})
