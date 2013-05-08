@@ -19,10 +19,11 @@
 #pragma once
 
 #include <phat/helpers/misc.h>
+#include <phat/representations/bit_tree_pivot_column.h>
 
 // interface class for the main data structure -- implementations of the interface can be found in ./representations
 namespace phat {
-    template< class Representation = default_representation >
+    template< class Representation = bit_tree_pivot_column >
     class boundary_matrix
     {
         
@@ -67,9 +68,9 @@ namespace phat {
         // syncronizes all internal data structures -- has to be called before and after any multithreaded access!
         void sync() { rep._sync(); }
 
-    // helper functions / operators -- independent of chosen 'Representation'
+    // info functions -- independent of chosen 'Representation'
     public:
-        // returns maximal dimension
+        // maximal dimension
         dimension get_max_dim() const {
             dimension cur_max_dim = 0;
             for( index idx = 0; idx < get_num_cols(); idx++ )
@@ -84,13 +85,37 @@ namespace phat {
             return cur_col.size();
         }
 
+        // maximal number of nonzero rows of all columns
+        index get_max_col_entries() const {
+            index max_col_entries = -1;
+            const index nr_of_columns = get_num_cols();
+            for( index idx = 0; idx < nr_of_columns; idx++ )
+                max_col_entries = get_num_rows( idx ) > max_col_entries ? get_num_rows( idx ) : max_col_entries;
+            return max_col_entries;
+        }
+
+        // maximal number of nonzero cols of all rows
+        index get_max_row_entries() const {
+            size_t max_row_entries = 0;
+            const index nr_of_columns = get_num_cols();
+            std::vector< std::vector< index > > transposed_matrix( nr_of_columns );
+            column temp_col;
+            for( index cur_col = 0; cur_col < nr_of_columns; cur_col++ ) {
+                get_col( cur_col, temp_col );
+                for( index idx = 0; idx < (index)temp_col.size(); idx++)
+                    transposed_matrix[ temp_col[ idx ]  ].push_back( cur_col );
+            }
+            for( index idx = 0; idx < nr_of_columns; idx++ )
+                max_row_entries = transposed_matrix[ idx ].size() > max_row_entries ? transposed_matrix[ idx ].size() : max_row_entries;
+            return max_row_entries;
+        }
+
         // overall number of entries in the matrix
         index get_num_entries() const {
             index number_of_nonzero_entries = 0;
             const index nr_of_columns = get_num_cols();
-            for( index idx = 0; idx < nr_of_columns; idx++ ) {
+            for( index idx = 0; idx < nr_of_columns; idx++ )
                 number_of_nonzero_entries += get_num_rows( idx );
-            }
             return number_of_nonzero_entries;
         }
     
