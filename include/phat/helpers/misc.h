@@ -69,8 +69,5 @@ namespace phat {
 
 #include <phat/helpers/thread_local_storage.h>
 
-#include <phat/representations/sparse_pivot_column.h>
 
-namespace phat { 
-    typedef phat::sparse_pivot_column default_representation;
-}
+
