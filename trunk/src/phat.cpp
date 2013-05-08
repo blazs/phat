@@ -32,7 +32,7 @@
 
 
 enum Representation_type  {VECTOR_VECTOR, VECTOR_SET, SPARSE_PIVOT_COLUMN, FULL_PIVOT_COLUMN, BIT_TREE_PIVOT_COLUMN, VECTOR_LIST};
-enum Algorithm_type  {STANDARD, TWIST, ROW, CHUNK };
+enum Algorithm_type  {STANDARD, TWIST, ROW, CHUNK, CHUNK_SEQUENTIAL };
 
 void print_help() {
     std::cerr << "Usage: " << "phat " << "[options] input_filename output_filename" << std::endl;
@@ -45,7 +45,7 @@ void print_help() {
     std::cerr << "--verbose --  verbose output" << std::endl;
     std::cerr << "--dualize   --  use dualization approach" << std::endl;
     std::cerr << "--vector_vector, --vector_set, --vector_list, --full_pivot_column, --sparse_pivot_column, --bit_tree_pivot_column  --  selects a representation data structure for boundary matrices (default is '--bit_tree_pivot_column')" << std::endl;
-    std::cerr << "--standard, --twist, --chunk, --row  --  selects a reduction algorithm (default is '--chunk')" << std::endl;
+    std::cerr << "--standard, --twist, --chunk, --chunk_sequential, --row  --  selects a reduction algorithm (default is '--twist')" << std::endl;
 }
 
 void print_help_and_exit() {
@@ -77,6 +77,7 @@ void parse_command_line( int argc, char** argv, bool& use_binary, Representation
         else if( option == "--twist" ) algorithm = TWIST;
         else if( option == "--row" ) algorithm = ROW;
         else if( option == "--chunk" ) algorithm = CHUNK;
+        else if( option == "--chunk_sequential" ) algorithm = CHUNK_SEQUENTIAL;
         else if( option == "--verbose" ) verbose = true;
         else if( option == "--help" ) print_help_and_exit();
         else print_help_and_exit();
@@ -86,11 +87,7 @@ void parse_command_line( int argc, char** argv, bool& use_binary, Representation
 #define LOG(msg) if( verbose ) std::cout << msg << std::endl;
 
 template<typename Representation, typename Algorithm>
-void generic_compute_pairing( std::string input_filename,
-                              std::string output_filename,
-                              bool use_binary,
-                              bool verbose,
-                              bool dualize ) {
+void compute_pairing( std::string input_filename, std::string output_filename, bool use_binary, bool verbose, bool dualize ) {
 
     phat::boundary_matrix< Representation > matrix;
     bool read_successful;
@@ -128,10 +125,20 @@ void generic_compute_pairing( std::string input_filename,
         pairs.save_ascii( output_filename );
     }
     LOG( "Writing output file took " << omp_get_wtime() - write_timer <<"s" )
-
 }
 
-#define CALL_GENERIC_CODE(rep,alg) generic_compute_pairing < rep, alg >( input_filename, output_filename, use_binary, verbose, dualize );
+#define COMPUTE_PAIRING(Representation) \
+    switch( algorithm ) { \
+    case STANDARD: compute_pairing< phat::Representation, phat::standard_reduction> ( input_filename, output_filename, use_binary, verbose, dualize ); break; \
+    case TWIST: compute_pairing< phat::Representation, phat::twist_reduction> ( input_filename, output_filename, use_binary, verbose, dualize ); break; \
+    case ROW: compute_pairing< phat::Representation, phat::row_reduction >( input_filename, output_filename, use_binary, verbose, dualize ); break; \
+    case CHUNK: compute_pairing< phat::Representation, phat::chunk_reduction >( input_filename, output_filename, use_binary, verbose, dualize ); break; \
+    case CHUNK_SEQUENTIAL: int num_threads = omp_get_max_threads(); \
+                           omp_set_num_threads( 1 ); \
+                           compute_pairing< phat::Representation, phat::chunk_reduction >( input_filename, output_filename, use_binary, verbose, dualize ); break; \
+                           omp_set_num_threads( num_threads ); \
+                           break; \
+    }
 
 int main( int argc, char** argv )
 {
@@ -146,46 +153,11 @@ int main( int argc, char** argv )
     parse_command_line( argc, argv, use_binary, representation, algorithm, input_filename, output_filename, verbose, dualize );
 
     switch( representation ) {
-    case VECTOR_VECTOR:       switch( algorithm ) {
-                        case STANDARD: CALL_GENERIC_CODE(phat::vector_vector, phat::standard_reduction) break;
-                        case TWIST: CALL_GENERIC_CODE(phat::vector_vector, phat::twist_reduction) break;
-                        case ROW: CALL_GENERIC_CODE(phat::vector_vector, phat::row_reduction) break;
-                        case CHUNK: CALL_GENERIC_CODE(phat::vector_vector, phat::chunk_reduction) break;
-                        } break;
-
-    case VECTOR_SET:       switch( algorithm ) {
-                        case STANDARD: CALL_GENERIC_CODE(phat::vector_set, phat::standard_reduction) break;
-                        case TWIST: CALL_GENERIC_CODE(phat::vector_set, phat::twist_reduction) break;
-                        case ROW: CALL_GENERIC_CODE(phat::vector_set, phat::row_reduction) break;
-                        case CHUNK: CALL_GENERIC_CODE(phat::vector_set, phat::chunk_reduction) break;
-                        } break;
-    
-    case VECTOR_LIST:       switch( algorithm ) {
-                        case STANDARD: CALL_GENERIC_CODE(phat::vector_list, phat::standard_reduction) break;
-                        case TWIST: CALL_GENERIC_CODE(phat::vector_list, phat::twist_reduction) break;
-                        case ROW: CALL_GENERIC_CODE(phat::vector_list, phat::row_reduction) break;
-                        case CHUNK: CALL_GENERIC_CODE(phat::vector_list, phat::chunk_reduction) break;
-                        } break;
-
-    case FULL_PIVOT_COLUMN:    switch( algorithm ) {
-                        case STANDARD: CALL_GENERIC_CODE(phat::full_pivot_column, phat::standard_reduction) break;
-                        case TWIST: CALL_GENERIC_CODE(phat::full_pivot_column, phat::twist_reduction) break;
-                        case ROW: CALL_GENERIC_CODE(phat::full_pivot_column, phat::row_reduction) break;
-                        case CHUNK: CALL_GENERIC_CODE(phat::full_pivot_column, phat::chunk_reduction) break;
-                        } break;
-
-    case BIT_TREE_PIVOT_COLUMN:  switch( algorithm ) {
-                        case STANDARD: CALL_GENERIC_CODE(phat::bit_tree_pivot_column, phat::standard_reduction) break;
-                        case TWIST: CALL_GENERIC_CODE(phat::bit_tree_pivot_column, phat::twist_reduction) break;
-                        case ROW: CALL_GENERIC_CODE(phat::bit_tree_pivot_column, phat::row_reduction) break;
-                        case CHUNK: CALL_GENERIC_CODE(phat::bit_tree_pivot_column, phat::chunk_reduction) break;
-                        } break;
-
-    case SPARSE_PIVOT_COLUMN:  switch( algorithm ) {
-                        case STANDARD: CALL_GENERIC_CODE(phat::sparse_pivot_column, phat::standard_reduction) break;
-                        case TWIST: CALL_GENERIC_CODE(phat::sparse_pivot_column, phat::twist_reduction) break;
-                        case ROW: CALL_GENERIC_CODE(phat::sparse_pivot_column, phat::row_reduction) break;
-                        case CHUNK: CALL_GENERIC_CODE(phat::sparse_pivot_column, phat::chunk_reduction) break;
-                        } break;
+    case VECTOR_VECTOR: COMPUTE_PAIRING(vector_vector) break;
+    case VECTOR_SET: COMPUTE_PAIRING(vector_set) break;
+    case VECTOR_LIST: COMPUTE_PAIRING(vector_list) break;
+    case FULL_PIVOT_COLUMN: COMPUTE_PAIRING(full_pivot_column) break;
+    case BIT_TREE_PIVOT_COLUMN: COMPUTE_PAIRING(bit_tree_pivot_column) break;
+    case SPARSE_PIVOT_COLUMN: COMPUTE_PAIRING(sparse_pivot_column) break;
     }
 }
