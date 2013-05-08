@@ -45,7 +45,7 @@ namespace phat {
         // (-x)&x isolates the rightmost bit.
         // The whole method is much faster than calling log2i, and very comparable to using ScanBitForward/Reverse intrinsic,
         // which should be one CPU instruction, but is not portable.
-        inline size_t rightmost_pos(const block_type value) const
+        size_t rightmost_pos(const block_type value) const
         {                
             return 64 - 1 - debrujin_magic_table[((value & (-(int64_t)value))*0x07EDD5E59A4E28C2) >> 58];
         }
@@ -69,7 +69,7 @@ namespace phat {
             data.resize(upper_blocks + bottom_blocks_needed, 0);
         }
 
-        inline index max_index() const
+        index max_index() const
         {
             if (!data[0])
                 return -1;
@@ -95,12 +95,12 @@ namespace phat {
             return -1;
         }
 
-        inline bool empty() const
+        bool empty() const
         {
             return data[0] == 0;
         }
 
-        inline void add_index(const size_t entry)
+        void add_index(const size_t entry)
         {
             const block_type ONE = 1;
             const block_type block_modulo_mask = ((ONE << block_shift) - 1);
@@ -150,7 +150,7 @@ namespace phat {
             }
         }
 
-        inline bool empty() {
+        bool empty() {
             return !data[0];
         }
     };
