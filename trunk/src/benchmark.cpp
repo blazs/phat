@@ -37,7 +37,7 @@
 
 
 enum Representation_type  {VECTOR_VECTOR, VECTOR_SET, SPARSE_PIVOT_COLUMN, FULL_PIVOT_COLUMN, BIT_TREE_PIVOT_COLUMN, VECTOR_LIST};
-enum Algorithm_type  {STANDARD, TWIST, ROW, CHUNK};
+enum Algorithm_type  {STANDARD, TWIST, ROW, CHUNK, CHUNK_SEQUENTIAL};
 enum Ansatz_type  {PRIMAL, DUAL};
 
 void print_help() {
@@ -51,7 +51,7 @@ void print_help() {
     std::cerr << "--dualize   --  use only dualization approach" << std::endl;
     std::cerr << "--primal   --  use only primal approach" << std::endl;
     std::cerr << "--vector_vector, --vector_set, --vector_list, --full_pivot_column, --sparse_pivot_column, --bit_tree_pivot_column  --  use only a subset of representation data structures for boundary matrices" << std::endl;
-    std::cerr << "--standard, --twist, --chunk, --row  --  use only a subset of reduction algorithms" << std::endl;
+    std::cerr << "--standard, --twist, --chunk, --chunk_sequential, --row  --  use only a subset of reduction algorithms" << std::endl;
 }
 
 void print_help_and_exit() {
@@ -79,6 +79,7 @@ void parse_command_line( int argc, char** argv, bool& use_binary, std::vector< R
             else if( argument == "--standard" ) algorithms.push_back( STANDARD );
             else if( argument == "--twist" ) algorithms.push_back( TWIST );
             else if( argument == "--row" ) algorithms.push_back( ROW );
+            else if( argument == "--chunk_sequential" ) algorithms.push_back( CHUNK_SEQUENTIAL );
             else if( argument == "--chunk" ) algorithms.push_back( CHUNK );
             else if( argument == "--primal" ) ansaetze.push_back( PRIMAL );
             else if( argument == "--dual" ) ansaetze.push_back( DUAL );
@@ -103,6 +104,7 @@ void parse_command_line( int argc, char** argv, bool& use_binary, std::vector< R
         algorithms.push_back( TWIST );
         algorithms.push_back( ROW );
         algorithms.push_back( CHUNK );
+        algorithms.push_back( CHUNK_SEQUENTIAL );
     }
     
     if( ansaetze.empty() == true ) {
@@ -112,9 +114,7 @@ void parse_command_line( int argc, char** argv, bool& use_binary, std::vector< R
 }
 
 template<typename Representation, typename Algorithm>
-void compute( std::string input_filename,
-              bool use_binary,
-              Ansatz_type ansatz ) {
+void benchmark( std::string input_filename, bool use_binary, Ansatz_type ansatz ) {
 
     phat::boundary_matrix< Representation > matrix;
     bool read_successful = use_binary ? matrix.load_binary( input_filename ) : matrix.load_ascii( input_filename );
@@ -140,71 +140,26 @@ void compute( std::string input_filename,
         reduction_timer = omp_get_wtime();
         reduction_algorithm( matrix );
     }
+
     double running_time = omp_get_wtime() - reduction_timer;
     double running_time_rounded = floor( running_time * 10.0 + 0.5 ) / 10.0;
     std::cout << " Reduction time: " << setiosflags( std::ios::fixed ) << setiosflags( std::ios::showpoint ) << std::setprecision( 1 ) << running_time_rounded <<"s" << std::endl;
 }
 
-
-void benchmark( std::string input_filename, bool use_binary, Algorithm_type algorithm, Representation_type representation, Ansatz_type ansatz ) {
-    std::cout << input_filename << ",";
-    
-    switch( representation ) {
-    case VECTOR_VECTOR:
-        std::cout << " vector_vector,";
-        switch( algorithm ) {
-        case STANDARD: std::cout << " standard_reduction,"; compute< phat::vector_vector, phat::standard_reduction >( input_filename, use_binary, ansatz ); break;
-        case TWIST: std::cout << " twist_reduction,"; compute< phat::vector_vector, phat::twist_reduction >( input_filename, use_binary, ansatz ); break;
-        case ROW: std::cout << " row_reduction,"; compute< phat::vector_vector, phat::row_reduction >( input_filename, use_binary, ansatz ); break;
-        case CHUNK: std::cout << " chunk_reduction,"; compute< phat::vector_vector, phat::chunk_reduction >( input_filename, use_binary, ansatz ); break;
-        } break;
-
-    case VECTOR_SET:   
-        std::cout << " vector_set,";
-        switch( algorithm ) {
-        case STANDARD: std::cout << " standard_reduction,"; compute< phat::vector_set, phat::standard_reduction >( input_filename, use_binary, ansatz ); break;
-        case TWIST: std::cout << " twist_reduction,"; compute< phat::vector_set, phat::twist_reduction >( input_filename, use_binary, ansatz ); break;
-        case ROW: std::cout << " row_reduction,"; compute< phat::vector_set, phat::row_reduction >( input_filename, use_binary, ansatz ); break;
-        case CHUNK: std::cout << " chunk_reduction,"; compute< phat::vector_set, phat::chunk_reduction >( input_filename, use_binary, ansatz ); break;
-        } break;
-    
-    case VECTOR_LIST:
-        std::cout << " vector_list,";
-        switch( algorithm ) {
-        case STANDARD: std::cout << " standard_reduction,"; compute< phat::vector_list, phat::standard_reduction >( input_filename, use_binary, ansatz ); break;
-        case TWIST: std::cout << " twist_reduction,"; compute< phat::vector_list, phat::twist_reduction >( input_filename, use_binary, ansatz ); break;
-        case ROW: std::cout << " row_reduction,"; compute< phat::vector_list, phat::row_reduction >( input_filename, use_binary, ansatz ); break;
-        case CHUNK: std::cout << " chunk_reduction,"; compute< phat::vector_list, phat::chunk_reduction >( input_filename, use_binary, ansatz ); break;
-        } break;
-
-    case FULL_PIVOT_COLUMN:
-        std::cout << " full_pivot_column,";
-        switch( algorithm ) {
-        case STANDARD: std::cout << " standard_reduction,"; compute< phat::full_pivot_column, phat::standard_reduction >( input_filename, use_binary, ansatz ); break;
-        case TWIST: std::cout << " twist_reduction,"; compute< phat::full_pivot_column, phat::twist_reduction >( input_filename, use_binary, ansatz ); break;
-        case ROW: std::cout << " row_reduction,"; compute< phat::full_pivot_column, phat::row_reduction >( input_filename, use_binary, ansatz ); break;
-        case CHUNK: std::cout << " chunk_reduction,"; compute< phat::full_pivot_column, phat::chunk_reduction >( input_filename, use_binary, ansatz ); break;
-        } break;
-
-    case BIT_TREE_PIVOT_COLUMN:
-        std::cout << " bit_tree_pivot_column,";
-        switch( algorithm ) {
-        case STANDARD: std::cout << " standard_reduction,"; compute< phat::bit_tree_pivot_column, phat::standard_reduction >( input_filename, use_binary, ansatz ); break;
-        case TWIST: std::cout << " twist_reduction,"; compute< phat::bit_tree_pivot_column, phat::twist_reduction >( input_filename, use_binary, ansatz ); break;
-        case ROW: std::cout << " row_reduction,"; compute< phat::bit_tree_pivot_column, phat::row_reduction >( input_filename, use_binary, ansatz ); break;
-        case CHUNK: std::cout << " chunk_reduction,"; compute< phat::bit_tree_pivot_column, phat::chunk_reduction >( input_filename, use_binary, ansatz ); break;
-        } break;
-
-    case SPARSE_PIVOT_COLUMN:
-        std::cout << " sparse_pivot_column,";
-        switch( algorithm ) {
-        case STANDARD: std::cout << " standard_reduction,"; compute< phat::sparse_pivot_column, phat::standard_reduction >( input_filename, use_binary, ansatz ); break;
-        case TWIST: std::cout << " twist_reduction,"; compute< phat::sparse_pivot_column, phat::twist_reduction >( input_filename, use_binary, ansatz ); break;
-        case ROW: std::cout << " row_reduction,"; compute< phat::sparse_pivot_column, phat::row_reduction >( input_filename, use_binary, ansatz ); break;
-        case CHUNK: std::cout << " chunk_reduction,"; compute< phat::sparse_pivot_column, phat::chunk_reduction >( input_filename, use_binary, ansatz ); break;
-        } break;
-    }
-}
+#define COMPUTE(Representation) \
+    std::cout << " " << #Representation << ","; \
+    switch( algorithm ) { \
+    case STANDARD: std::cout << " standard,"; benchmark< phat::Representation, phat::standard_reduction >( input_filename, use_binary, ansatz ); break; \
+    case TWIST: std::cout << " twist,"; benchmark< phat::Representation, phat::twist_reduction >( input_filename, use_binary, ansatz ); break; \
+    case ROW: std::cout << " row,"; benchmark< phat::Representation, phat::row_reduction >( input_filename, use_binary, ansatz ); break; \
+    case CHUNK: std::cout << " chunk,"; benchmark< phat::Representation, phat::chunk_reduction >( input_filename, use_binary, ansatz ); break; \
+    case CHUNK_SEQUENTIAL: std::cout << " chunk_sequential,"; \
+                           int num_threads = omp_get_max_threads(); \
+                           omp_set_num_threads( 1 ); \
+                           benchmark< phat::Representation, phat::chunk_reduction >( input_filename, use_binary, ansatz ); \
+                           omp_set_num_threads( num_threads ); \
+                           break; \
+    };
 
 int main( int argc, char** argv )
 {
@@ -225,7 +180,15 @@ int main( int argc, char** argv )
                 Representation_type representation = representations[ idx_representation ];
                 for( int idx_ansatz = 0; idx_ansatz < ansaetze.size(); idx_ansatz++ ) {
                     Ansatz_type ansatz = ansaetze[ idx_ansatz ];
-                    benchmark( input_filename, use_binary, algorithm, representation, ansatz );
+                    std::cout << input_filename << ",";
+                    switch( representation ) {
+                    case VECTOR_VECTOR: COMPUTE(vector_vector) break;
+                    case VECTOR_SET: COMPUTE(vector_set) break;
+                    case VECTOR_LIST: COMPUTE(vector_list) break;
+                    case FULL_PIVOT_COLUMN: COMPUTE(full_pivot_column) break;
+                    case BIT_TREE_PIVOT_COLUMN: COMPUTE(bit_tree_pivot_column) break;
+                    case SPARSE_PIVOT_COLUMN: COMPUTE(sparse_pivot_column) break;
+                    }
                 }
             }
         }
