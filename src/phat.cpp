@@ -100,7 +100,9 @@ void compute_pairing( std::string input_filename, std::string output_filename, b
         LOG( "Reading input file " << input_filename << " in ascii mode" )
         read_successful = matrix.load_ascii( input_filename );
     }
-    LOG( "Reading input file took " << omp_get_wtime() - read_timer <<"s" )
+    double read_time = omp_get_wtime() - read_timer;
+    double read_time_rounded = floor( read_time * 10.0 + 0.5 ) / 10.0;
+    LOG( "Reading input file took " << setiosflags( std::ios::fixed ) << setiosflags( std::ios::showpoint ) << std::setprecision( 1 ) << read_time_rounded <<"s" )
 
     if( !read_successful ) {
         std::cerr << "Error opening file " << input_filename << std::endl;
@@ -114,7 +116,9 @@ void compute_pairing( std::string input_filename, std::string output_filename, b
         phat::compute_persistence_pairs_dualized< Algorithm > ( pairs, matrix );
     else
         phat::compute_persistence_pairs < Algorithm > ( pairs, matrix );
-    LOG( "Computing persistence pairs took " << omp_get_wtime() - pairs_timer <<"s" )
+    double pairs_time = omp_get_wtime() - pairs_timer;
+    double pairs_time_rounded = floor( pairs_time * 10.0 + 0.5 ) / 10.0;
+    LOG( "Computing persistence pairs took " << setiosflags( std::ios::fixed ) << setiosflags( std::ios::showpoint ) << std::setprecision( 1 ) << pairs_time_rounded <<"s" )
 
     double write_timer = omp_get_wtime();
     if( use_binary ) {
@@ -124,7 +128,9 @@ void compute_pairing( std::string input_filename, std::string output_filename, b
         LOG( "Writing output file " << output_filename << " in ascii mode ..." )
         pairs.save_ascii( output_filename );
     }
-    LOG( "Writing output file took " << omp_get_wtime() - write_timer <<"s" )
+    double write_time = omp_get_wtime() - write_timer;
+    double write_time_rounded = floor( write_time * 10.0 + 0.5 ) / 10.0;
+    LOG( "Writing output file took " << setiosflags( std::ios::fixed ) << setiosflags( std::ios::showpoint ) << std::setprecision( 1 ) << write_time_rounded <<"s" )
 }
 
 #define COMPUTE_PAIRING(Representation) \
