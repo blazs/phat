@@ -71,14 +71,7 @@ namespace phat {
         }
         // replaces(!) content of 'col' with boundary of given index
         void _get_col( index idx, column& col  ) const {
-            col.clear();
-            if( is_represented_by_pivot_column( idx ) ) {
-                pivot_column& pivot_column = get_pivot_column();
-                pivot_column.get_column_and_clear( col );
-                pivot_column.add_column( col );
-            } else {
-                Base::_get_col( idx, col );
-            }
+            is_represented_by_pivot_column( idx ) ? get_pivot_column().get_col( col ) : Base::_get_col( idx, col );
         }
         
         // true iff boundary of given idx is empty
@@ -88,16 +81,7 @@ namespace phat {
 
         // largest row index of given column idx (new name for lowestOne())
         index _get_max_index( index idx ) const {
-            if( is_represented_by_pivot_column( idx ) ) {
-                pivot_column& pivot_column = get_pivot_column();
-                if( pivot_column.empty() ) {
-                    return -1;
-                } else {
-                    return pivot_column.max_index();
-                }
-            } else {
-                return Base::_get_max_index( idx );
-            }
+			return is_represented_by_pivot_column( idx ) ? get_pivot_column().max_index() : Base::_get_max_index( idx );
         }
 
         // adds column 'source' to column 'target'
@@ -111,37 +95,16 @@ namespace phat {
 
         // clears given column
         void _clear( index idx ) {
-            if( is_represented_by_pivot_column( idx ) ) {
-                column dummy;
-                get_pivot_column().get_column_and_clear(dummy);
-            } else {
-                Base::_clear( idx );
-            }
+			is_represented_by_pivot_column( idx ) ? get_pivot_column().clear() : Base::_clear( idx );
         }
 
         void _set_col( index idx, const column& col  ) {
-            if( is_represented_by_pivot_column( idx ) ) {
-                column dummy;
-                pivot_column& pivot_column = get_pivot_column();
-                pivot_column.get_column_and_clear( dummy );
-                pivot_column.add_column( col );
-            } else {
-                Base::_set_col( idx, col );
-            }
+            is_represented_by_pivot_column( idx ) ? get_pivot_column().set_col( col ) : Base::_set_col( idx, col );
         }
 
         // removes the maximal index of a column
         void _remove_max( index idx ) {
-            _toggle( idx, _get_max_index( idx ) );
-        }
-
-        //// toggles given index pair
-        void _toggle( index col_idx, index row_idx ) {
-            if( !is_represented_by_pivot_column( col_idx ) ) {
-                unset_pos_of_pivot_column();
-                represent_by_pivot_column( col_idx );
-            } 
-            get_pivot_column().add_index( row_idx );
+			is_represented_by_pivot_column( idx ) ? get_pivot_column().remove_max() : Base::_remove_max( idx );
         }
 
         // syncronizes all data structures (essential for openmp stuff)

@@ -153,6 +153,31 @@ namespace phat {
         bool empty() {
             return !data[0];
         }
+
+		void clear() {
+            while(true)
+            {
+                index mx = this->max_index();
+                if (mx == -1)
+                    break;
+                add_index(mx);
+            }
+        }
+
+		void remove_max() {
+            add_index( max_index() );
+        }
+
+        void set_col( const column& col  ) {
+            clear();
+            add_column( col );
+        }
+
+        void get_col( column& col  ) {
+            col.clear();
+            get_column_and_clear( col );
+            add_column( col );
+        }
     };
 
     const size_t bit_tree_column::debrujin_magic_table[64] =  {
