@@ -63,6 +63,7 @@ namespace phat {
     #define omp_get_thread_num() 0
     #define omp_get_max_threads() 1
     #define omp_get_num_threads() 1
+	void omp_set_num_threads( int ) {};
     #include <time.h>
     #define omp_get_wtime() (float)clock() / (float)CLOCKS_PER_SEC
 #endif
