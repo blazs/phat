@@ -75,6 +75,26 @@ namespace phat {
         bool empty() {
             return (max_index() == -1);   
         }
+
+		void clear() {
+			while( !empty() )
+				add_index( max_index() );
+		}
+
+		void remove_max() {
+            add_index( max_index() );
+        }
+
+        void set_col( const column& col  ) {
+            clear();
+            add_column( col );
+        }
+
+        void get_col( column& col  ) {
+            col.clear();
+            get_column_and_clear( col );
+            add_column( col );
+        }
     };
 
     typedef abstract_pivot_column< full_column > full_pivot_column;

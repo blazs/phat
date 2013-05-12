@@ -24,9 +24,8 @@ namespace phat {
     class vector_list {
 
     protected:
-        typedef std::list< index > internal_column; 
         std::vector< dimension > dims;
-        std::vector< internal_column > matrix;
+        std::vector< std::list< index > > matrix;
 
     public:
         // overall number of cells in boundary_matrix
@@ -71,7 +70,7 @@ namespace phat {
 
         // removes the maximal index of a column
         void _remove_max( index idx ) {
-            internal_column::iterator it = matrix[ idx ].end();
+            std::list< index >::iterator it = matrix[ idx ].end();
             it--;
             matrix[ idx ].erase( it );
         }
@@ -86,9 +85,9 @@ namespace phat {
 
         // adds column 'source' to column 'target'
         void _add_to( index source, index target ) {
-            internal_column& source_col = matrix[ source ];
-            internal_column& target_col = matrix[ target ];
-            internal_column temp_col;
+            std::list< index >& source_col = matrix[ source ];
+            std::list< index >& target_col = matrix[ target ];
+            std::list< index > temp_col;
             target_col.swap( temp_col );
             std::set_symmetric_difference( temp_col.begin(), temp_col.end(),
                                            source_col.begin(), source_col.end(),
