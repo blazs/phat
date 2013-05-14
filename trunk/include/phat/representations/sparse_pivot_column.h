@@ -27,33 +27,33 @@ namespace phat {
     protected:
         std::set< index > m_data;
 
-    public:
-        void init( const index total_size ) {
-            m_data.clear(); 
-        }
-
-        void add_column( const column& col ) {
-            for( index idx = 0; idx < (index) col.size(); idx++ )
-                add_index( col[ idx ] );
-        }
-
         void add_index( const index idx ) {
             std::pair< std::set< index >::iterator, bool > result = m_data.insert( idx );
             if( result.second == false )
                 m_data.erase( result.first );
         }
 
-        index max_index() {
+    public:
+        void init( const index total_size ) {
+            m_data.clear(); 
+        }
+
+        void add_col( const column& col ) {
+            for( index idx = 0; idx < (index) col.size(); idx++ )
+                add_index( col[ idx ] );
+        }
+
+        index get_max_index() {
             return m_data.empty() ? -1 : *m_data.rbegin();
         }
 
-        void get_column_and_clear( column& col ) {
+        void get_col_and_clear( column& col ) {
             col.clear();
             col.assign( m_data.begin(), m_data.end() );
             m_data.clear();
         }
 
-        bool empty() {
+        bool is_empty() {
             return m_data.empty();
         }
 
@@ -62,18 +62,18 @@ namespace phat {
 		}
 
 		void remove_max() {
-            add_index( max_index() );
+            add_index( get_max_index() );
         }
 
         void set_col( const column& col  ) {
             clear();
-            add_column( col );
+            add_col( col );
         }
 
         void get_col( column& col  ) {
             col.clear();
-            get_column_and_clear( col );
-            add_column( col );
+            get_col_and_clear( col );
+            add_col( col );
         }
     };
 

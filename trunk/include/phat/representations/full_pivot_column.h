@@ -35,7 +35,7 @@ namespace phat {
             m_isInHistory.resize( total_size, false );
         }
 
-        void add_column( const column& col ) {
+        void add_col( const column& col ) {
             for( index idx = 0; idx < (index) col.size(); idx++ ) {
                 add_index( col[ idx ] );
             }
@@ -49,7 +49,7 @@ namespace phat {
             m_data[ idx ] = !m_data[ idx ];
         }
 
-        index max_index() {
+        index get_max_index() {
             while( m_history.size() > 0 ) {
                 index topIndex = m_history.top();
                 if( m_data[ topIndex ] ) {
@@ -63,37 +63,37 @@ namespace phat {
             return -1;
         }
 
-        void get_column_and_clear( column& col ) {
+        void get_col_and_clear( column& col ) {
             col.clear();
-            while( !empty() ) {
-                col.push_back( max_index() );
-                add_index( max_index() );
+            while( !is_empty() ) {
+                col.push_back( get_max_index() );
+                add_index( get_max_index() );
             }
             std::reverse( col.begin(), col.end() );
         }
 
-        bool empty() {
-            return (max_index() == -1);   
+        bool is_empty() {
+            return (get_max_index() == -1);   
         }
 
 		void clear() {
-			while( !empty() )
-				add_index( max_index() );
+			while( !is_empty() )
+				add_index( get_max_index() );
 		}
 
 		void remove_max() {
-            add_index( max_index() );
+            add_index( get_max_index() );
         }
 
         void set_col( const column& col  ) {
             clear();
-            add_column( col );
+            add_col( col );
         }
 
         void get_col( column& col  ) {
             col.clear();
-            get_column_and_clear( col );
-            add_column( col );
+            get_col_and_clear( col );
+            add_col( col );
         }
     };
 
