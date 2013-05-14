@@ -25,14 +25,14 @@ namespace phat {
     class full_column {
 
     protected:
-        std::priority_queue< index > m_history;
-        std::vector< char > m_isInHistory;
-        std::vector< char > m_data;
+        std::priority_queue< index > history;
+        std::vector< char > is_in_history;
+        std::vector< char > col_bit_field;
 
     public:
         void init( const index total_size ) {
-            m_data.resize( total_size, false );
-            m_isInHistory.resize( total_size, false );
+            col_bit_field.resize( total_size, false );
+            is_in_history.resize( total_size, false );
         }
 
         void add_col( const column& col ) {
@@ -40,23 +40,24 @@ namespace phat {
                 add_index( col[ idx ] );
             }
         }
+
         void add_index( const index idx ) {
-            if( !m_isInHistory[ idx ] ) {
-                m_history.push( idx );
-                m_isInHistory[ idx ] = true; 
+            if( !is_in_history[ idx ] ) {
+                history.push( idx );
+                is_in_history[ idx ] = true; 
             }
 
-            m_data[ idx ] = !m_data[ idx ];
+            col_bit_field[ idx ] = !col_bit_field[ idx ];
         }
 
         index get_max_index() {
-            while( m_history.size() > 0 ) {
-                index topIndex = m_history.top();
-                if( m_data[ topIndex ] ) {
+            while( history.size() > 0 ) {
+                index topIndex = history.top();
+                if( col_bit_field[ topIndex ] ) {
                     return topIndex;
                 } else {
-                    m_history.pop();
-                    m_isInHistory[ topIndex ] = false;
+                    history.pop();
+                    is_in_history[ topIndex ] = false;
                 }
             }
     
@@ -64,7 +65,6 @@ namespace phat {
         }
 
         void get_col_and_clear( column& col ) {
-            col.clear();
             while( !is_empty() ) {
                 col.push_back( get_max_index() );
                 add_index( get_max_index() );
@@ -91,7 +91,6 @@ namespace phat {
         }
 
         void get_col( column& col  ) {
-            col.clear();
             get_col_and_clear( col );
             add_col( col );
         }

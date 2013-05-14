@@ -45,7 +45,7 @@ namespace phat {
         void set_dim( index idx, dimension dim ) { rep._set_dim( idx, dim ); }
 
         // replaces content of @col with boundary of given index
-        void get_col( index idx, column& col  ) const { rep._get_col( idx, col ); }
+        void get_col( index idx, column& col  ) const { col.clear(); rep._get_col( idx, col ); }
 
         // set column @idx to the values contained in @col
         void set_col( index idx, const column& col  ) { rep._set_col( idx, col ); }

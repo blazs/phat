@@ -47,8 +47,10 @@ namespace phat {
       
         void release_pivot_col() {
             index idx = idx_of_pivot_cols();
-            if( idx != -1 )
+            if( idx != -1 ) {
+                this->matrix[ idx ].clear();
                 pivot_cols().get_col_and_clear( this->matrix[ idx ] );
+            }
             idx_of_pivot_cols() = -1;
         }
         
