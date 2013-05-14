@@ -69,7 +69,7 @@ namespace phat {
             data.resize(upper_blocks + bottom_blocks_needed, 0);
         }
 
-        index max_index() const
+        index get_max_index() const
         {
             if (!data[0])
                 return -1;
@@ -95,7 +95,7 @@ namespace phat {
             return -1;
         }
 
-        bool empty() const
+        bool is_empty() const
         {
             return data[0] == 0;
         }
@@ -127,12 +127,12 @@ namespace phat {
             }
         }
 
-        void get_column_and_clear(column &out)
+        void get_col_and_clear(column &out)
         {
             out.clear();
             while(true)
             {
-                index mx = this->max_index();
+                index mx = this->get_max_index();
                 if (mx == -1)
                     break;
                 out.push_back(mx);
@@ -142,7 +142,7 @@ namespace phat {
             std::reverse(out.begin(), out.end());
         }
 
-        void add_column(const column &col)
+        void add_col(const column &col)
         {
             for (size_t i = 0; i < col.size(); ++i)
             {
@@ -150,14 +150,10 @@ namespace phat {
             }
         }
 
-        bool empty() {
-            return !data[0];
-        }
-
 		void clear() {
             while(true)
             {
-                index mx = this->max_index();
+                index mx = this->get_max_index();
                 if (mx == -1)
                     break;
                 add_index(mx);
@@ -165,22 +161,22 @@ namespace phat {
         }
 
 		void remove_max() {
-            add_index( max_index() );
+            add_index( get_max_index() );
         }
 
         void set_col( const column& col  ) {
             clear();
-            add_column( col );
+            add_col( col );
         }
 
         void get_col( column& col  ) {
             col.clear();
-            get_column_and_clear( col );
-            add_column( col );
+            get_col_and_clear( col );
+            add_col( col );
         }
     };
 
-    const size_t bit_tree_column::debrujin_magic_table[64] =  {
+    const size_t bit_tree_column::debrujin_magic_table[64] = {
                     63,  0, 58,  1, 59, 47, 53,  2,
                     60, 39, 48, 27, 54, 33, 42,  3,
                     61, 51, 37, 40, 49, 18, 28, 20,
@@ -188,7 +184,7 @@ namespace phat {
                     62, 57, 46, 52, 38, 26, 32, 41,
                     50, 36, 17, 19, 29, 10, 13, 21,
                     56, 45, 25, 31, 35, 16,  9, 12,
-                    44, 24, 15,  8, 23,  7,  6,  5};
+                    44, 24, 15,  8, 23,  7,  6,  5 };
 
     typedef abstract_pivot_column<bit_tree_column> bit_tree_pivot_column;
 }
