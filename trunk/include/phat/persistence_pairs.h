@@ -39,6 +39,10 @@ namespace phat {
             return pairs[ idx ];
         }
 
+        void set_pair( index idx, index birth, index death )  {
+            pairs[ idx ] = std::make_pair( birth, death );
+        }
+        
         void clear() {
             pairs.clear();
         }
