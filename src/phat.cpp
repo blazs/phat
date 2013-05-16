@@ -30,6 +30,7 @@
 #include <phat/algorithms/row_reduction.h>
 #include <phat/algorithms/chunk_reduction.h>
 
+#include <phat/helpers/dualize.h>
 
 enum Representation_type  {VECTOR_VECTOR, VECTOR_SET, SPARSE_PIVOT_COLUMN, FULL_PIVOT_COLUMN, BIT_TREE_PIVOT_COLUMN, VECTOR_LIST};
 enum Algorithm_type  {STANDARD, TWIST, ROW, CHUNK, CHUNK_SEQUENTIAL };
@@ -108,17 +109,28 @@ void compute_pairing( std::string input_filename, std::string output_filename, b
         std::cerr << "Error opening file " << input_filename << std::endl;
         print_help_and_exit();
     }
+    
+    phat::index num_cols = matrix.get_num_cols();
 
+    if( dualize ) {
+        double dualize_timer = omp_get_wtime();
+        LOG( "Dualizing ..." )
+        phat::dualize ( matrix );
+        double dualize_time = omp_get_wtime() - dualize_timer;
+        double dualize_time_rounded = floor( dualize_time * 10.0 + 0.5 ) / 10.0;
+        LOG( "Dualizing took " << setiosflags( std::ios::fixed ) << setiosflags( std::ios::showpoint ) << std::setprecision( 1 ) << dualize_time_rounded <<"s" )
+    }
+        
     double pairs_timer = omp_get_wtime();
     phat::persistence_pairs pairs;
     LOG( "Computing persistence pairs ..." )
-    if( dualize )
-        phat::compute_persistence_pairs_dualized< Algorithm > ( pairs, matrix );
-    else
-        phat::compute_persistence_pairs < Algorithm > ( pairs, matrix );
+    phat::compute_persistence_pairs < Algorithm > ( pairs, matrix );
     double pairs_time = omp_get_wtime() - pairs_timer;
     double pairs_time_rounded = floor( pairs_time * 10.0 + 0.5 ) / 10.0;
     LOG( "Computing persistence pairs took " << setiosflags( std::ios::fixed ) << setiosflags( std::ios::showpoint ) << std::setprecision( 1 ) << pairs_time_rounded <<"s" )
+    
+    if( dualize ) dualize_persistence_pairs( pairs, num_cols );
+    
 
     double write_timer = omp_get_wtime();
     if( use_binary ) {

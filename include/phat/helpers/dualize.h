@@ -20,6 +20,8 @@
 
 #include <phat/helpers/misc.h>
 #include <phat/boundary_matrix.h>
+#include <phat/persistence_pairs.h>
+
 
 namespace phat {
     template< typename Representation >
@@ -59,5 +61,12 @@ namespace phat {
             std::reverse( dual_matrix[ cur_col ].begin(), dual_matrix[ cur_col ].end() );
 
         boundary_matrix.load_vector_vector( dual_matrix, dual_dims );
+    }
+    
+    void dualize_persistence_pairs( persistence_pairs& pairs, const index n ) {
+        for (index i = 0; i < pairs.get_num_pairs(); ++i) {
+            std::pair< index, index > pair = pairs.get_pair( i );
+            pairs.set_pair( i , n - 1 - pair.second, n - 1 - pair.first);
+        }
     }
 }

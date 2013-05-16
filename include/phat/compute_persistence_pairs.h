@@ -41,18 +41,10 @@ namespace phat {
     
     template< typename ReductionAlgorithm, typename Representation >
     void compute_persistence_pairs_dualized( persistence_pairs& pairs, boundary_matrix< Representation >& boundary_matrix ) {
-        ReductionAlgorithm reduce;
-        const index nr_columns = boundary_matrix.get_num_cols();
+
         dualize( boundary_matrix );
-        reduce( boundary_matrix );
-        pairs.clear();
-        for( index idx = 0; idx < nr_columns; idx++ ) {
-            if( !boundary_matrix.is_empty( idx ) ) {
-                index death = nr_columns - 1 - boundary_matrix.get_max_index( idx );
-                index birth = nr_columns - 1 - idx;
-                pairs.append_pair( birth, death );
-            }
-        }
+        compute_persistence_pairs( pairs, boundary_matrix );
+        dualize_persistence_pairs( pairs, boundary_matrix.get_num_cols() );
     }
     
     template< typename Representation >
