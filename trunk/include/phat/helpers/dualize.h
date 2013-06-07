@@ -40,13 +40,13 @@ namespace phat {
         for( index cur_col = 0; cur_col < nr_of_columns; cur_col++ ) {
             boundary_matrix.get_col( cur_col, temp_col );
             for( index idx = 0; idx < (index)temp_col.size(); idx++)
-                dual_sizes[ nr_of_columns - 1 - temp_col[ idx ]  ]++;
+                    dual_sizes[ nr_of_columns - 1 - temp_col[ idx ]  ]++;
         }
  
-        for( index cur_col = 0; cur_col < nr_of_columns; cur_col++ ) {
+        #pragma omp parallel for 
+        for( index cur_col = 0; cur_col < nr_of_columns; cur_col++ )
             dual_matrix[cur_col].reserve(dual_sizes[cur_col]);
-        }
-        
+
         for( index cur_col = 0; cur_col < nr_of_columns; cur_col++ ) {
             boundary_matrix.get_col( cur_col, temp_col );
             for( index idx = 0; idx < (index)temp_col.size(); idx++)
@@ -54,9 +54,11 @@ namespace phat {
         }
 
         const dimension max_dim = boundary_matrix.get_max_dim();
+        #pragma omp parallel for
         for( index cur_col = 0; cur_col < nr_of_columns; cur_col++ )
             dual_dims[ nr_of_columns - 1 - cur_col ] = max_dim - boundary_matrix.get_dim( cur_col );
 
+        #pragma omp parallel for
         for( index cur_col = 0; cur_col < nr_of_columns; cur_col++ )
             std::reverse( dual_matrix[ cur_col ].begin(), dual_matrix[ cur_col ].end() );
 

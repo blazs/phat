@@ -176,6 +176,7 @@ namespace phat {
             const index nr_of_columns = (index)input_matrix.size();
             this->set_num_cols( nr_of_columns );
             column temp_col;
+            #pragma omp parallel for private( temp_col )
             for( index cur_col = 0; cur_col <  nr_of_columns; cur_col++ ) {
                 this->set_dim( cur_col, (dimension)input_dims[ cur_col ] );
                 
