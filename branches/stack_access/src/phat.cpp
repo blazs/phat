@@ -90,7 +90,7 @@ void parse_command_line( int argc, char** argv, bool& use_binary, Representation
 template<typename Representation, typename Algorithm>
 void compute_pairing( std::string input_filename, std::string output_filename, bool use_binary, bool verbose, bool dualize ) {
 
-    phat::boundary_matrix< Representation > matrix;
+    phat::random_access_boundary_matrix< Representation > matrix;
     bool read_successful;
 
     double read_timer = omp_get_wtime();

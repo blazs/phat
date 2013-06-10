@@ -116,7 +116,7 @@ void parse_command_line( int argc, char** argv, bool& use_binary, std::vector< R
 template<typename Representation, typename Algorithm>
 void benchmark( std::string input_filename, bool use_binary, Ansatz_type ansatz ) {
 
-    phat::boundary_matrix< Representation > matrix;
+    phat::random_access_boundary_matrix< Representation > matrix;
     bool read_successful = use_binary ? matrix.load_binary( input_filename ) : matrix.load_ascii( input_filename );
    
     if( !read_successful ) {

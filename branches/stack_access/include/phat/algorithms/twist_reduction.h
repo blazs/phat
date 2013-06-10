@@ -19,13 +19,14 @@
 #pragma once
 
 #include <phat/helpers/misc.h>
-#include <phat/boundary_matrix.h>
+#include <phat/random_access_boundary_matrix.h>
+
 
 namespace phat {
     class twist_reduction {
     public:
         template< typename Representation >
-        void operator () ( boundary_matrix< Representation >& boundary_matrix ) {
+        void operator () ( random_access_boundary_matrix< Representation >& boundary_matrix ) {
 
             const index nr_columns = boundary_matrix.get_num_cols();
             std::vector< index > lowest_one_lookup( nr_columns, -1 );

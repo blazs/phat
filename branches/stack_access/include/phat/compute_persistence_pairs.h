@@ -19,14 +19,15 @@
 #pragma once
 
 #include <phat/persistence_pairs.h>
-#include <phat/boundary_matrix.h>
 #include <phat/helpers/dualize.h>
 #include <phat/algorithms/twist_reduction.h>
+#include <phat/stack_access_boundary_matrix.h>
+#include <phat/random_access_boundary_matrix.h>
 
 namespace phat {
 
     template< typename ReductionAlgorithm, typename Representation >
-    void compute_persistence_pairs( persistence_pairs& pairs, boundary_matrix< Representation >& boundary_matrix ) {
+    void compute_persistence_pairs( persistence_pairs& pairs, random_access_boundary_matrix< Representation>& boundary_matrix ) {
         ReductionAlgorithm reduce;
         reduce( boundary_matrix );
         pairs.clear();
@@ -38,24 +39,38 @@ namespace phat {
             }
         }
     }
-    
+
     template< typename ReductionAlgorithm, typename Representation >
-    void compute_persistence_pairs_dualized( persistence_pairs& pairs, boundary_matrix< Representation >& boundary_matrix ) {
+    void compute_persistence_pairs( persistence_pairs& pairs, stack_access_boundary_matrix< Representation>& boundary_matrix ) {
+        ReductionAlgorithm reduce;
+        stack_access_boundary_matrix< Representation> reduced_matrix;
+        reduce( boundary_matrix, reduced_matrix );
+        pairs.clear();
+        for( index idx = 0; idx < reduced_matrix.get_num_cols(); idx++ ) {
+            if( !reduced_matrix.is_empty( idx ) ) {
+                index birth = reduced_matrix.get_max_index( idx );
+                index death = idx;
+                pairs.append_pair( birth, death );
+            }
+        }
+    }
+    
+    template< typename ReductionAlgorithm, typename BoundaryMatrix >
+    void compute_persistence_pairs_dualized( persistence_pairs& pairs, BoundaryMatrix& boundary_matrix ) {
 
         dualize( boundary_matrix );
-        compute_persistence_pairs( pairs, boundary_matrix );
+        compute_persistence_pairs< ReductionAlgorithm >( pairs, boundary_matrix );
         dualize_persistence_pairs( pairs, boundary_matrix.get_num_cols() );
     }
     
-    template< typename Representation >
-    void compute_persistence_pairs( persistence_pairs& pairs, boundary_matrix< Representation >& boundary_matrix ) {
+    template< typename BoundaryMatrix >
+    void compute_persistence_pairs( persistence_pairs& pairs, BoundaryMatrix& boundary_matrix ) {
         phat::compute_persistence_pairs< twist_reduction >( pairs, boundary_matrix );
     }
     
     
-    template< typename Representation >
-    void compute_persistence_pairs_dualized( persistence_pairs& pairs, boundary_matrix< Representation >& boundary_matrix ) {
+    template< typename BoundaryMatrix >
+    void compute_persistence_pairs_dualized( persistence_pairs& pairs, BoundaryMatrix& boundary_matrix ) {
         compute_persistence_pairs_dualized< twist_reduction >( pairs, boundary_matrix );
     }
-
 }
