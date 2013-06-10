@@ -16,7 +16,7 @@
     You should have received a copy of the GNU Lesser General Public License
     along with PHAT.  If not, see <http://www.gnu.org/licenses/>. */
 
-#include <phat/boundary_matrix.h>
+#include <phat/random_access_boundary_matrix.h>
 
 void print_help() {
     std::cerr << "Usage: " << "info " << "[options] input_filename_0 input_filename_1 ... input_filename_N" << std::endl;
@@ -60,7 +60,7 @@ int main( int argc, char** argv )
 
     for( int idx_input = 0; idx_input < input_filenames.size(); idx_input++ ) {
         std::string input_filename = input_filenames[ idx_input ];
-        phat::boundary_matrix<> matrix;
+        phat::random_access_boundary_matrix<> matrix;
         bool read_successful = use_binary ? matrix.load_binary( input_filename ) : matrix.load_ascii( input_filename );
         if( !read_successful ) {
             std::cerr << std::endl << " Error opening file " << input_filename << std::endl;

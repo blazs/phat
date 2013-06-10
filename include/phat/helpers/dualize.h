@@ -19,13 +19,13 @@
 #pragma once
 
 #include <phat/helpers/misc.h>
-#include <phat/boundary_matrix.h>
+#include <phat/random_access_boundary_matrix.h>
 #include <phat/persistence_pairs.h>
 
 
 namespace phat {
     template< typename Representation >
-    void dualize( boundary_matrix< Representation >& boundary_matrix ) {
+    void dualize( random_access_boundary_matrix< Representation >& boundary_matrix ) {
 
         std::vector< dimension > dual_dims;
         std::vector< std::vector< index > > dual_matrix;

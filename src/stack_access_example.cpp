@@ -19,7 +19,7 @@
 // This file contains a simple example that demonstrates the usage of the library interface
 
 // interface of the main data structure
-#include <phat/random_access_boundary_matrix.h>
+#include <phat/stack_access_boundary_matrix.h>
 
 // wrapper algorithm that computes the persistence pairs of a given boundary matrix using a specified algorithm
 #include <phat/compute_persistence_pairs.h>
@@ -51,48 +51,36 @@ int main( int argc, char** argv )
 
 
     // first define a boundary matrix with the chosen internal representation
-    phat::random_access_boundary_matrix< phat::vector_vector > boundary_matrix;
-
-    // set the number of columns (has to be 7 since we have 7 simplices)
-    boundary_matrix.set_num_cols( 7 );
-    
-    // set the dimension of the cell that a column represents:
-    boundary_matrix.set_dim( 0, 0 );
-    boundary_matrix.set_dim( 1, 0 );
-    boundary_matrix.set_dim( 2, 1 );
-    boundary_matrix.set_dim( 3, 0 );
-    boundary_matrix.set_dim( 4, 1 );
-    boundary_matrix.set_dim( 5, 1 );
-    boundary_matrix.set_dim( 6, 2 );
+    phat::stack_access_boundary_matrix< phat::vector_vector > boundary_matrix;
 
     // set the respective columns -- the columns entries have to be sorted
     std::vector< phat::index > temp_col;
 
-    boundary_matrix.set_col( 0, temp_col );
+    boundary_matrix.push_col( temp_col, 0 );
 
-    boundary_matrix.set_col( 1, temp_col );
+    boundary_matrix.push_col( temp_col, 0 );
 
     temp_col.push_back( 0 );
     temp_col.push_back( 1 );
-    boundary_matrix.set_col( 2, temp_col );
+    boundary_matrix.push_col( temp_col, 1 );
     temp_col.clear();
 
-    boundary_matrix.set_col( 3, temp_col );
+    boundary_matrix.push_col( temp_col, 0 );
 
     temp_col.push_back( 1 );
     temp_col.push_back( 3 );
-    boundary_matrix.set_col( 4, temp_col );
+    boundary_matrix.push_col( temp_col, 1 );
     temp_col.clear();
 
     temp_col.push_back( 0 );
     temp_col.push_back( 3 );
-    boundary_matrix.set_col( 5, temp_col );
+    boundary_matrix.push_col( temp_col, 1 );
     temp_col.clear();
 
     temp_col.push_back( 2 );
     temp_col.push_back( 4 );
     temp_col.push_back( 5 );
-    boundary_matrix.set_col( 6, temp_col );
+    boundary_matrix.push_col( temp_col, 2 );
     temp_col.clear();
 
     // print some information of the boundary matrix:
@@ -117,7 +105,7 @@ int main( int argc, char** argv )
 
     // choose an algorithm (choice affects performance) and compute the persistence pair
     // (modifies boundary_matrix)
-    phat::compute_persistence_pairs< phat::twist_reduction >( pairs, boundary_matrix );
+    phat::compute_persistence_pairs< phat::standard_reduction >( pairs, boundary_matrix );
     
     // sort the persistence pairs by birth index 
     pairs.sort();

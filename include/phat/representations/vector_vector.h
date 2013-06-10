@@ -89,5 +89,22 @@ namespace phat {
                                            std::back_inserter( temp_col ) );
             target_col.swap( temp_col );
         }
+
+        // appends given column to the matrix
+        void _push_col( const column& col, dimension dim  ) { 
+            matrix.push_back( col );
+            dims.push_back( dim );
+        }
+
+        // removes last column of the matrix
+        void _pop_col() {
+            matrix.pop_back();
+            dims.pop_back();
+        }
+
+        // adds column @source to right-most column
+        void _add_to( index source ) {
+            _add_to( source, _get_num_cols() - 1 );
+        }
     };
 }
