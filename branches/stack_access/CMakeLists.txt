@@ -24,10 +24,9 @@ int main() {
 
 if(OPENMP_VERSION)
 
-
-
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+
 else()
 message("
 
@@ -35,16 +34,19 @@ OpenMP 3.0 not supported by the compiler (${CMAKE_CXX_COMPILER})!
 To get optimal performance for the \"chunk\" algorithm, use a C++ compiler with OpenMP 3.0 support (e.g., GCC >=4.4).
 To use a different compiler, pass it to cmake in the variable CMAKE_CXX_COMPILER: 
  cmake . -DCMAKE_CXX_COMPILER=g++-4.7
-
+ 
 ")
 endif()
  
 FILE(GLOB_RECURSE all_headers "include/phat/*.h")
 
-FILE(GLOB general_includes "include/phat/*.h")
-FILE(GLOB algorithms_includes "include/phat/algorithms/*.h")
-FILE(GLOB helpers_includes "include/phat/helpers/*.h")
-FILE(GLOB representations_includes "include/phat/representations/*.h")
+FILE(GLOB general_includes "include/phat/common/*.h")
+FILE(GLOB random_access_includes "include/phat/random_access/*.h")
+FILE(GLOB random_access_representations_includes "include/phat/random_access/representations/*.h")
+FILE(GLOB random_access_reducers_includes "include/phat/random_access/reducers/*.h")
+FILE(GLOB stack_access_includes "include/phat/stack_access/*.h")
+FILE(GLOB stack_access_representations_includes "include/phat/stack_access/representations/*.h")
+FILE(GLOB stack_access_reducers_includes "include/phat/stack_access/reducers/*.h")
 
 add_executable (simple_example src/simple_example.cpp ${all_headers})
 add_executable (stack_access_example src/stack_access_example.cpp ${all_headers})
@@ -55,6 +57,9 @@ add_executable (benchmark src/benchmark.cpp ${all_headers})
 add_executable (stack_access_benchmark src/stack_access_benchmark.cpp ${all_headers})
 
 source_group(Header\ Files FILES ${general_includes})
-source_group(Header\ Files\\helpers FILES ${helpers_includes})
-source_group(Header\ Files\\representations FILES ${representations_includes})
-source_group(Header\ Files\\algorithms FILES ${algorithms_includes})
+source_group(Header\ Files\\random_access FILES ${random_access_includes})
+source_group(Header\ Files\\random_access\\representations FILES ${random_access_representations_includes})
+source_group(Header\ Files\\random_access\\reducers FILES ${random_access_reducers_includes})
+source_group(Header\ Files\\stack_access FILES ${stack_access_includes})
+source_group(Header\ Files\\stack_access\\representations FILES ${stack_access_representations_includes})
+source_group(Header\ Files\\stack_access\\reducers FILES ${stack_access_reducers_includes})
