@@ -23,7 +23,7 @@
 
 // interface class for the main data structure -- implementations of the interface can be found in ./representations
 namespace phat { namespace common {
-    template< class Representation = bit_tree_pivot_column >
+    template< class Representation = bit_tree_pivot >
     class const_boundary_matrix
     {
         

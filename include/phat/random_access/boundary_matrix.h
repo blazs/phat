@@ -23,9 +23,9 @@
 #include <phat/random_access/representations/bit_tree_pivot.h>
 
 // interface class for the main data structure -- implementations of the interface can be found in ./representations
-namespace phat {
-    template< class Representation = bit_tree_pivot_column >
-    class random_access_boundary_matrix : public common::const_boundary_matrix< Representation >
+namespace phat { namespace random_access {
+    template< class Representation = bit_tree_pivot >
+    class boundary_matrix : public common::const_boundary_matrix< Representation >
     {
 
     // interface functions -- actual implementation and complexity depends on chosen @Representation template
@@ -47,15 +47,15 @@ namespace phat {
 
     // operators / constructors
     public:
-        random_access_boundary_matrix() {};
+        boundary_matrix() {};
 
         template< class OtherBoundaryMatrix >
-        random_access_boundary_matrix( const OtherBoundaryMatrix& other ) {
+        boundary_matrix( const OtherBoundaryMatrix& other ) {
             *this = other;
         }
 
         template< typename OtherRepresentation >
-        random_access_boundary_matrix< Representation >& operator=( const const_boundary_matrix< OtherRepresentation >& other )
+        boundary_matrix< Representation >& operator=( const const_boundary_matrix< OtherRepresentation >& other )
         {
             const index nr_of_columns = other.get_num_cols();
             init( nr_of_columns );
@@ -175,4 +175,4 @@ namespace phat {
 
 
     };
-}
+} }

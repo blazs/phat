@@ -27,15 +27,15 @@ namespace phat {
     //       But I cannot imagine that anything else than vector<vector<index>> would
     //       make sense
     template< typename PivotColumn >
-    class abstract_pivot_column : public vector_vector {
+    class abstract_pivot : public vector_vector {
         
     protected:
         typedef vector_vector Base;
         typedef PivotColumn pivot_col;
 
         // For parallization purposes, it could be more than one full column
-        mutable thread_local_storage< pivot_col > pivot_cols;
-        mutable thread_local_storage< index > idx_of_pivot_cols;
+        mutable common::thread_local_storage< pivot_col > pivot_cols;
+        mutable common::thread_local_storage< index > idx_of_pivot_cols;
 
         pivot_col& get_pivot_col() const {
             return pivot_cols();

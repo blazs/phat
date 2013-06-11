@@ -20,7 +20,7 @@
 
 #include <phat/common/basic_types.h>
 
-namespace phat {
+namespace phat { namespace common {
     class persistence_pairs {
 
     protected:
@@ -51,7 +51,7 @@ namespace phat {
             std::sort( pairs.begin(), pairs.end() );
         }
 
-        // Loads the persistence pairs from given file in asci format 
+        // Loads the persistence pairs from given file in ascii format 
         // Format: nr_pairs % newline % birth1 % death1 % newline % birth2 % death2 % newline ...
         bool load_ascii( std::string filename ) {
             std::ifstream input_stream( filename.c_str() );
@@ -149,7 +149,4 @@ namespace phat {
             return !( *this == other_pairs );
         }
     };
-    
-
-    
-}
+} }

@@ -159,5 +159,5 @@ namespace phat {
                     56, 45, 25, 31, 35, 16,  9, 12,
                     44, 24, 15,  8, 23,  7,  6,  5 };
 
-    typedef abstract_pivot_column<bit_tree_column> bit_tree_pivot_column;
+    typedef abstract_pivot< bit_tree_column > bit_tree_pivot;
 }

@@ -96,5 +96,5 @@ namespace phat {
         }
     };
 
-    typedef abstract_pivot_column< full_column > full_pivot_column;
+    typedef abstract_pivot< full_column > full_pivot;
 }

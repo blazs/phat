@@ -24,8 +24,8 @@
 
 
 namespace phat { namespace common {
-    template< typename Representation >
-    void dualize( random_access_boundary_matrix< Representation >& boundary_matrix ) {
+    template< typename BoundaryMatrix >
+    void dualize( BoundaryMatrix& boundary_matrix ) {
 
         std::vector< dimension > dual_dims;
         std::vector< std::vector< index > > dual_matrix;

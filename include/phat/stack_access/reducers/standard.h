@@ -26,7 +26,7 @@ namespace phat { namespace stack_access { namespace reducers {
 
     public:
         template< typename Representation >
-        void operator() ( stack_access_boundary_matrix< Representation >& input_matrix, stack_access_boundary_matrix< Representation >& reduced_matrix ) {
+        void operator() ( boundary_matrix< Representation >& input_matrix, boundary_matrix< Representation >& reduced_matrix ) {
 
             const index nr_columns = input_matrix.get_num_cols();
             std::vector< index > lowest_one_lookup( nr_columns, -1 );
