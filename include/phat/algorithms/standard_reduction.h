@@ -53,7 +53,7 @@ namespace phat {
                 reduced_matrix.push_col( temp_col, input_matrix.get_dim( cur_col ) );
                 index lowest_one = reduced_matrix.get_max_index( cur_col );
                 while( lowest_one != -1 && lowest_one_lookup[ lowest_one ] != -1 ) {
-                    reduced_matrix.add_to( lowest_one_lookup[ lowest_one ] );
+                    reduced_matrix.add_to_top( lowest_one_lookup[ lowest_one ] );
                     lowest_one = reduced_matrix.get_max_index( cur_col );
                 }
                 if( lowest_one != -1 )

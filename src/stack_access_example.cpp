@@ -26,6 +26,7 @@
 
 // main data structure (choice affects performance)
 #include <phat/representations/vector_vector.h>
+#include <phat/representations/bit_tree_compressed_vector.h>
 
 // algorithm (choice affects performance)
 #include <phat/algorithms/standard_reduction.h>
@@ -51,7 +52,9 @@ int main( int argc, char** argv )
 
 
     // first define a boundary matrix with the chosen internal representation
-    phat::stack_access_boundary_matrix< phat::vector_vector > boundary_matrix;
+    phat::stack_access_boundary_matrix< phat::bit_tree_compressed_vector > boundary_matrix;
+
+    
 
     // set the respective columns -- the columns entries have to be sorted
     std::vector< phat::index > temp_col;

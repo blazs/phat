@@ -62,13 +62,13 @@ namespace phat {
 
     public:  
 
-        void _set_num_cols( index nr_of_cols ) {
+        void _init( index nr_of_cols ) {
             #pragma omp parallel for
             for( int tid = 0; tid < omp_get_num_threads(); tid++ ) {
                 pivot_cols[ tid ].init( nr_of_cols );
                 idx_of_pivot_cols[ tid ] = -1;
             }
-            Base::_set_num_cols( nr_of_cols );
+            Base::_init( nr_of_cols );
         }
 
         void _add_to( index source, index target ) {

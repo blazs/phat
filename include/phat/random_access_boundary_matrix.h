@@ -33,9 +33,6 @@ namespace phat {
         // set column @idx to the values contained in @col
         void set_col( index idx, const column& col  ) { rep._set_col( idx, col ); }
 
-        // set overall number of columns in boundary_matrix
-        void set_num_cols( index nr_of_columns ) { rep._set_num_cols( nr_of_columns ); }
-
         // removes maximal index from given column 
         void remove_max( index idx ) { rep._remove_max( idx ); }
 
@@ -61,7 +58,7 @@ namespace phat {
         random_access_boundary_matrix< Representation >& operator=( const boundary_matrix< OtherRepresentation >& other )
         {
             const index nr_of_columns = other.get_num_cols();
-            this->set_num_cols( nr_of_columns );
+            init( nr_of_columns );
             column temp_col;
             for( index cur_col = 0; cur_col <  nr_of_columns; cur_col++ ) {
                 this->set_dim( cur_col, other.get_dim( cur_col ) );
@@ -80,7 +77,7 @@ namespace phat {
         template< typename index_type, typename dimemsion_type >
         void load_vector_vector( const std::vector< std::vector< index_type > >& input_matrix, const std::vector< dimemsion_type >& input_dims ) { 
             const index nr_of_columns = (index)input_matrix.size();
-            this->set_num_cols( nr_of_columns );
+            init( nr_of_columns );
             column temp_col;
             #pragma omp parallel for private( temp_col )
             for( index cur_col = 0; cur_col <  nr_of_columns; cur_col++ ) {
@@ -111,7 +108,7 @@ namespace phat {
                     number_of_columns++;
 
             }
-            this->set_num_cols( number_of_columns );
+            init( number_of_columns );
             dummy.close();
 
             std::ifstream input_stream( filename.c_str() );
@@ -154,7 +151,7 @@ namespace phat {
 
             int64_t nr_columns;
             input_stream.read( (char*)&nr_columns, sizeof( int64_t ) );
-            this->set_num_cols( (index)nr_columns );
+            init( (index)nr_columns );
 
             column temp_col;
             for( index cur_col = 0; cur_col < nr_columns; cur_col++ ) {

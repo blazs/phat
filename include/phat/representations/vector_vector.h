@@ -34,7 +34,7 @@ namespace phat {
         index _get_num_cols() const {
             return (index)matrix.size(); 
         }
-        void _set_num_cols( index nr_of_columns ) {
+        void _init( index nr_of_columns ) {
             dims.resize( nr_of_columns );
             matrix.resize( nr_of_columns );
         }
@@ -88,23 +88,6 @@ namespace phat {
                                            source_col.begin(), source_col.end(),
                                            std::back_inserter( temp_col ) );
             target_col.swap( temp_col );
-        }
-
-        // appends given column to the matrix
-        void _push_col( const column& col, dimension dim  ) { 
-            matrix.push_back( col );
-            dims.push_back( dim );
-        }
-
-        // removes last column of the matrix
-        void _pop_col() {
-            matrix.pop_back();
-            dims.pop_back();
-        }
-
-        // adds column @source to right-most column
-        void _add_to( index source ) {
-            _add_to( source, _get_num_cols() - 1 );
         }
     };
 }
