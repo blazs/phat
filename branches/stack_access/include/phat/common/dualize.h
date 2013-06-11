@@ -18,12 +18,12 @@
 
 #pragma once
 
-#include <phat/helpers/misc.h>
-#include <phat/random_access_boundary_matrix.h>
-#include <phat/persistence_pairs.h>
+#include <phat/common/basic_types.h>
+#include <phat/random_access/boundary_matrix.h>
+#include <phat/common/persistence_pairs.h>
 
 
-namespace phat {
+namespace phat { namespace common {
     template< typename Representation >
     void dualize( random_access_boundary_matrix< Representation >& boundary_matrix ) {
 
@@ -71,4 +71,4 @@ namespace phat {
             pairs.set_pair( i , n - 1 - pair.second, n - 1 - pair.first);
         }
     }
-}
+} }

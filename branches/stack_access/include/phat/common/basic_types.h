@@ -68,7 +68,7 @@ namespace phat {
     #define omp_get_wtime() (float)clock() / (float)CLOCKS_PER_SEC
 #endif
 
-#include <phat/helpers/thread_local_storage.h>
+#include <phat/common/thread_local_storage.h>
 
 
 

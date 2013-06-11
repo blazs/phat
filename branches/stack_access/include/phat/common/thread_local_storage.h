@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <phat/helpers/misc.h>
+#include <phat/common/basic_types.h>
 
 // should ideally be equal to the cache line size of the CPU
 #define PHAT_TLS_SPACING_FACTOR 64
