@@ -18,11 +18,11 @@
 
 #pragma once
 
-#include <phat/helpers/misc.h>
-#include <phat/random_access_boundary_matrix.h>
+#include <phat/common/basic_types.h>
+#include <phat/random_access/boundary_matrix.h>
 
-namespace phat {
-    class chunk_reduction {
+namespace phat { namespace random_access { namespace reducers {
+    class chunk {
     public:
         enum column_type { GLOBAL
                          , LOCAL_POSITIVE
@@ -237,4 +237,4 @@ namespace phat {
             boundary_matrix.set_col( col_idx, temp_col );
         }
     };
-}
+} } }

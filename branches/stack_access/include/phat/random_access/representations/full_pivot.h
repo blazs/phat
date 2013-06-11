@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <phat/helpers/misc.h>
-#include <phat/representations/abstract_pivot_column.h>
+#include <phat/common/basic_types.h>
+#include <phat/random_access/representations/abstract_pivot.h>
 
 namespace phat {
     class full_column {

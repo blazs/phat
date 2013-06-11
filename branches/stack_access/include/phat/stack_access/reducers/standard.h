@@ -18,30 +18,13 @@
 
 #pragma once
 
-#include <phat/helpers/misc.h>
-#include <phat/random_access_boundary_matrix.h>
-#include <phat/stack_access_boundary_matrix.h>
+#include <phat/common/basic_types.h>
+#include <phat/stack_access/boundary_matrix.h>
 
-namespace phat {
-    class standard_reduction {
+namespace phat { namespace stack_access { namespace reducers {
+    class standard {
+
     public:
-        template< typename Representation >
-        void operator() ( random_access_boundary_matrix< Representation >& boundary_matrix ) {
-
-            const index nr_columns = boundary_matrix.get_num_cols();
-            std::vector< index > lowest_one_lookup( nr_columns, -1 );
-            
-            for( index cur_col = 0; cur_col < nr_columns; cur_col++ ) {
-                index lowest_one = boundary_matrix.get_max_index( cur_col );
-                while( lowest_one != -1 && lowest_one_lookup[ lowest_one ] != -1 ) {
-                    boundary_matrix.add_to( lowest_one_lookup[ lowest_one ], cur_col );
-                    lowest_one = boundary_matrix.get_max_index( cur_col );
-                }
-                if( lowest_one != -1 )
-                    lowest_one_lookup[ lowest_one ] = cur_col;
-            }
-        }
-
         template< typename Representation >
         void operator() ( stack_access_boundary_matrix< Representation >& input_matrix, stack_access_boundary_matrix< Representation >& reduced_matrix ) {
 
@@ -61,4 +44,4 @@ namespace phat {
             }
         }
     };
-}
+} } }

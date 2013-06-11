@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <phat/helpers/misc.h>
+#include <phat/common/basic_types.h>
 
 namespace phat {
     class vector_list {

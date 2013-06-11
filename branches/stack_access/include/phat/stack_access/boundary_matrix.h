@@ -18,14 +18,14 @@
 
 #pragma once
 
-#include <phat/helpers/misc.h>
-#include <phat/boundary_matrix.h>
-#include <phat/representations/bit_tree_pivot_column.h>
+#include <phat/common/basic_types.h>
+#include <phat/common/read_only_boundary_matrix.h>
+#include <phat/stack_access/representations/bit_tree_compressed_vector.h>
 
 // interface class for the main data structure -- implementations of the interface can be found in ./representations
 namespace phat {
-    template< class Representation = bit_tree_pivot_column >
-    class stack_access_boundary_matrix : public boundary_matrix< Representation >
+    template< class Representation = bit_tree_compressed_vector >
+    class stack_access_boundary_matrix : public common::read_only_boundary_matrix< Representation >
     {
 
     // interface functions -- actual implementation and complexity depends on chosen @Representation template
@@ -48,7 +48,7 @@ namespace phat {
         }
 
         template< typename OtherRepresentation >
-        stack_access_boundary_matrix< Representation >& operator=( const boundary_matrix< OtherRepresentation >& other )
+        stack_access_boundary_matrix< Representation >& operator=( const common::read_only_boundary_matrix< OtherRepresentation >& other )
         {
             const index nr_of_columns = other.get_num_cols();
             init( nr_of_columns );

@@ -18,12 +18,11 @@
 
 #pragma once
 
-#include <phat/helpers/misc.h>
-#include <phat/random_access_boundary_matrix.h>
-#include <phat/stack_access_boundary_matrix.h>
+#include <phat/common/basic_types.h>
+#include <phat/random_access/boundary_matrix.h>
 
-namespace phat {
-    class standard_reduction {
+namespace phat { namespace random_access { namespace reducers {
+    class standard {
     public:
         template< typename Representation >
         void operator() ( random_access_boundary_matrix< Representation >& boundary_matrix ) {
@@ -41,24 +40,5 @@ namespace phat {
                     lowest_one_lookup[ lowest_one ] = cur_col;
             }
         }
-
-        template< typename Representation >
-        void operator() ( stack_access_boundary_matrix< Representation >& input_matrix, stack_access_boundary_matrix< Representation >& reduced_matrix ) {
-
-            const index nr_columns = input_matrix.get_num_cols();
-            std::vector< index > lowest_one_lookup( nr_columns, -1 );
-            column temp_col;
-            for( index cur_col = 0; cur_col < nr_columns; cur_col++ ) {
-                input_matrix.get_col( cur_col, temp_col );
-                reduced_matrix.push_col( temp_col, input_matrix.get_dim( cur_col ) );
-                index lowest_one = reduced_matrix.get_max_index( cur_col );
-                while( lowest_one != -1 && lowest_one_lookup[ lowest_one ] != -1 ) {
-                    reduced_matrix.add_to_top( lowest_one_lookup[ lowest_one ] );
-                    lowest_one = reduced_matrix.get_max_index( cur_col );
-                }
-                if( lowest_one != -1 )
-                    lowest_one_lookup[ lowest_one ] = cur_col;
-            }
-        }
     };
-}
+} } }
