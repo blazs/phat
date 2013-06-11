@@ -44,6 +44,7 @@ namespace phat {
     void compute_persistence_pairs( persistence_pairs& pairs, stack_access_boundary_matrix< Representation>& boundary_matrix ) {
         ReductionAlgorithm reduce;
         stack_access_boundary_matrix< Representation> reduced_matrix;
+        reduced_matrix.init( boundary_matrix.get_num_cols() );
         reduce( boundary_matrix, reduced_matrix );
         pairs.clear();
         for( index idx = 0; idx < reduced_matrix.get_num_cols(); idx++ ) {

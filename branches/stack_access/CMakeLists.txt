@@ -52,6 +52,7 @@ add_executable (self_test src/self_test.cpp ${all_headers})
 add_executable (phat src/phat.cpp ${all_headers})
 add_executable (info src/info.cpp ${all_headers})
 add_executable (benchmark src/benchmark.cpp ${all_headers})
+add_executable (stack_access_benchmark src/stack_access_benchmark.cpp ${all_headers})
 
 source_group(Header\ Files FILES ${general_includes})
 source_group(Header\ Files\\helpers FILES ${helpers_includes})

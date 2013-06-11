@@ -50,6 +50,9 @@ namespace phat {
         // syncronizes all internal data structures -- has to be called before and after any multithreaded access!
         void sync() { rep._sync(); }
 
+        // has to be called initially to prepare internal data structures
+        void init( index num_cols ) { rep._init( num_cols ); }
+
     // info functions -- independent of chosen 'Representation'
     public:
         // maximal dimension

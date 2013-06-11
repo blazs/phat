@@ -33,11 +33,10 @@ namespace phat {
         // appends given column to the matrix
         void push_col( const column& col, dimension dim  ) { rep._push_col( col, dim ); }
 
-        // removes last column of the matrix
-        void pop_col() { rep._pop_col(); }
-
         // adds column @source to right-most column
-        void add_to( index source ) { rep._add_to( source ); }
+        void add_to_top( index source ) { rep._add_to_top( source ); }
+
+        
 
     // operators / constructors
     public:
@@ -52,6 +51,7 @@ namespace phat {
         stack_access_boundary_matrix< Representation >& operator=( const boundary_matrix< OtherRepresentation >& other )
         {
             const index nr_of_columns = other.get_num_cols();
+            init( nr_of_columns );
             column temp_col;
             for( index cur_col = 0; cur_col <  nr_of_columns; cur_col++ ) {
                 other.get_col( cur_col, temp_col );
@@ -69,6 +69,7 @@ namespace phat {
         template< typename index_type, typename dimemsion_type >
         void load_vector_vector( const std::vector< std::vector< index_type > >& input_matrix, const std::vector< dimemsion_type >& input_dims ) { 
             const index nr_of_columns = (index)input_matrix.size();
+            init( nr_of_columns );
             column temp_col;
             for( index cur_col = 0; cur_col < nr_of_columns; cur_col++ ) {
                 this->set_dim( cur_col,  );
@@ -84,12 +85,26 @@ namespace phat {
         // Format: each line represents a column, first number is dimension, other numbers are the content of the column.
         // Ignores empty lines and lines starting with a '#'.
         bool load_ascii( std::string filename ) { 
+            // first count number of columns:
+            std::string cur_line;
+            std::ifstream dummy( filename .c_str() );
+            if( dummy.fail() )
+                return false;
+
+            index number_of_columns = 0;
+            while( getline( dummy, cur_line ) ) {
+                cur_line.erase(cur_line.find_last_not_of(" \t\n\r\f\v") + 1);
+                if( cur_line != "" && cur_line[ 0 ] != '#' )
+                    number_of_columns++;
+
+            }
+            init( number_of_columns );
+            dummy.close();
             
             std::ifstream input_stream( filename.c_str() );
             if( input_stream.fail() )
                 return false;
             
-            std::string cur_line;
             column temp_col;
             index cur_col = -1;
             while( getline( input_stream, cur_line ) ) {
@@ -126,6 +141,8 @@ namespace phat {
 
             int64_t nr_columns;
             input_stream.read( (char*)&nr_columns, sizeof( int64_t ) );
+
+            init( nr_columns );
 
             column temp_col;
             for( index cur_col = 0; cur_col < nr_columns; cur_col++ ) {

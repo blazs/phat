@@ -54,7 +54,7 @@ int main( int argc, char** argv )
     phat::random_access_boundary_matrix< phat::vector_vector > boundary_matrix;
 
     // set the number of columns (has to be 7 since we have 7 simplices)
-    boundary_matrix.set_num_cols( 7 );
+    boundary_matrix.init( 7 );
     
     // set the dimension of the cell that a column represents:
     boundary_matrix.set_dim( 0, 0 );

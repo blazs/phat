@@ -32,7 +32,8 @@ namespace phat {
         index _get_num_cols() const {
             return (index)matrix.size(); 
         }
-        void _set_num_cols( index nr_of_columns ) {
+
+        void _init( index nr_of_columns ) {
             dims.resize( nr_of_columns );
             matrix.resize( nr_of_columns );
         }
