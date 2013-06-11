@@ -19,20 +19,18 @@
 // This file contains a simple example that demonstrates the usage of the library interface
 
 // interface of the main data structure
-#include <phat/stack_access_boundary_matrix.h>
+#include <phat/stack_access/boundary_matrix.h>
 
 // wrapper algorithm that computes the persistence pairs of a given boundary matrix using a specified algorithm
-#include <phat/compute_persistence_pairs.h>
+#include <phat/common/compute_persistence_pairs.h>
 
 // main data structure (choice affects performance)
-#include <phat/representations/vector_vector.h>
-#include <phat/representations/bit_tree_compressed_vector.h>
+#include <phat/random_access/representations/vector_vector.h>
+#include <phat/stack_access/representations/bit_tree_compressed_vector.h>
 
 // algorithm (choice affects performance)
-#include <phat/algorithms/standard_reduction.h>
-#include <phat/algorithms/chunk_reduction.h>
-#include <phat/algorithms/row_reduction.h>
-#include <phat/algorithms/twist_reduction.h>
+#include <phat/stack_access/reducers/standard.h>
+
 
 int main( int argc, char** argv ) 
 {
@@ -108,7 +106,7 @@ int main( int argc, char** argv )
 
     // choose an algorithm (choice affects performance) and compute the persistence pair
     // (modifies boundary_matrix)
-    phat::compute_persistence_pairs< phat::standard_reduction >( pairs, boundary_matrix );
+    phat::compute_persistence_pairs< phat::stack_access::reducers::standard >( pairs, boundary_matrix );
     
     // sort the persistence pairs by birth index 
     pairs.sort();

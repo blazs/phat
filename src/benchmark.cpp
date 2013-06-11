@@ -16,21 +16,21 @@
     You should have received a copy of the GNU Lesser General Public License
     along with PHAT.  If not, see <http://www.gnu.org/licenses/>. */
 
-#include <phat/compute_persistence_pairs.h>
+#include <phat/common/compute_persistence_pairs.h>
 
-#include <phat/representations/vector_vector.h>
-#include <phat/representations/vector_set.h>
-#include <phat/representations/vector_list.h>
-#include <phat/representations/sparse_pivot_column.h>
-#include <phat/representations/full_pivot_column.h>
-#include <phat/representations/bit_tree_pivot_column.h>
+#include <phat/random_access/representations/vector_vector.h>
+#include <phat/random_access/representations/vector_set.h>
+#include <phat/random_access/representations/vector_list.h>
+#include <phat/random_access/representations/sparse_pivot.h>
+#include <phat/random_access/representations/full_pivot.h>
+#include <phat/random_access/representations/bit_tree_pivot.h>
 
-#include <phat/algorithms/twist_reduction.h>
-#include <phat/algorithms/standard_reduction.h>
-#include <phat/algorithms/row_reduction.h>
-#include <phat/algorithms/chunk_reduction.h>
+#include <phat/random_access/reducers/twist.h>
+#include <phat/random_access/reducers/standard.h>
+#include <phat/random_access/reducers/row.h>
+#include <phat/random_access/reducers/chunk.h>
 
-#include <phat/helpers/dualize.h>
+#include <phat/common/dualize.h>
 
 #include <iostream>
 #include <iomanip>
@@ -133,7 +133,7 @@ void benchmark( std::string input_filename, bool use_binary, Ansatz_type ansatz 
     } else {
         std::cout << " dual,";
         double dualization_timer = omp_get_wtime();
-        dualize( matrix );
+        phat::common::dualize( matrix );
         double dualization_time = omp_get_wtime() - dualization_timer;
         double dualization_time_rounded = floor( dualization_time * 10.0 + 0.5 ) / 10.0;
         std::cout << " Dualization time: " << setiosflags( std::ios::fixed ) << setiosflags( std::ios::showpoint ) << std::setprecision( 1 ) << dualization_time_rounded <<"s,";
@@ -149,14 +149,14 @@ void benchmark( std::string input_filename, bool use_binary, Ansatz_type ansatz 
 #define COMPUTE(Representation) \
     std::cout << " " << #Representation << ","; \
     switch( algorithm ) { \
-    case STANDARD: std::cout << " standard,"; benchmark< phat::Representation, phat::standard_reduction >( input_filename, use_binary, ansatz ); break; \
-    case TWIST: std::cout << " twist,"; benchmark< phat::Representation, phat::twist_reduction >( input_filename, use_binary, ansatz ); break; \
-    case ROW: std::cout << " row,"; benchmark< phat::Representation, phat::row_reduction >( input_filename, use_binary, ansatz ); break; \
-    case CHUNK: std::cout << " chunk,"; benchmark< phat::Representation, phat::chunk_reduction >( input_filename, use_binary, ansatz ); break; \
+    case STANDARD: std::cout << " standard,"; benchmark< phat::Representation, phat::random_access::reducers::standard >( input_filename, use_binary, ansatz ); break; \
+    case TWIST: std::cout << " twist,"; benchmark< phat::Representation, phat::random_access::reducers::twist >( input_filename, use_binary, ansatz ); break; \
+    case ROW: std::cout << " row,"; benchmark< phat::Representation, phat::random_access::reducers::row >( input_filename, use_binary, ansatz ); break; \
+    case CHUNK: std::cout << " chunk,"; benchmark< phat::Representation, phat::random_access::reducers::chunk >( input_filename, use_binary, ansatz ); break; \
     case CHUNK_SEQUENTIAL: std::cout << " chunk_sequential,"; \
                            int num_threads = omp_get_max_threads(); \
                            omp_set_num_threads( 1 ); \
-                           benchmark< phat::Representation, phat::chunk_reduction >( input_filename, use_binary, ansatz ); \
+                           benchmark< phat::Representation, phat::random_access::reducers::chunk >( input_filename, use_binary, ansatz ); \
                            omp_set_num_threads( num_threads ); \
                            break; \
     };

@@ -18,11 +18,11 @@
 
 #pragma once
 
-#include <phat/helpers/misc.h>
-#include <phat/random_access_boundary_matrix.h>
+#include <phat/common/basic_types.h>
+#include <phat/random_access/boundary_matrix.h>
 
-namespace phat {
-    class row_reduction {
+namespace phat { namespace random_access { namespace reducers {
+    class row {
     public:
         template< typename Representation >
         void operator() ( random_access_boundary_matrix< Representation >& boundary_matrix ) {
@@ -52,4 +52,4 @@ namespace phat {
             }
         }
     };
-}
+} } }

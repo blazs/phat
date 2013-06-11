@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <phat/helpers/misc.h>
-#include <phat/representations/bit_tree_pivot_column.h>
+#include <phat/common/basic_types.h>
+#include <phat/random_access/representations/bit_tree_pivot.h>
 
 namespace phat {
     class bit_tree_compressed_vector {

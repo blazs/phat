@@ -16,7 +16,7 @@
     You should have received a copy of the GNU Lesser General Public License
     along with PHAT.  If not, see <http://www.gnu.org/licenses/>. */
 
-#include <phat/random_access_boundary_matrix.h>
+#include <phat/random_access/boundary_matrix.h>
 
 void print_help() {
     std::cerr << "Usage: " << "info " << "[options] input_filename_0 input_filename_1 ... input_filename_N" << std::endl;

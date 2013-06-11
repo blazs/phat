@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <phat/helpers/misc.h>
-#include <phat/representations/vector_vector.h>
+#include <phat/common/basic_types.h>
+#include <phat/random_access/representations/vector_vector.h>
 
 namespace phat {
 
