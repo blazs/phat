@@ -18,11 +18,11 @@
 
 #pragma once
 
-#include <phat/persistence_pairs.h>
-#include <phat/helpers/dualize.h>
-#include <phat/algorithms/twist_reduction.h>
-#include <phat/stack_access_boundary_matrix.h>
-#include <phat/random_access_boundary_matrix.h>
+#include <phat/common/persistence_pairs.h>
+#include <phat/common/dualize.h>
+#include <phat/random_access/reducers/twist.h>
+#include <phat/stack_access/boundary_matrix.h>
+#include <phat/random_access/boundary_matrix.h>
 
 namespace phat {
 
@@ -59,14 +59,14 @@ namespace phat {
     template< typename ReductionAlgorithm, typename BoundaryMatrix >
     void compute_persistence_pairs_dualized( persistence_pairs& pairs, BoundaryMatrix& boundary_matrix ) {
 
-        dualize( boundary_matrix );
+        common::dualize( boundary_matrix );
         compute_persistence_pairs< ReductionAlgorithm >( pairs, boundary_matrix );
-        dualize_persistence_pairs( pairs, boundary_matrix.get_num_cols() );
+        common::dualize_persistence_pairs( pairs, boundary_matrix.get_num_cols() );
     }
     
     template< typename BoundaryMatrix >
     void compute_persistence_pairs( persistence_pairs& pairs, BoundaryMatrix& boundary_matrix ) {
-        phat::compute_persistence_pairs< twist_reduction >( pairs, boundary_matrix );
+        compute_persistence_pairs< twist_reduction >( pairs, boundary_matrix );
     }
     
     

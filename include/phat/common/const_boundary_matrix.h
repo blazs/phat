@@ -18,13 +18,13 @@
 
 #pragma once
 
-#include <phat/helpers/misc.h>
-#include <phat/representations/bit_tree_pivot_column.h>
+#include <phat/common/basic_types.h>
+#include <phat/random_access/representations/bit_tree_pivot.h>
 
 // interface class for the main data structure -- implementations of the interface can be found in ./representations
-namespace phat {
+namespace phat { namespace common {
     template< class Representation = bit_tree_pivot_column >
-    class boundary_matrix
+    class const_boundary_matrix
     {
         
     protected:
@@ -106,10 +106,10 @@ namespace phat {
     
     // operators / constructors
     public:
-        boundary_matrix() {};
+        const_boundary_matrix() {};
 
         template< typename OtherRepresentation >
-        bool operator==( const boundary_matrix< OtherRepresentation >& other_boundary_matrix ) const {
+        bool operator==( const const_boundary_matrix< OtherRepresentation >& other_boundary_matrix ) const {
             const index number_of_columns = this->get_num_cols();
 
             if( number_of_columns != other_boundary_matrix.get_num_cols() )
@@ -127,7 +127,7 @@ namespace phat {
         }
 
         template< typename OtherRepresentation >
-        bool operator!=( const boundary_matrix< OtherRepresentation >& other_boundary_matrix ) const {
+        bool operator!=( const const_boundary_matrix< OtherRepresentation >& other_boundary_matrix ) const {
             return !( *this == other_boundary_matrix );
         }
 
@@ -197,4 +197,4 @@ namespace phat {
             return true;
         }
     };
-}
+} }
