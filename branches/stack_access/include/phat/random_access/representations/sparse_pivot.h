@@ -75,5 +75,5 @@ namespace phat {
         }
     };
 
-    typedef abstract_pivot_column< sparse_column > sparse_pivot_column;
+    typedef abstract_pivot< sparse_column > sparse_pivot;
 }

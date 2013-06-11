@@ -27,7 +27,7 @@ namespace phat {
         std::vector< dimension > dims;
         std::vector< column > matrix;
 
-        thread_local_storage< column > temp_column_buffer;
+        common::thread_local_storage< column > temp_column_buffer;
 
     public:
         // overall number of cells in boundary_matrix

@@ -23,9 +23,9 @@
 #include <phat/stack_access/representations/bit_tree_compressed_vector.h>
 
 // interface class for the main data structure -- implementations of the interface can be found in ./representations
-namespace phat {
+namespace phat { namespace stack_access {
     template< class Representation = bit_tree_compressed_vector >
-    class stack_access_boundary_matrix : public common::const_boundary_matrix< Representation >
+    class boundary_matrix : public common::const_boundary_matrix< Representation >
     {
 
     // interface functions -- actual implementation and complexity depends on chosen @Representation template
@@ -40,15 +40,15 @@ namespace phat {
 
     // operators / constructors
     public:
-        stack_access_boundary_matrix() {};
+        boundary_matrix() {};
 
         template< class OtherBoundaryMatrix >
-        stack_access_boundary_matrix( const OtherBoundaryMatrix& other ) {
+        boundary_matrix( const OtherBoundaryMatrix& other ) {
             *this = other;
         }
 
         template< typename OtherRepresentation >
-        stack_access_boundary_matrix< Representation >& operator=( const common::const_boundary_matrix< OtherRepresentation >& other )
+        boundary_matrix< Representation >& operator=( const common::const_boundary_matrix< OtherRepresentation >& other )
         {
             const index nr_of_columns = other.get_num_cols();
             init( nr_of_columns );
@@ -163,4 +163,4 @@ namespace phat {
             return true;
         }
     };
-}
+} }

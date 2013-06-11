@@ -30,7 +30,7 @@ namespace phat { namespace random_access { namespace reducers {
 
     public:
         template< typename Representation >
-        void operator() ( random_access_boundary_matrix< Representation >& boundary_matrix ) {
+        void operator() ( boundary_matrix< Representation >& boundary_matrix ) {
 
             const index nr_columns = boundary_matrix.get_num_cols();
             const dimension max_dim = boundary_matrix.get_max_dim();
@@ -100,7 +100,7 @@ namespace phat { namespace random_access { namespace reducers {
     
     protected:
         template< typename Representation >
-        void _get_chunks( const random_access_boundary_matrix< Representation >& boundary_matrix
+        void _get_chunks( const boundary_matrix< Representation >& boundary_matrix
                         , std::vector< index >& chunk_boundaries) 
         {
             chunk_boundaries.clear();
@@ -129,7 +129,7 @@ namespace phat { namespace random_access { namespace reducers {
         }
     
         template< typename Representation >
-        void _local_chunk_reduction( random_access_boundary_matrix< Representation >& boundary_matrix
+        void _local_chunk_reduction( boundary_matrix< Representation >& boundary_matrix
                                    , std::vector<index>& lowest_one_lookup
                                    , std::vector< column_type >& column_type
                                    , const dimension max_dim
@@ -155,7 +155,7 @@ namespace phat { namespace random_access { namespace reducers {
         }
 
         template< typename Representation >
-        void _get_active_columns( const random_access_boundary_matrix< Representation >& boundary_matrix
+        void _get_active_columns( const boundary_matrix< Representation >& boundary_matrix
                                 , const std::vector< index >& lowest_one_lookup
                                 , const std::vector< column_type >& column_type
                                 , const std::vector< index >& global_columns
@@ -208,7 +208,7 @@ namespace phat { namespace random_access { namespace reducers {
         
         template< typename Representation >
         void _global_column_simplification( const index col_idx
-                                          , random_access_boundary_matrix< Representation >& boundary_matrix
+                                          , boundary_matrix< Representation >& boundary_matrix
                                           , const std::vector< index >& lowest_one_lookup
                                           , const std::vector< column_type >& column_type
                                           , const std::vector< char >& is_active

@@ -25,7 +25,7 @@ namespace phat { namespace random_access { namespace reducers {
     class standard {
     public:
         template< typename Representation >
-        void operator() ( random_access_boundary_matrix< Representation >& boundary_matrix ) {
+        void operator() ( boundary_matrix< Representation >& boundary_matrix ) {
 
             const index nr_columns = boundary_matrix.get_num_cols();
             std::vector< index > lowest_one_lookup( nr_columns, -1 );
