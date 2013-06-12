@@ -22,7 +22,7 @@
 #include <phat/random_access/representations/bit_tree_pivot.h>
 
 namespace phat { namespace stack_access { namespace representations {
-    class bit_tree_compressed_vector {
+    class bit_tree_pivot {
 
     protected:
         std::vector< dimension > dims;

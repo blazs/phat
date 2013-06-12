@@ -26,7 +26,7 @@
 #include <phat/random_access/representations/full_pivot.h>
 #include <phat/random_access/representations/bit_tree_pivot.h>
 
-#include <phat/stack_access/representations/bit_tree_compressed_vector.h>
+#include <phat/stack_access/representations/bit_tree_pivot.h>
 #include <phat/stack_access/reducers/standard.h>
 
 #include <phat/random_access/reducers/twist.h>
@@ -164,7 +164,7 @@ int main( int argc, char** argv )
         phat::random_access::compute_persistence_pairs< phat::random_access::reducers::standard >( random_access_pairs, random_access_boundary_matrix );
 
         phat::common::persistence_pairs stack_access_pairs;
-        phat::stack_access::boundary_matrix< phat::stack_access::representations::bit_tree_compressed_vector > stack_access_boundary_matrix = boundary_matrix;
+        phat::stack_access::boundary_matrix< phat::stack_access::representations::bit_tree_pivot > stack_access_boundary_matrix = boundary_matrix;
         phat::stack_access::compute_persistence_pairs< phat::stack_access::reducers::standard >( stack_access_pairs, stack_access_boundary_matrix );
 
         if( random_access_pairs != stack_access_pairs ) {

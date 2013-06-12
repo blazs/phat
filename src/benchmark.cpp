@@ -16,29 +16,28 @@
     You should have received a copy of the GNU Lesser General Public License
     along with PHAT.  If not, see <http://www.gnu.org/licenses/>. */
 
-#include <phat/random_access/compute_persistence_pairs.h>
+//#include <phat/random_access/compute_persistence_pairs.h>
 
+#include <phat/random_access/boundary_matrix.h>
 #include <phat/random_access/representations/vector_vector.h>
 #include <phat/random_access/representations/vector_set.h>
 #include <phat/random_access/representations/vector_list.h>
 #include <phat/random_access/representations/sparse_pivot.h>
 #include <phat/random_access/representations/full_pivot.h>
 #include <phat/random_access/representations/bit_tree_pivot.h>
-
 #include <phat/random_access/reducers/twist.h>
 #include <phat/random_access/reducers/standard.h>
 #include <phat/random_access/reducers/row.h>
 #include <phat/random_access/reducers/chunk.h>
 
+#include <phat/stack_access/boundary_matrix.h>
+#include <phat/stack_access/representations/bit_tree_pivot.h>
+#include <phat/stack_access/reducers/standard.h>
+
 #include <phat/common/dualize.h>
 
 #include <iostream>
 #include <iomanip>
-
-
-enum Representation_type  {VECTOR_VECTOR, VECTOR_SET, SPARSE_PIVOT_COLUMN, FULL_PIVOT_COLUMN, BIT_TREE_PIVOT_COLUMN, VECTOR_LIST};
-enum Algorithm_type  {STANDARD, TWIST, ROW, CHUNK, CHUNK_SEQUENTIAL};
-enum Ansatz_type  {PRIMAL, DUAL};
 
 void print_help() {
     std::cerr << "Usage: " << "benchmark " << "[options] input_filename_0 input_filename_1 ... input_filename_N" << std::endl;
@@ -48,6 +47,8 @@ void print_help() {
     std::cerr << "--ascii   --  use ascii file format" << std::endl;
     std::cerr << "--binary  --  use binary file format (default)" << std::endl;
     std::cerr << "--help    --  prints this screen" << std::endl;
+    std::cerr << "--stack_access   --  use only stack access based algorithms / data structures" << std::endl;
+    std::cerr << "--random_access   --  use only random access based algorithms / data structures" << std::endl;
     std::cerr << "--dualize   --  use only dualization approach" << std::endl;
     std::cerr << "--primal   --  use only primal approach" << std::endl;
     std::cerr << "--vector_vector, --vector_set, --vector_list, --full_pivot, --sparse_pivot, --bit_tree_pivot  --  use only a subset of representation data structures for boundary matrices" << std::endl;
@@ -59,8 +60,13 @@ void print_help_and_exit() {
     exit( EXIT_FAILURE );
 }
 
+enum Representation_type  {VECTOR_VECTOR, VECTOR_SET, SPARSE_PIVOT, FULL_PIVOT, BIT_TREE_PIVOT, VECTOR_LIST};
+enum Algorithm_type  {STANDARD, TWIST, ROW, CHUNK, CHUNK_SEQUENTIAL};
+enum Ansatz_type  {PRIMAL, DUAL};
+enum Access_type  {RANDOM_ACCESS, STACK_ACCESS};
+
 void parse_command_line( int argc, char** argv, bool& use_binary, std::vector< Representation_type >& representations, std::vector< Algorithm_type >& algorithms
-                       , std::vector< Ansatz_type >& ansaetze, std::vector< std::string >& input_filenames ) {
+                       , std::vector< Ansatz_type >& ansaetze, std::vector< Access_type >& accesses, std::vector< std::string >& input_filenames ) {
 
     if( argc < 2 ) print_help_and_exit();
 
@@ -73,9 +79,9 @@ void parse_command_line( int argc, char** argv, bool& use_binary, std::vector< R
             else if( argument == "--vector_vector" ) representations.push_back( VECTOR_VECTOR );
             else if( argument == "--vector_set" ) representations.push_back( VECTOR_SET );
             else if( argument == "--vector_list" ) representations.push_back( VECTOR_LIST );
-            else if( argument == "--full_pivot" )  representations.push_back( FULL_PIVOT_COLUMN );
-            else if( argument == "--bit_tree_pivot" )  representations.push_back( BIT_TREE_PIVOT_COLUMN );
-            else if( argument == "--sparse_pivot" ) representations.push_back( SPARSE_PIVOT_COLUMN );
+            else if( argument == "--full_pivot" )  representations.push_back( FULL_PIVOT );
+            else if( argument == "--bit_tree_pivot" )  representations.push_back( BIT_TREE_PIVOT );
+            else if( argument == "--sparse_pivot" ) representations.push_back( SPARSE_PIVOT );
             else if( argument == "--standard" ) algorithms.push_back( STANDARD );
             else if( argument == "--twist" ) algorithms.push_back( TWIST );
             else if( argument == "--row" ) algorithms.push_back( ROW );
@@ -83,6 +89,8 @@ void parse_command_line( int argc, char** argv, bool& use_binary, std::vector< R
             else if( argument == "--chunk" ) algorithms.push_back( CHUNK );
             else if( argument == "--primal" ) ansaetze.push_back( PRIMAL );
             else if( argument == "--dual" ) ansaetze.push_back( DUAL );
+            else if( argument == "--random_access" ) accesses.push_back( RANDOM_ACCESS );
+            else if( argument == "--stack_access" ) accesses.push_back( STACK_ACCESS );
             else if( argument == "--help" ) print_help_and_exit();
             else print_help_and_exit();
         } else {
@@ -94,9 +102,9 @@ void parse_command_line( int argc, char** argv, bool& use_binary, std::vector< R
         representations.push_back( VECTOR_VECTOR );
         representations.push_back( VECTOR_SET );
         representations.push_back( VECTOR_LIST );
-        representations.push_back( FULL_PIVOT_COLUMN );
-        representations.push_back( BIT_TREE_PIVOT_COLUMN );
-        representations.push_back( SPARSE_PIVOT_COLUMN );
+        representations.push_back( FULL_PIVOT );
+        representations.push_back( BIT_TREE_PIVOT );
+        representations.push_back( SPARSE_PIVOT );
     }
 
     if( algorithms.empty() == true ) {
@@ -111,10 +119,15 @@ void parse_command_line( int argc, char** argv, bool& use_binary, std::vector< R
         ansaetze.push_back( PRIMAL );
         ansaetze.push_back( DUAL );
     }
+
+    if( accesses.empty() == true ) {
+        accesses.push_back( RANDOM_ACCESS );
+        accesses.push_back( STACK_ACCESS );
+    }
 }
 
 template<typename Representation, typename Algorithm>
-void benchmark( std::string input_filename, bool use_binary, Ansatz_type ansatz ) {
+void benchmark_random_access( std::string input_filename, bool use_binary, Ansatz_type ansatz ) {
 
     phat::random_access::boundary_matrix< Representation > matrix;
     bool read_successful = use_binary ? matrix.load_binary( input_filename ) : matrix.load_ascii( input_filename );
@@ -146,18 +159,69 @@ void benchmark( std::string input_filename, bool use_binary, Ansatz_type ansatz 
     std::cout << " Reduction time: " << setiosflags( std::ios::fixed ) << setiosflags( std::ios::showpoint ) << std::setprecision( 1 ) << running_time_rounded <<"s" << std::endl;
 }
 
-#define COMPUTE(Representation) \
-    std::cout << " " << #Representation << ","; \
+template<typename Representation, typename Algorithm>
+void benchmark_stack_access( std::string input_filename, bool use_binary, Ansatz_type ansatz ) {
+
+    phat::stack_access::boundary_matrix< Representation > matrix;
+    bool read_successful = use_binary ? matrix.load_binary( input_filename ) : matrix.load_ascii( input_filename );
+   
+    if( !read_successful ) {
+        std::cerr << std::endl << " Error opening file " << input_filename << std::endl;
+        print_help_and_exit();
+    }
+
+    phat::stack_access::boundary_matrix< Representation> reduced_matrix;
+
+    Algorithm reduction_algorithm;
+    double reduction_timer = -1; 
+    if( ansatz == PRIMAL ) {
+        std::cout << " primal,";
+        reduction_timer = omp_get_wtime();
+        reduced_matrix.init( matrix.get_num_cols() );
+        reduction_algorithm( matrix, reduced_matrix );
+    } else {
+        std::cout << " dual,";
+        double dualization_timer = omp_get_wtime();
+        phat::common::dualize( matrix );
+        double dualization_time = omp_get_wtime() - dualization_timer;
+        double dualization_time_rounded = floor( dualization_time * 10.0 + 0.5 ) / 10.0;
+        std::cout << " Dualization time: " << setiosflags( std::ios::fixed ) << setiosflags( std::ios::showpoint ) << std::setprecision( 1 ) << dualization_time_rounded <<"s,";
+        reduction_timer = omp_get_wtime();
+        reduced_matrix.init( matrix.get_num_cols() );
+        reduction_algorithm( matrix, reduced_matrix );
+    }
+
+    double running_time = omp_get_wtime() - reduction_timer;
+    double running_time_rounded = floor( running_time * 10.0 + 0.5 ) / 10.0;
+    std::cout << " Reduction time: " << setiosflags( std::ios::fixed ) << setiosflags( std::ios::showpoint ) << std::setprecision( 1 ) << running_time_rounded <<"s" << std::endl;
+}
+
+#define COMPUTE_RANDOM_ACCESS(Representation) \
     switch( algorithm ) { \
-    case STANDARD: std::cout << " standard,"; benchmark< phat::random_access::representations::Representation, phat::random_access::reducers::standard >( input_filename, use_binary, ansatz ); break; \
-    case TWIST: std::cout << " twist,"; benchmark< phat::random_access::representations::Representation, phat::random_access::reducers::twist >( input_filename, use_binary, ansatz ); break; \
-    case ROW: std::cout << " row,"; benchmark< phat::random_access::representations::Representation, phat::random_access::reducers::row >( input_filename, use_binary, ansatz ); break; \
-    case CHUNK: std::cout << " chunk,"; benchmark< phat::random_access::representations::Representation, phat::random_access::reducers::chunk >( input_filename, use_binary, ansatz ); break; \
-    case CHUNK_SEQUENTIAL: std::cout << " chunk_sequential,"; \
+    case STANDARD:         std::cout << input_filename << ", random_access, " << #Representation << ", standard,"; \
+                           benchmark_random_access< phat::random_access::representations::Representation, phat::random_access::reducers::standard >( input_filename, use_binary, ansatz ); \
+                           break; \
+    case TWIST:            std::cout << input_filename << ", random_access, " << #Representation << ", twist,"; \
+                           benchmark_random_access< phat::random_access::representations::Representation, phat::random_access::reducers::twist >( input_filename, use_binary, ansatz ); \
+                           break; \
+    case ROW:              std::cout << input_filename << ", random_access, " << #Representation << ", row,"; \
+                           benchmark_random_access< phat::random_access::representations::Representation, phat::random_access::reducers::row >( input_filename, use_binary, ansatz ); \
+                           break; \
+    case CHUNK:            std::cout << input_filename << ", random_access, " << #Representation << ", chunk,"; \
+                           benchmark_random_access< phat::random_access::representations::Representation, phat::random_access::reducers::chunk >( input_filename, use_binary, ansatz ); \
+                           break; \
+    case CHUNK_SEQUENTIAL: std::cout << input_filename << ", random_access, " << #Representation << ", chunk_sequential,"; \
                            int num_threads = omp_get_max_threads(); \
                            omp_set_num_threads( 1 ); \
-                           benchmark< phat::random_access::representations::Representation, phat::random_access::reducers::chunk >( input_filename, use_binary, ansatz ); \
+                           benchmark_random_access< phat::random_access::representations::Representation, phat::random_access::reducers::chunk >( input_filename, use_binary, ansatz ); \
                            omp_set_num_threads( num_threads ); \
+                           break; \
+    };
+
+#define COMPUTE_STACK_ACCESS(Representation) \
+    switch( algorithm ) { \
+    case STANDARD:         std::cout << input_filename << ", stack_access, " << #Representation << ", standard,"; \
+                           benchmark_stack_access< phat::stack_access::representations::Representation, phat::stack_access::reducers::standard >( input_filename, use_binary, ansatz ); \
                            break; \
     };
 
@@ -169,8 +233,9 @@ int main( int argc, char** argv )
     std::vector< Representation_type > representations; // representation class
     std::vector< Algorithm_type > algorithms; // reduction algorithm
     std::vector< Ansatz_type > ansaetze; // primal / dual
+    std::vector< Access_type > accesses; // stack / random
 
-    parse_command_line( argc, argv, use_binary, representations, algorithms, ansaetze, input_filenames );
+    parse_command_line( argc, argv, use_binary, representations, algorithms, ansaetze, accesses, input_filenames );
 
     for( int idx_input = 0; idx_input < input_filenames.size(); idx_input++ ) {
         std::string input_filename = input_filenames[ idx_input ];
@@ -178,16 +243,23 @@ int main( int argc, char** argv )
             Algorithm_type algorithm = algorithms[ idx_algorithm ];
             for( int idx_representation = 0; idx_representation < representations.size(); idx_representation++ ) {
                 Representation_type cur_representation = representations[ idx_representation ];
-                for( int idx_ansatz = 0; idx_ansatz < ansaetze.size(); idx_ansatz++ ) {
-                    Ansatz_type ansatz = ansaetze[ idx_ansatz ];
-                    std::cout << input_filename << ",";
-                    switch( cur_representation ) {
-                    case VECTOR_VECTOR: COMPUTE(vector_vector) break;
-                    case VECTOR_SET: COMPUTE(vector_set) break;
-                    case VECTOR_LIST: COMPUTE(vector_list) break;
-                    case FULL_PIVOT_COLUMN: COMPUTE(full_pivot) break;
-                    case BIT_TREE_PIVOT_COLUMN: COMPUTE(bit_tree_pivot) break;
-                    case SPARSE_PIVOT_COLUMN: COMPUTE(sparse_pivot) break;
+                for( int idx_access = 0; idx_access < accesses.size(); idx_access++ ) {
+                    Access_type cur_access = accesses[ idx_access ];
+                    for( int idx_ansatz = 0; idx_ansatz < ansaetze.size(); idx_ansatz++ ) {
+                        Ansatz_type ansatz = ansaetze[ idx_ansatz ];
+                        switch( cur_access ) {
+                        case RANDOM_ACCESS: switch( cur_representation ) {
+                                            case VECTOR_VECTOR:  COMPUTE_RANDOM_ACCESS(vector_vector) break;
+                                            case VECTOR_SET:     COMPUTE_RANDOM_ACCESS(vector_set) break;
+                                            case VECTOR_LIST:    COMPUTE_RANDOM_ACCESS(vector_list) break;
+                                            case FULL_PIVOT:     COMPUTE_RANDOM_ACCESS(full_pivot) break;
+                                            case BIT_TREE_PIVOT: COMPUTE_RANDOM_ACCESS(bit_tree_pivot) break;
+                                            case SPARSE_PIVOT:   COMPUTE_RANDOM_ACCESS(sparse_pivot) break;
+                                            } break;
+                        case STACK_ACCESS:  switch( cur_representation ) {
+                                            case BIT_TREE_PIVOT: COMPUTE_STACK_ACCESS(bit_tree_pivot) break;
+                                            } break;
+                        }
                     }
                 }
             }

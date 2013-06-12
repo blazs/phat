@@ -25,7 +25,7 @@
 #include <phat/stack_access/compute_persistence_pairs.h>
 
 // main data structure (choice affects performance)
-#include <phat/stack_access/representations/bit_tree_compressed_vector.h>
+#include <phat/stack_access/representations/bit_tree_pivot.h>
 
 // algorithm (choice affects performance)
 #include <phat/stack_access/reducers/standard.h>
