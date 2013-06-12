@@ -24,7 +24,7 @@
 
 // interface class for the main data structure -- implementations of the interface can be found in ./representations
 namespace phat { namespace stack_access {
-    template< class Representation = bit_tree_compressed_vector >
+    template< class Representation = representations::bit_tree_compressed_vector >
     class boundary_matrix : public common::const_boundary_matrix< Representation >
     {
 

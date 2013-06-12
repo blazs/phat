@@ -21,7 +21,7 @@
 #include <phat/common/basic_types.h>
 #include <phat/random_access/representations/bit_tree_pivot.h>
 
-namespace phat {
+namespace phat { namespace stack_access { namespace representations {
     class bit_tree_compressed_vector {
 
     protected:
@@ -30,7 +30,7 @@ namespace phat {
         std::vector< index > offsets;
 
         mutable bool is_top_column_pivot;
-        mutable bit_tree_column pivot_column;
+        mutable random_access::representations::bit_tree_column pivot_column;
         index num_cols;
 
         void release_pivot_col() {
@@ -123,4 +123,4 @@ namespace phat {
                 pivot_column.add_index( entries[ entry_idx ] );
         }
     };
-}
+} } }

@@ -20,7 +20,7 @@
 
 #include <phat/common/basic_types.h>
 
-namespace phat {
+namespace phat { namespace random_access { namespace representations {
     class vector_vector {
 
     protected:
@@ -90,4 +90,4 @@ namespace phat {
             target_col.swap( temp_col );
         }
     };
-}
+} } }

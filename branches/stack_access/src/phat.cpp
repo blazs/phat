@@ -16,7 +16,7 @@
     You should have received a copy of the GNU Lesser General Public License
     along with PHAT.  If not, see <http://www.gnu.org/licenses/>. */
 
-#include <phat/common/compute_persistence_pairs.h>
+#include <phat/random_access/compute_persistence_pairs.h>
 
 #include <phat/random_access/representations/vector_vector.h>
 #include <phat/random_access/representations/vector_set.h>
@@ -45,7 +45,7 @@ void print_help() {
     std::cerr << "--help    --  prints this screen" << std::endl;
     std::cerr << "--verbose --  verbose output" << std::endl;
     std::cerr << "--dualize   --  use dualization approach" << std::endl;
-    std::cerr << "--vector_vector, --vector_set, --vector_list, --full_pivot_column, --sparse_pivot_column, --bit_tree_pivot_column  --  selects a representation data structure for boundary matrices (default is '--bit_tree_pivot_column')" << std::endl;
+    std::cerr << "--vector_vector, --vector_set, --vector_list, --full_pivot, --sparse_pivot, --bit_tree_pivot  --  selects a representation data structure for boundary matrices (default is '--bit_tree_pivot')" << std::endl;
     std::cerr << "--standard, --twist, --chunk, --chunk_sequential, --row  --  selects a reduction algorithm (default is '--twist')" << std::endl;
 }
 
@@ -71,9 +71,9 @@ void parse_command_line( int argc, char** argv, bool& use_binary, Representation
         else if( option == "--vector_vector" ) representation = VECTOR_VECTOR;
         else if( option == "--vector_set" ) representation = VECTOR_SET;
         else if( option == "--vector_list" ) representation = VECTOR_LIST;
-        else if( option == "--full_pivot_column" )  representation = FULL_PIVOT_COLUMN;
-        else if( option == "--bit_tree_pivot_column" )  representation = BIT_TREE_PIVOT_COLUMN;
-        else if( option == "--sparse_pivot_column" ) representation = SPARSE_PIVOT_COLUMN;
+        else if( option == "--full_pivot" )  representation = FULL_PIVOT_COLUMN;
+        else if( option == "--bit_tree_pivot" )  representation = BIT_TREE_PIVOT_COLUMN;
+        else if( option == "--sparse_pivot" ) representation = SPARSE_PIVOT_COLUMN;
         else if( option == "--standard" ) algorithm = STANDARD;
         else if( option == "--twist" ) algorithm = TWIST;
         else if( option == "--row" ) algorithm = ROW;
@@ -90,7 +90,7 @@ void parse_command_line( int argc, char** argv, bool& use_binary, Representation
 template<typename Representation, typename Algorithm>
 void compute_pairing( std::string input_filename, std::string output_filename, bool use_binary, bool verbose, bool dualize ) {
 
-    phat::random_access_boundary_matrix< Representation > matrix;
+    phat::random_access::boundary_matrix< Representation > matrix;
     bool read_successful;
 
     double read_timer = omp_get_wtime();
@@ -122,9 +122,9 @@ void compute_pairing( std::string input_filename, std::string output_filename, b
     }
         
     double pairs_timer = omp_get_wtime();
-    phat::persistence_pairs pairs;
+    phat::common::persistence_pairs pairs;
     LOG( "Computing persistence pairs ..." )
-    phat::compute_persistence_pairs < Algorithm > ( pairs, matrix );
+    phat::random_access::compute_persistence_pairs < Algorithm > ( pairs, matrix );
     double pairs_time = omp_get_wtime() - pairs_timer;
     double pairs_time_rounded = floor( pairs_time * 10.0 + 0.5 ) / 10.0;
     LOG( "Computing persistence pairs took " << setiosflags( std::ios::fixed ) << setiosflags( std::ios::showpoint ) << std::setprecision( 1 ) << pairs_time_rounded <<"s" )
@@ -147,13 +147,13 @@ void compute_pairing( std::string input_filename, std::string output_filename, b
 
 #define COMPUTE_PAIRING(Representation) \
     switch( algorithm ) { \
-    case STANDARD: compute_pairing< phat::Representation, phat::random_access::reducers::standard> ( input_filename, output_filename, use_binary, verbose, dualize ); break; \
-    case TWIST: compute_pairing< phat::Representation, phat::random_access::reducers::twist> ( input_filename, output_filename, use_binary, verbose, dualize ); break; \
-    case ROW: compute_pairing< phat::Representation, phat::random_access::reducers::row >( input_filename, output_filename, use_binary, verbose, dualize ); break; \
-    case CHUNK: compute_pairing< phat::Representation, phat::random_access::reducers::chunk >( input_filename, output_filename, use_binary, verbose, dualize ); break; \
+    case STANDARD: compute_pairing< phat::random_access::representations::Representation, phat::random_access::reducers::standard> ( input_filename, output_filename, use_binary, verbose, dualize ); break; \
+    case TWIST: compute_pairing< phat::random_access::representations::Representation, phat::random_access::reducers::twist> ( input_filename, output_filename, use_binary, verbose, dualize ); break; \
+    case ROW: compute_pairing< phat::random_access::representations::Representation, phat::random_access::reducers::row >( input_filename, output_filename, use_binary, verbose, dualize ); break; \
+    case CHUNK: compute_pairing< phat::random_access::representations::Representation, phat::random_access::reducers::chunk >( input_filename, output_filename, use_binary, verbose, dualize ); break; \
     case CHUNK_SEQUENTIAL: int num_threads = omp_get_max_threads(); \
                            omp_set_num_threads( 1 ); \
-                           compute_pairing< phat::Representation, phat::random_access::reducers::chunk >( input_filename, output_filename, use_binary, verbose, dualize ); break; \
+                           compute_pairing< phat::random_access::representations::Representation, phat::random_access::reducers::chunk >( input_filename, output_filename, use_binary, verbose, dualize ); break; \
                            omp_set_num_threads( num_threads ); \
                            break; \
     }
@@ -174,8 +174,8 @@ int main( int argc, char** argv )
     case VECTOR_VECTOR: COMPUTE_PAIRING(vector_vector) break;
     case VECTOR_SET: COMPUTE_PAIRING(vector_set) break;
     case VECTOR_LIST: COMPUTE_PAIRING(vector_list) break;
-    case FULL_PIVOT_COLUMN: COMPUTE_PAIRING(full_pivot_column) break;
-    case BIT_TREE_PIVOT_COLUMN: COMPUTE_PAIRING(bit_tree_pivot_column) break;
-    case SPARSE_PIVOT_COLUMN: COMPUTE_PAIRING(sparse_pivot_column) break;
+    case FULL_PIVOT_COLUMN: COMPUTE_PAIRING(full_pivot) break;
+    case BIT_TREE_PIVOT_COLUMN: COMPUTE_PAIRING(bit_tree_pivot) break;
+    case SPARSE_PIVOT_COLUMN: COMPUTE_PAIRING(sparse_pivot) break;
     }
 }

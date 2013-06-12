@@ -20,7 +20,7 @@
 
 #include <phat/common/basic_types.h>
 
-namespace phat {
+namespace phat { namespace random_access { namespace representations {
     class vector_list {
 
     protected:
@@ -94,4 +94,4 @@ namespace phat {
                                            std::back_inserter( target_col ) );
         }
     };
-}
+} } }

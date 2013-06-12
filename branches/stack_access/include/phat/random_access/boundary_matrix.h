@@ -24,8 +24,8 @@
 
 // interface class for the main data structure -- implementations of the interface can be found in ./representations
 namespace phat { namespace random_access {
-    template< class Representation = bit_tree_pivot >
-    class boundary_matrix : public common::const_boundary_matrix< Representation >
+    template< class Representation = phat::random_access::representations::bit_tree_pivot >
+    class boundary_matrix : public phat::common::const_boundary_matrix< Representation >
     {
 
     // interface functions -- actual implementation and complexity depends on chosen @Representation template

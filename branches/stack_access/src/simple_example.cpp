@@ -22,7 +22,7 @@
 #include <phat/random_access/boundary_matrix.h>
 
 // wrapper algorithm that computes the persistence pairs of a given boundary matrix using a specified algorithm
-#include <phat/common/compute_persistence_pairs.h>
+#include <phat/random_access/compute_persistence_pairs.h>
 
 // main data structure (choice affects performance)
 #include <phat/random_access/representations/vector_vector.h>
@@ -51,7 +51,7 @@ int main( int argc, char** argv )
 
 
     // first define a boundary matrix with the chosen internal representation
-    phat::random_access_boundary_matrix< phat::vector_vector > boundary_matrix;
+    phat::random_access::boundary_matrix< phat::random_access::representations::vector_vector > boundary_matrix;
 
     // set the number of columns (has to be 7 since we have 7 simplices)
     boundary_matrix.init( 7 );
@@ -113,11 +113,11 @@ int main( int argc, char** argv )
     
 
     // define the object to hold the resulting persistence pairs
-    phat::persistence_pairs pairs;
+    phat::common::persistence_pairs pairs;
 
     // choose an algorithm (choice affects performance) and compute the persistence pair
     // (modifies boundary_matrix)
-    phat::compute_persistence_pairs< phat::random_access::reducers::twist >( pairs, boundary_matrix );
+    phat::random_access::compute_persistence_pairs< phat::random_access::reducers::twist >( pairs, boundary_matrix );
     
     // sort the persistence pairs by birth index 
     pairs.sort();

@@ -16,7 +16,8 @@
     You should have received a copy of the GNU Lesser General Public License
     along with PHAT.  If not, see <http://www.gnu.org/licenses/>. */
 
-#include <phat/common/compute_persistence_pairs.h>
+#include <phat/random_access/compute_persistence_pairs.h>
+#include <phat/stack_access/compute_persistence_pairs.h>
 
 #include <phat/random_access/representations/vector_vector.h>
 #include <phat/random_access/representations/vector_set.h>
@@ -37,15 +38,15 @@ int main( int argc, char** argv )
 {
     std::string test_data = argc > 1 ? argv[ 1 ] : "torus.bin";
 
-    typedef phat::sparse_pivot_column Sparse;
-    typedef phat::full_pivot_column Full;
-    typedef phat::bit_tree_pivot_column BitTree;
-    typedef phat::vector_vector Vec_vec;
-    typedef phat::vector_set Vec_set;
-    typedef phat::vector_list Vec_list;
+    typedef phat::random_access::representations::sparse_pivot Sparse;
+    typedef phat::random_access::representations::full_pivot Full;
+    typedef phat::random_access::representations::bit_tree_pivot BitTree;
+    typedef phat::random_access::representations::vector_vector Vec_vec;
+    typedef phat::random_access::representations::vector_set Vec_set;
+    typedef phat::random_access::representations::vector_list Vec_list;
 
     std::cout << "Reading test data " << test_data << " in binary format ..." << std::endl;
-    phat::random_access_boundary_matrix< Full > boundary_matrix;
+    phat::random_access::boundary_matrix< Full > boundary_matrix;
     if( !boundary_matrix.load_binary( test_data ) ) {
         std::cerr << "Error: test data " << test_data << " not found!" << std::endl;
         return EXIT_FAILURE;
@@ -55,34 +56,34 @@ int main( int argc, char** argv )
     std::cout << "Comparing representations using Chunk algorithm ..." << std::endl;
     {
         std::cout << "Running Chunk - Sparse ..." << std::endl;
-        phat::persistence_pairs sparse_pairs;
-        phat::random_access_boundary_matrix< Sparse > sparse_boundary_matrix = boundary_matrix;
-        phat::compute_persistence_pairs< phat::random_access::reducers::chunk >( sparse_pairs, sparse_boundary_matrix );
+        phat::common::persistence_pairs sparse_pairs;
+        phat::random_access::boundary_matrix< Sparse > sparse_boundary_matrix = boundary_matrix;
+        phat::random_access::compute_persistence_pairs< phat::random_access::reducers::chunk >( sparse_pairs, sparse_boundary_matrix );
 
         std::cout << "Running Chunk - Full ..." << std::endl;
-        phat::persistence_pairs full_pairs;
-        phat::random_access_boundary_matrix< Full > full_boundary_matrix = boundary_matrix;
-        phat::compute_persistence_pairs< phat::random_access::reducers::chunk >( full_pairs, full_boundary_matrix );
+        phat::common::persistence_pairs full_pairs;
+        phat::random_access::boundary_matrix< Full > full_boundary_matrix = boundary_matrix;
+        phat::random_access::compute_persistence_pairs< phat::random_access::reducers::chunk >( full_pairs, full_boundary_matrix );
 
         std::cout << "Running Chunk - BitTree ..." << std::endl;
-        phat::persistence_pairs bit_tree_pairs;
-        phat::random_access_boundary_matrix< BitTree > bit_tree_boundary_matrix = boundary_matrix;
-        phat::compute_persistence_pairs< phat::random_access::reducers::chunk >( bit_tree_pairs, bit_tree_boundary_matrix );
+        phat::common::persistence_pairs bit_tree_pairs;
+        phat::random_access::boundary_matrix< BitTree > bit_tree_boundary_matrix = boundary_matrix;
+        phat::random_access::compute_persistence_pairs< phat::random_access::reducers::chunk >( bit_tree_pairs, bit_tree_boundary_matrix );
 
         std::cout << "Running Chunk - Vec_vec ..." << std::endl;
-        phat::persistence_pairs vec_vec_pairs;
-        phat::random_access_boundary_matrix< Vec_vec > vec_vec_boundary_matrix = boundary_matrix;
-        phat::compute_persistence_pairs< phat::random_access::reducers::chunk >( vec_vec_pairs, vec_vec_boundary_matrix );
+        phat::common::persistence_pairs vec_vec_pairs;
+        phat::random_access::boundary_matrix< Vec_vec > vec_vec_boundary_matrix = boundary_matrix;
+        phat::random_access::compute_persistence_pairs< phat::random_access::reducers::chunk >( vec_vec_pairs, vec_vec_boundary_matrix );
 
         std::cout << "Running Chunk - Vec_set ..." << std::endl;
-        phat::persistence_pairs vec_set_pairs;
-        phat::random_access_boundary_matrix< Vec_set > vec_set_boundary_matrix = boundary_matrix;
-        phat::compute_persistence_pairs< phat::random_access::reducers::chunk >( vec_set_pairs, vec_set_boundary_matrix );
+        phat::common::persistence_pairs vec_set_pairs;
+        phat::random_access::boundary_matrix< Vec_set > vec_set_boundary_matrix = boundary_matrix;
+        phat::random_access::compute_persistence_pairs< phat::random_access::reducers::chunk >( vec_set_pairs, vec_set_boundary_matrix );
 
         std::cout << "Running Chunk - Vec_list ..." << std::endl;
-        phat::persistence_pairs vec_list_pairs;
-        phat::random_access_boundary_matrix< Vec_list > vec_list_boundary_matrix = boundary_matrix;
-        phat::compute_persistence_pairs< phat::random_access::reducers::chunk >( vec_list_pairs, vec_list_boundary_matrix );
+        phat::common::persistence_pairs vec_list_pairs;
+        phat::random_access::boundary_matrix< Vec_list > vec_list_boundary_matrix = boundary_matrix;
+        phat::random_access::compute_persistence_pairs< phat::random_access::reducers::chunk >( vec_list_pairs, vec_list_boundary_matrix );
 
         if( sparse_pairs != full_pairs ) {
             std::cerr << "Error: sparse and full differ!" << std::endl;
@@ -116,24 +117,24 @@ int main( int argc, char** argv )
     std::cout << "Comparing algorithms using BitTree representation ..." << std::endl;
     {
         std::cout << "Running Twist - BitTree ..." << std::endl;
-        phat::persistence_pairs twist_pairs;
-        phat::random_access_boundary_matrix< BitTree > twist_boundary_matrix = boundary_matrix;
-        phat::compute_persistence_pairs< phat::random_access::reducers::twist >( twist_pairs, twist_boundary_matrix );
+        phat::common::persistence_pairs twist_pairs;
+        phat::random_access::boundary_matrix< BitTree > twist_boundary_matrix = boundary_matrix;
+        phat::random_access::compute_persistence_pairs< phat::random_access::reducers::twist >( twist_pairs, twist_boundary_matrix );
 
         std::cout << "Running Standard - BitTree ..." << std::endl;
-        phat::persistence_pairs std_pairs;
-        phat::random_access_boundary_matrix< BitTree > std_boundary_matrix = boundary_matrix;
-        phat::compute_persistence_pairs< phat::random_access::reducers::standard >( std_pairs, std_boundary_matrix );
+        phat::common::persistence_pairs std_pairs;
+        phat::random_access::boundary_matrix< BitTree > std_boundary_matrix = boundary_matrix;
+        phat::random_access::compute_persistence_pairs< phat::random_access::reducers::standard >( std_pairs, std_boundary_matrix );
 
         std::cout << "Running Chunk - BitTree ..." << std::endl;
-        phat::persistence_pairs chunk_pairs;
-        phat::random_access_boundary_matrix< BitTree > chunk_boundary_matrix = boundary_matrix;
-        phat::compute_persistence_pairs< phat::random_access::reducers::chunk >( chunk_pairs, chunk_boundary_matrix );
+        phat::common::persistence_pairs chunk_pairs;
+        phat::random_access::boundary_matrix< BitTree > chunk_boundary_matrix = boundary_matrix;
+        phat::random_access::compute_persistence_pairs< phat::random_access::reducers::chunk >( chunk_pairs, chunk_boundary_matrix );
 
         std::cout << "Running Row - BitTree ..." << std::endl;
-        phat::persistence_pairs row_pairs;
-        phat::random_access_boundary_matrix< BitTree > row_boundary_matrix = boundary_matrix;
-        phat::compute_persistence_pairs< phat::random_access::reducers::row >( row_pairs, row_boundary_matrix );
+        phat::common::persistence_pairs row_pairs;
+        phat::random_access::boundary_matrix< BitTree > row_boundary_matrix = boundary_matrix;
+        phat::random_access::compute_persistence_pairs< phat::random_access::reducers::row >( row_pairs, row_boundary_matrix );
 
         if( twist_pairs != std_pairs ) {
             std::cerr << "Error: twist and standard differ!" << std::endl;
@@ -158,13 +159,13 @@ int main( int argc, char** argv )
 
     std::cout << "Comparing random_access to stack_access using Standard - BitTree ..." << std::endl;
     {
-        phat::persistence_pairs random_access_pairs;
-        phat::random_access_boundary_matrix< BitTree > random_access_boundary_matrix = boundary_matrix;
-        phat::compute_persistence_pairs< phat::random_access::reducers::standard >( random_access_pairs, random_access_boundary_matrix );
+        phat::common::persistence_pairs random_access_pairs;
+        phat::random_access::boundary_matrix< BitTree > random_access_boundary_matrix = boundary_matrix;
+        phat::random_access::compute_persistence_pairs< phat::random_access::reducers::standard >( random_access_pairs, random_access_boundary_matrix );
 
-        phat::persistence_pairs stack_access_pairs;
-        phat::stack_access_boundary_matrix< phat::bit_tree_compressed_vector > stack_access_boundary_matrix = boundary_matrix;
-        phat::compute_persistence_pairs< phat::stack_access::reducers::standard >( stack_access_pairs, stack_access_boundary_matrix );
+        phat::common::persistence_pairs stack_access_pairs;
+        phat::stack_access::boundary_matrix< phat::stack_access::representations::bit_tree_compressed_vector > stack_access_boundary_matrix = boundary_matrix;
+        phat::stack_access::compute_persistence_pairs< phat::stack_access::reducers::standard >( stack_access_pairs, stack_access_boundary_matrix );
 
         if( random_access_pairs != stack_access_pairs ) {
             std::cerr << "Error: random_access and stack_access differ!" << std::endl;
@@ -177,13 +178,13 @@ int main( int argc, char** argv )
 
     std::cout << "Comparing primal and dual approach using Chunk - Full ..." << std::endl;
     {
-        phat::persistence_pairs primal_pairs;
-        phat::random_access_boundary_matrix< Full > primal_boundary_matrix = boundary_matrix;
-        phat::compute_persistence_pairs< phat::random_access::reducers::chunk >( primal_pairs, primal_boundary_matrix );
+        phat::common::persistence_pairs primal_pairs;
+        phat::random_access::boundary_matrix< Full > primal_boundary_matrix = boundary_matrix;
+        phat::random_access::compute_persistence_pairs< phat::random_access::reducers::chunk >( primal_pairs, primal_boundary_matrix );
 
-        phat::persistence_pairs dual_pairs;
-        phat::random_access_boundary_matrix< Full > dual_boundary_matrix = boundary_matrix;
-        phat::compute_persistence_pairs_dualized< phat::random_access::reducers::chunk >( dual_pairs, dual_boundary_matrix );
+        phat::common::persistence_pairs dual_pairs;
+        phat::random_access::boundary_matrix< Full > dual_boundary_matrix = boundary_matrix;
+        phat::random_access::compute_persistence_pairs_dualized< phat::random_access::reducers::chunk >( dual_pairs, dual_boundary_matrix );
 
         if( primal_pairs != dual_pairs ) {
             std::cerr << "Error: primal and dual differ!" << std::endl;
@@ -199,7 +200,7 @@ int main( int argc, char** argv )
         std::vector< std::vector< int > > vector_vector_matrix;
         std::vector< int > vector_dims;
         boundary_matrix.save_vector_vector( vector_vector_matrix, vector_dims );
-        phat::random_access_boundary_matrix< BitTree > vector_vector_boundary_matrix;
+        phat::random_access::boundary_matrix< BitTree > vector_vector_boundary_matrix;
         vector_vector_boundary_matrix.load_vector_vector( vector_vector_matrix, vector_dims );
 
         if( vector_vector_boundary_matrix != boundary_matrix ) {

@@ -22,10 +22,9 @@
 #include <phat/stack_access/boundary_matrix.h>
 
 // wrapper algorithm that computes the persistence pairs of a given boundary matrix using a specified algorithm
-#include <phat/common/compute_persistence_pairs.h>
+#include <phat/stack_access/compute_persistence_pairs.h>
 
 // main data structure (choice affects performance)
-#include <phat/random_access/representations/vector_vector.h>
 #include <phat/stack_access/representations/bit_tree_compressed_vector.h>
 
 // algorithm (choice affects performance)
@@ -50,9 +49,7 @@ int main( int argc, char** argv )
 
 
     // first define a boundary matrix with the chosen internal representation
-    phat::stack_access_boundary_matrix< phat::bit_tree_compressed_vector > boundary_matrix;
-
-    
+    phat::stack_access::boundary_matrix<> boundary_matrix;
 
     // set the respective columns -- the columns entries have to be sorted
     std::vector< phat::index > temp_col;
@@ -102,11 +99,10 @@ int main( int argc, char** argv )
     
 
     // define the object to hold the resulting persistence pairs
-    phat::persistence_pairs pairs;
+    phat::common::persistence_pairs pairs;
 
-    // choose an algorithm (choice affects performance) and compute the persistence pair
-    // (modifies boundary_matrix)
-    phat::compute_persistence_pairs< phat::stack_access::reducers::standard >( pairs, boundary_matrix );
+    // choose an algorithm (choice affects performance) and compute the persistence pair (modifies boundary_matrix)
+    phat::stack_access::compute_persistence_pairs<>( pairs, boundary_matrix );
     
     // sort the persistence pairs by birth index 
     pairs.sort();

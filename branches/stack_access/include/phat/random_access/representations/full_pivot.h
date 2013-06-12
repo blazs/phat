@@ -21,7 +21,7 @@
 #include <phat/common/basic_types.h>
 #include <phat/random_access/representations/abstract_pivot.h>
 
-namespace phat {
+namespace phat { namespace random_access { namespace representations {
     class full_column {
 
     protected:
@@ -97,4 +97,4 @@ namespace phat {
     };
 
     typedef abstract_pivot< full_column > full_pivot;
-}
+} } }
