@@ -28,10 +28,7 @@
 #include <phat/random_access/representations/vector_vector.h>
 
 // algorithm (choice affects performance)
-#include <phat/random_access/reducers/twist.h>
 #include <phat/random_access/reducers/standard.h>
-#include <phat/random_access/reducers/row.h>
-#include <phat/random_access/reducers/chunk.h>
 
 int main( int argc, char** argv ) 
 {
@@ -117,7 +114,7 @@ int main( int argc, char** argv )
 
     // choose an algorithm (choice affects performance) and compute the persistence pair
     // (modifies boundary_matrix)
-    phat::random_access::compute_persistence_pairs< phat::random_access::reducers::twist >( pairs, boundary_matrix );
+    phat::random_access::compute_persistence_pairs< phat::random_access::reducers::standard >( pairs, boundary_matrix );
     
     // sort the persistence pairs by birth index 
     pairs.sort();
