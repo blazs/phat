@@ -19,9 +19,8 @@
 #pragma once
 
 #include <phat/common/basic_types.h>
-#include <phat/random_access/representations/abstract_pivot.h>
 
-namespace phat { namespace random_access { namespace representations {
+namespace phat { namespace common { 
 
     // This is a bitset indexed with a 64-ary tree. Each node in the index
     // has 64 bits; i-th bit says that the i-th subtree is non-empty.
@@ -158,6 +157,4 @@ namespace phat { namespace random_access { namespace representations {
                     50, 36, 17, 19, 29, 10, 13, 21,
                     56, 45, 25, 31, 35, 16,  9, 12,
                     44, 24, 15,  8, 23,  7,  6,  5 };
-
-    typedef abstract_pivot< bit_tree_column > bit_tree_pivot;
-} } }
+} }
