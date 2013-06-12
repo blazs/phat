@@ -20,11 +20,11 @@
 
 #include <phat/common/basic_types.h>
 #include <phat/common/const_boundary_matrix.h>
-#include <phat/stack_access/representations/bit_tree_compressed_vector.h>
+#include <phat/stack_access/representations/bit_tree_pivot.h>
 
 // interface class for the main data structure -- implementations of the interface can be found in ./representations
 namespace phat { namespace stack_access {
-    template< class Representation = representations::bit_tree_compressed_vector >
+    template< class Representation = representations::bit_tree_pivot >
     class boundary_matrix : public common::const_boundary_matrix< Representation >
     {
 
@@ -72,7 +72,6 @@ namespace phat { namespace stack_access {
             init( nr_of_columns );
             column temp_col;
             for( index cur_col = 0; cur_col < nr_of_columns; cur_col++ ) {
-                this->set_dim( cur_col,  );
                 index num_rows = input_matrix[ cur_col ].size();
                 temp_col.resize( num_rows );
                 for( index cur_row = 0; cur_row <  num_rows; cur_row++ )
