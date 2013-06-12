@@ -21,7 +21,7 @@
 #include <phat/common/basic_types.h>
 #include <phat/random_access/representations/vector_vector.h>
 
-namespace phat {
+namespace phat { namespace random_access { namespace representations {
 
     // Note: We could even make the rep generic in the underlying Const representation
     //       But I cannot imagine that anything else than vector<vector<index>> would
@@ -95,6 +95,6 @@ namespace phat {
 
         void _remove_max( index idx ) {	is_pivot_col( idx ) ? get_pivot_col().remove_max() : Base::_remove_max( idx ); }
     };
-}
+} } }
 
 

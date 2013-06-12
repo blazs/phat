@@ -21,7 +21,7 @@
 #include <phat/common/basic_types.h>
 #include <phat/random_access/representations/abstract_pivot.h>
 
-namespace phat {
+namespace phat { namespace random_access { namespace representations {
 
     // This is a bitset indexed with a 64-ary tree. Each node in the index
     // has 64 bits; i-th bit says that the i-th subtree is non-empty.
@@ -160,4 +160,4 @@ namespace phat {
                     44, 24, 15,  8, 23,  7,  6,  5 };
 
     typedef abstract_pivot< bit_tree_column > bit_tree_pivot;
-}
+} } }
