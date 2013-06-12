@@ -19,9 +19,8 @@
 #pragma once
 
 #include <phat/common/basic_types.h>
-#include <phat/random_access/representations/abstract_pivot.h>
 
-namespace phat { namespace random_access { namespace representations {
+namespace phat { namespace common {
     class full_column {
 
     protected:
@@ -95,6 +94,4 @@ namespace phat { namespace random_access { namespace representations {
             add_col( col );
         }
     };
-
-    typedef abstract_pivot< full_column > full_pivot;
-} } }
+} }
