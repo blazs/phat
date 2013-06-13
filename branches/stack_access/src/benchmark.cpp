@@ -32,6 +32,9 @@
 
 #include <phat/stack_access/boundary_matrix.h>
 #include <phat/stack_access/representations/bit_tree_pivot.h>
+#include <phat/stack_access/representations/sparse_pivot.h>
+#include <phat/stack_access/representations/full_pivot.h>
+#include <phat/stack_access/representations/bit_tree_pivot.h>
 #include <phat/stack_access/reducers/standard.h>
 
 #include <phat/common/dualize.h>
@@ -63,10 +66,10 @@ void print_help_and_exit() {
 enum Representation_type  {VECTOR_VECTOR, VECTOR_SET, SPARSE_PIVOT, FULL_PIVOT, BIT_TREE_PIVOT, VECTOR_LIST};
 enum Algorithm_type  {STANDARD, TWIST, ROW, CHUNK, CHUNK_SEQUENTIAL};
 enum Ansatz_type  {PRIMAL, DUAL};
-enum Access_type  {RANDOM_ACCESS, STACK_ACCESS};
+enum Package_type  {RANDOM_ACCESS, STACK_ACCESS};
 
 void parse_command_line( int argc, char** argv, bool& use_binary, std::vector< Representation_type >& representations, std::vector< Algorithm_type >& algorithms
-                       , std::vector< Ansatz_type >& ansaetze, std::vector< Access_type >& accesses, std::vector< std::string >& input_filenames ) {
+                       , std::vector< Ansatz_type >& ansaetze, std::vector< Package_type >& packages, std::vector< std::string >& input_filenames ) {
 
     if( argc < 2 ) print_help_and_exit();
 
@@ -89,8 +92,8 @@ void parse_command_line( int argc, char** argv, bool& use_binary, std::vector< R
             else if( argument == "--chunk" ) algorithms.push_back( CHUNK );
             else if( argument == "--primal" ) ansaetze.push_back( PRIMAL );
             else if( argument == "--dual" ) ansaetze.push_back( DUAL );
-            else if( argument == "--random_access" ) accesses.push_back( RANDOM_ACCESS );
-            else if( argument == "--stack_access" ) accesses.push_back( STACK_ACCESS );
+            else if( argument == "--random_access" ) packages.push_back( RANDOM_ACCESS );
+            else if( argument == "--stack_access" ) packages.push_back( STACK_ACCESS );
             else if( argument == "--help" ) print_help_and_exit();
             else print_help_and_exit();
         } else {
@@ -120,9 +123,9 @@ void parse_command_line( int argc, char** argv, bool& use_binary, std::vector< R
         ansaetze.push_back( DUAL );
     }
 
-    if( accesses.empty() == true ) {
-        accesses.push_back( RANDOM_ACCESS );
-        accesses.push_back( STACK_ACCESS );
+    if( packages.empty() == true ) {
+        packages.push_back( RANDOM_ACCESS );
+        packages.push_back( STACK_ACCESS );
     }
 }
 
@@ -233,9 +236,9 @@ int main( int argc, char** argv )
     std::vector< Representation_type > representations; // representation class
     std::vector< Algorithm_type > algorithms; // reduction algorithm
     std::vector< Ansatz_type > ansaetze; // primal / dual
-    std::vector< Access_type > accesses; // stack / random
+    std::vector< Package_type > packages; // stack / random
 
-    parse_command_line( argc, argv, use_binary, representations, algorithms, ansaetze, accesses, input_filenames );
+    parse_command_line( argc, argv, use_binary, representations, algorithms, ansaetze, packages, input_filenames );
 
     for( int idx_input = 0; idx_input < input_filenames.size(); idx_input++ ) {
         std::string input_filename = input_filenames[ idx_input ];
@@ -243,11 +246,11 @@ int main( int argc, char** argv )
             Algorithm_type algorithm = algorithms[ idx_algorithm ];
             for( int idx_representation = 0; idx_representation < representations.size(); idx_representation++ ) {
                 Representation_type cur_representation = representations[ idx_representation ];
-                for( int idx_access = 0; idx_access < accesses.size(); idx_access++ ) {
-                    Access_type cur_access = accesses[ idx_access ];
+                for( int idx_package = 0; idx_package < packages.size(); idx_package++ ) {
+                    Package_type cur_package = packages[ idx_package ];
                     for( int idx_ansatz = 0; idx_ansatz < ansaetze.size(); idx_ansatz++ ) {
                         Ansatz_type ansatz = ansaetze[ idx_ansatz ];
-                        switch( cur_access ) {
+                        switch( cur_package ) {
                         case RANDOM_ACCESS: switch( cur_representation ) {
                                             case VECTOR_VECTOR:  COMPUTE_RANDOM_ACCESS(vector_vector) break;
                                             case VECTOR_SET:     COMPUTE_RANDOM_ACCESS(vector_set) break;
@@ -258,6 +261,8 @@ int main( int argc, char** argv )
                                             } break;
                         case STACK_ACCESS:  switch( cur_representation ) {
                                             case BIT_TREE_PIVOT: COMPUTE_STACK_ACCESS(bit_tree_pivot) break;
+                                            case FULL_PIVOT:     COMPUTE_STACK_ACCESS(full_pivot) break;
+                                            case SPARSE_PIVOT:   COMPUTE_STACK_ACCESS(sparse_pivot) break;
                                             } break;
                         }
                     }
