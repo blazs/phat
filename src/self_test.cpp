@@ -106,25 +106,6 @@ int main( int argc, char** argv )
         else std::cout << "All results are identical (as they should be)" << std::endl;
     }
 
-    std::cout << "Comparing random_access to stack_access using standard - bit_tree_pivot ..." << std::endl;
-    {
-        common::persistence_pairs random_access_pairs;
-        random_access::boundary_matrix< random_access::representations::bit_tree_pivot > random_access_boundary_matrix = boundary_matrix;
-        random_access::compute_persistence_pairs< random_access::reducers::twist >( random_access_pairs, random_access_boundary_matrix );
-
-        common::persistence_pairs stack_access_pairs;
-        stack_access::boundary_matrix< stack_access::representations::bit_tree_pivot > stack_access_boundary_matrix = boundary_matrix;
-        stack_access::compute_persistence_pairs< stack_access::reducers::twist >( stack_access_pairs, stack_access_boundary_matrix );
-
-        if( random_access_pairs != stack_access_pairs ) {
-            std::cerr << "Error: random_access and stack_access differ!" << std::endl;
-            error = true;
-        }
-
-        if( error ) return EXIT_FAILURE;
-        else std::cout << "All results are identical (as they should be)" << std::endl;
-    }
-
     std::cout << "Comparing primal and dual approach using random_access and chunk - full_pivot ..." << std::endl;
     {
         common::persistence_pairs primal_pairs;

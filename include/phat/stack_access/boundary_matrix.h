@@ -36,8 +36,6 @@ namespace phat { namespace stack_access {
         // adds column @source to right-most column
         void add_to_top( index source ) { rep._add_to_top( source ); }
 
-        
-
     // operators / constructors
     public:
         boundary_matrix() {};
