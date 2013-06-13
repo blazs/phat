@@ -19,9 +19,9 @@
 #pragma once
 
 #include <phat/common/basic_types.h>
-#include <phat/random_access/representations/abstract_pivot.h>
+#include <phat/stack_access/representations/abstract_pivot.h>
 #include <phat/common/sparse_column.h>
 
-namespace phat { namespace random_access { namespace representations {
+namespace phat { namespace stack_access { namespace representations {
     typedef abstract_pivot< common::sparse_column > sparse_pivot;
 } } }

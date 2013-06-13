@@ -22,7 +22,8 @@
 #include <phat/random_access/representations/bit_tree_pivot.h>
 
 namespace phat { namespace stack_access { namespace representations {
-    class bit_tree_pivot {
+    template< typename PivotColumn >
+    class abstract_pivot {
 
     protected:
         std::vector< dimension > dims;
@@ -30,7 +31,7 @@ namespace phat { namespace stack_access { namespace representations {
         std::vector< index > offsets;
 
         mutable bool is_top_column_pivot;
-        mutable common::bit_tree_column pivot_column;
+        mutable PivotColumn pivot_column;
         index num_cols;
 
         void release_pivot_col() {

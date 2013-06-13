@@ -26,12 +26,6 @@ namespace phat { namespace common {
     protected:
         std::set< index > data;
 
-        void add_index( const index idx ) {
-            std::pair< std::set< index >::iterator, bool > result = data.insert( idx );
-            if( result.second == false )
-                data.erase( result.first );
-        }
-
     public:
         void init( const index total_size ) {
             data.clear(); 
@@ -71,6 +65,12 @@ namespace phat { namespace common {
         void get_col( column& col  ) {
             get_col_and_clear( col );
             add_col( col );
+        }
+
+        void add_index( const index idx ) {
+            std::pair< std::set< index >::iterator, bool > result = data.insert( idx );
+            if( result.second == false )
+                data.erase( result.first );
         }
     };
 } }
