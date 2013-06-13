@@ -39,13 +39,13 @@ namespace phat { namespace stack_access { namespace reducers {
                 reduced_matrix.init( nr_columns );
                 for( index cur_col = 0; cur_col < nr_columns; cur_col++ ) {
                     if( temp_matrix.get_dim( cur_col ) == cur_dim ) {
-                        index lowest_one = temp_matrix.get_max_index( cur_col );
-                        if( lowest_one != -1 && lowest_one_lookup[ lowest_one ] != -1 ) {
+                        if( lowest_one_lookup[ cur_col ] != -1 ) {
                             temp_col.clear();
                             reduced_matrix.push_col( temp_col, temp_matrix.get_dim( cur_col ) );
                         } else {
                             temp_matrix.get_col( cur_col, temp_col );
                             reduced_matrix.push_col( temp_col, temp_matrix.get_dim( cur_col ) );
+                            index lowest_one = reduced_matrix.get_max_index( cur_col );
                             while( lowest_one != -1 && lowest_one_lookup[ lowest_one ] != -1 ) {
                                 reduced_matrix.add_to_top( lowest_one_lookup[ lowest_one ] );
                                 lowest_one = reduced_matrix.get_max_index( cur_col );
