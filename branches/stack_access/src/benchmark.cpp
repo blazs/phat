@@ -36,6 +36,7 @@
 #include <phat/stack_access/representations/full_pivot.h>
 #include <phat/stack_access/representations/bit_tree_pivot.h>
 #include <phat/stack_access/reducers/standard.h>
+#include <phat/stack_access/reducers/twist.h>
 
 #include <phat/common/dualize.h>
 
@@ -225,6 +226,9 @@ void benchmark_stack_access( std::string input_filename, bool use_binary, Ansatz
     switch( algorithm ) { \
     case STANDARD:         std::cout << input_filename << ", stack_access, " << #Representation << ", standard,"; \
                            benchmark_stack_access< phat::stack_access::representations::Representation, phat::stack_access::reducers::standard >( input_filename, use_binary, ansatz ); \
+                           break; \
+    case TWIST:         std::cout << input_filename << ", stack_access, " << #Representation << ", twist,"; \
+                           benchmark_stack_access< phat::stack_access::representations::Representation, phat::stack_access::reducers::twist >( input_filename, use_binary, ansatz ); \
                            break; \
     };
 
