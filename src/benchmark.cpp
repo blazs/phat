@@ -152,6 +152,9 @@ void benchmark( std::string input_filename, bool use_binary, Ansatz_type ansatz 
         print_help_and_exit();
     }
 
+    std::vector< phat::index > normalization_map;
+    matrix.normalize( normalization_map );
+
     ReducedMatrix reduced_matrix;
     Algorithm reduction_algorithm;
 

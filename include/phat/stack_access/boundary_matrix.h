@@ -64,6 +64,35 @@ namespace phat { namespace stack_access {
 
     // I/O -- independent of chosen 'Representation'
     public:
+        void normalize( std::vector< index >& normalization_map ) {
+            boundary_matrix< Representation > temp_boundary_matrix = *this;
+            const index num_cols = temp_boundary_matrix.get_num_cols();
+            init( num_cols );
+
+            normalization_map.resize( num_cols, -1 );
+            index cur_idx = 0;
+            for( index cur_dim = temp_boundary_matrix.get_max_dim(); cur_dim >= 0 ; cur_dim-- ) {
+                for( index cur_col = 0; cur_col < num_cols; cur_col++ ) {
+                    if( temp_boundary_matrix.get_dim( cur_col ) == cur_dim ) {
+                        normalization_map[ cur_col ] = cur_idx++;
+                    }
+                }
+            }
+
+            column temp_col;
+            column normalized_col;
+            for( index cur_dim = temp_boundary_matrix.get_max_dim(); cur_dim >= 0 ; cur_dim-- ) {
+                for( index cur_col = 0; cur_col < num_cols; cur_col++ ) {
+                    if( temp_boundary_matrix.get_dim( cur_col ) == cur_dim ) {
+                        temp_boundary_matrix.get_col( cur_col, temp_col );
+                        normalized_col.clear();
+                        for( index idx = 0; idx < (index)temp_col.size(); idx++ )
+                            normalized_col.push_back( normalization_map[ temp_col[ idx ] ] );
+                        push_col( normalized_col, temp_boundary_matrix.get_dim( cur_col ) );
+                    }
+                }
+            }
+        }
 
         // initializes boundary_matrix from (vector<vector>, vector) pair -- untested
         template< typename index_type, typename dimemsion_type >
