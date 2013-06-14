@@ -163,6 +163,36 @@ int main( int argc, char** argv )
         else std::cout << "All results are identical (as they should be)" << std::endl;
     }
 
+    std::cout << "Testing normalization ..." << std::endl;
+    {
+        common::persistence_pairs classic_pairs;
+        stack_access::boundary_matrix< stack_access::representations::bit_tree_pivot > classic_boundary_matrix = boundary_matrix;
+        stack_access::compute_persistence_pairs< stack_access::reducers::twist >( classic_pairs, classic_boundary_matrix );
+
+        common::persistence_pairs normalized_pairs;
+        stack_access::boundary_matrix< stack_access::representations::bit_tree_pivot > normalized_boundary_matrix = boundary_matrix;
+        std::vector< phat::index > normalization_map;
+        normalized_boundary_matrix.normalize( normalization_map );
+        stack_access::compute_persistence_pairs< stack_access::reducers::straight_twist >( normalized_pairs, normalized_boundary_matrix );
+
+        // now normalize classic pairs to compare:
+        common::persistence_pairs normalized_classic_pairs;
+        for( index idx = 0; idx < classic_pairs.get_num_pairs(); idx++ ) {
+            index normalized_birth = normalization_map[ classic_pairs.get_pair( idx ).first ];
+            index normalized_death = normalization_map[ classic_pairs.get_pair( idx ).second ];
+            normalized_classic_pairs.append_pair( normalized_birth, normalized_death );
+        }
+
+
+        if( normalized_pairs != normalized_classic_pairs ) {
+            std::cerr << "Error: normalization bug" << std::endl;
+            error = true;
+        }
+
+        if( error ) return EXIT_FAILURE;
+        else std::cout << "Test passed!" << std::endl;
+    }
+
     std::cout << "Testing random_access vector<vector> interface ..." << std::endl;
     {
         std::vector< std::vector< int > > vector_vector_matrix;
