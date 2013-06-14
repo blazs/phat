@@ -24,5 +24,30 @@
 // interface class for the main data structure -- implementations of the interface can be found in ./representations
 namespace phat { namespace auto_reducing {
     template< class Representation = representations::bit_tree_pivot >
-    class boundary_matrix : public stack_access::boundary_matrix boundary_matrix< Representation > {};
+    class boundary_matrix : public stack_access::boundary_matrix< Representation > {
+    public:
+        boundary_matrix() {};
+
+        template< class OtherBoundaryMatrix >
+        boundary_matrix( const OtherBoundaryMatrix& other ) {
+            *this = other;
+        }
+
+        template< typename OtherRepresentation >
+        boundary_matrix< Representation >& operator=( const common::const_boundary_matrix< OtherRepresentation >& other )
+        {
+            if( (void*)this != (void*)&other ) {
+                const index nr_of_columns = other.get_num_cols();
+                init( nr_of_columns );
+                column temp_col;
+                for( index cur_col = 0; cur_col <  nr_of_columns; cur_col++ ) {
+                    other.get_col( cur_col, temp_col );
+                    this->push_col( temp_col, other.get_dim( cur_col ) );
+                }
+            }
+
+            // by convention, always return *this
+            return *this;
+        }
+    };
 } }

@@ -51,6 +51,9 @@ int main( int argc, char** argv )
     // first define a boundary matrix with the chosen internal representation
     phat::stack_access::boundary_matrix<> boundary_matrix;
 
+    // set the number of columns (has to be 7 since we have 7 simplices)
+    boundary_matrix.init( 7 );
+
     // set the respective columns -- the columns entries have to be sorted
     std::vector< phat::index > temp_col;
 

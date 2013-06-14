@@ -51,6 +51,18 @@ namespace phat { namespace common {
             std::sort( pairs.begin(), pairs.end() );
         }
 
+        template< typename BoundaryMatrix >
+        void read_off_pairs( const BoundaryMatrix& reduced_boundary_matrix ) {
+            clear();
+            for( index idx = 0; idx < reduced_boundary_matrix.get_num_cols(); idx++ ) {
+                if( !reduced_boundary_matrix.is_empty( idx ) ) {
+                    index birth = reduced_boundary_matrix.get_max_index( idx );
+                    index death = idx;
+                    append_pair( birth, death );
+                }
+            }
+        }
+
         // Loads the persistence pairs from given file in ascii format 
         // Format: nr_pairs % newline % birth1 % death1 % newline % birth2 % death2 % newline ...
         bool load_ascii( std::string filename ) {

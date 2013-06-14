@@ -16,6 +16,7 @@
     You should have received a copy of the GNU Lesser General Public License
     along with PHAT.  If not, see <http://www.gnu.org/licenses/>. */
 
+#include <phat/random_access/boundary_matrix.h>
 #include <phat/random_access/compute_persistence_pairs.h>
 #include <phat/random_access/representations/vector_vector.h>
 #include <phat/random_access/representations/vector_set.h>
@@ -27,13 +28,23 @@
 #include <phat/random_access/reducers/standard.h>
 #include <phat/random_access/reducers/row.h>
 #include <phat/random_access/reducers/chunk.h>
+#include <phat/random_access/reducers/straight_twist.h>
 
+#include <phat/stack_access/boundary_matrix.h>
 #include <phat/stack_access/compute_persistence_pairs.h>
 #include <phat/stack_access/representations/sparse_pivot.h>
 #include <phat/stack_access/representations/full_pivot.h>
 #include <phat/stack_access/representations/bit_tree_pivot.h>
 #include <phat/stack_access/reducers/standard.h>
 #include <phat/stack_access/reducers/twist.h>
+#include <phat/stack_access/reducers/straight_twist.h>
+
+#include <phat/auto_reducing/compute_persistence_pairs.h>
+#include <phat/auto_reducing/boundary_matrix.h>
+#include <phat/auto_reducing/representations/bit_tree_pivot.h>
+#include <phat/auto_reducing/representations/sparse_pivot.h>
+#include <phat/auto_reducing/representations/full_pivot.h>
+#include <phat/auto_reducing/reducers/straight_twist.h>
 
 #define COMPUTE_PAIRS(Package,Representation,Reducer) \
     std::cout << "Running " << #Package << " - " << #Representation << " - " #Reducer " ..." << std::endl;\
@@ -60,7 +71,7 @@ int main( int argc, char** argv )
     }
 
     bool error = false;
-    std::cout << "Comparing representations using twist algorithm ..." << std::endl;
+    std::cout << "Comparing representations using (straight-)twist algorithm ..." << std::endl;
     {
         COMPUTE_PAIRS(random_access, sparse_pivot, twist)
         COMPUTE_PAIRS(random_access, full_pivot, twist)
@@ -71,6 +82,7 @@ int main( int argc, char** argv )
         COMPUTE_PAIRS(stack_access, sparse_pivot, twist)
         COMPUTE_PAIRS(stack_access, full_pivot, twist)
         COMPUTE_PAIRS(stack_access, bit_tree_pivot, twist)
+        COMPUTE_PAIRS(auto_reducing, bit_tree_pivot, straight_twist)
 
         COMPARE_PAIRS(random_access, sparse_pivot, twist, random_access, full_pivot, twist)
         COMPARE_PAIRS(random_access, full_pivot, twist, random_access, bit_tree_pivot, twist)
@@ -80,7 +92,8 @@ int main( int argc, char** argv )
         COMPARE_PAIRS(random_access, vector_list, twist, stack_access, sparse_pivot, twist)
         COMPARE_PAIRS(stack_access, sparse_pivot, twist, stack_access, full_pivot, twist)
         COMPARE_PAIRS(stack_access, full_pivot, twist, stack_access, bit_tree_pivot, twist)
-        COMPARE_PAIRS(stack_access, bit_tree_pivot, twist, random_access, sparse_pivot, twist)
+        COMPARE_PAIRS(stack_access, bit_tree_pivot, twist, auto_reducing, bit_tree_pivot, straight_twist)
+        COMPARE_PAIRS(auto_reducing, bit_tree_pivot, straight_twist, random_access, sparse_pivot, twist)
 
         if( error ) return EXIT_FAILURE;
         else std::cout << "All results are identical (as they should be)" << std::endl;
@@ -92,15 +105,21 @@ int main( int argc, char** argv )
         COMPUTE_PAIRS(random_access, bit_tree_pivot, standard)
         COMPUTE_PAIRS(random_access, bit_tree_pivot, chunk)
         COMPUTE_PAIRS(random_access, bit_tree_pivot, row)
+        COMPUTE_PAIRS(random_access, bit_tree_pivot, straight_twist)
         COMPUTE_PAIRS(stack_access, bit_tree_pivot, standard)
         COMPUTE_PAIRS(stack_access, bit_tree_pivot, twist)
+        COMPUTE_PAIRS(stack_access, bit_tree_pivot, straight_twist)
+        COMPUTE_PAIRS(auto_reducing, bit_tree_pivot, straight_twist)
 
         COMPARE_PAIRS(random_access, bit_tree_pivot, twist, random_access, bit_tree_pivot, standard)
         COMPARE_PAIRS(random_access, bit_tree_pivot, standard, random_access, bit_tree_pivot, chunk)
         COMPARE_PAIRS(random_access, bit_tree_pivot, chunk, random_access, bit_tree_pivot, row)
-        COMPARE_PAIRS(random_access, bit_tree_pivot, row, stack_access, bit_tree_pivot, standard)
+        COMPARE_PAIRS(random_access, bit_tree_pivot, row, random_access, bit_tree_pivot, straight_twist)
+        COMPARE_PAIRS(random_access, bit_tree_pivot, straight_twist, stack_access, bit_tree_pivot, standard)
         COMPARE_PAIRS(stack_access, bit_tree_pivot, standard, stack_access, bit_tree_pivot, twist)
-        COMPARE_PAIRS(stack_access, bit_tree_pivot, twist, random_access, bit_tree_pivot, twist)
+        COMPARE_PAIRS(stack_access, bit_tree_pivot, twist, stack_access, bit_tree_pivot, straight_twist)
+        COMPARE_PAIRS(stack_access, bit_tree_pivot, straight_twist, auto_reducing, bit_tree_pivot, straight_twist)
+        COMPARE_PAIRS(auto_reducing, bit_tree_pivot, straight_twist, random_access, bit_tree_pivot, twist)
 
         if( error ) return EXIT_FAILURE;
         else std::cout << "All results are identical (as they should be)" << std::endl;

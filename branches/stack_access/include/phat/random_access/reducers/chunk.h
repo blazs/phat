@@ -20,15 +20,20 @@
 
 #include <phat/common/basic_types.h>
 #include <phat/random_access/boundary_matrix.h>
+#include <phat/common/const_boundary_matrix.h>
 
 namespace phat { namespace random_access { namespace reducers {
     class chunk {
     public:
-        enum column_type { GLOBAL
-                         , LOCAL_POSITIVE
-                         , LOCAL_NEGATIVE };
+        enum column_type { GLOBAL, LOCAL_POSITIVE, LOCAL_NEGATIVE };
 
     public:
+        template< typename Representation, typename InputBoundaryMatrix >
+        void operator() ( const InputBoundaryMatrix& input_matrix, boundary_matrix< Representation >& reduced_matrix ) {
+            reduced_matrix = input_matrix;
+            (*this)( reduced_matrix );
+        }
+
         template< typename Representation >
         void operator() ( boundary_matrix< Representation >& boundary_matrix ) {
 
