@@ -29,14 +29,7 @@ namespace phat { namespace random_access {
     void compute_persistence_pairs( common::persistence_pairs& pairs, boundary_matrix< Representation >& boundary_matrix ) {
         ReductionAlgorithm reduce;
         reduce( boundary_matrix );
-        pairs.clear();
-        for( index idx = 0; idx < boundary_matrix.get_num_cols(); idx++ ) {
-            if( !boundary_matrix.is_empty( idx ) ) {
-                index birth = boundary_matrix.get_max_index( idx );
-                index death = idx;
-                pairs.append_pair( birth, death );
-            }
-        }
+        pairs.read_off_pairs( boundary_matrix );
     }
     
     template< typename ReductionAlgorithm, typename Representation >

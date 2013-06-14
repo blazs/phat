@@ -21,25 +21,18 @@
 #include <phat/common/persistence_pairs.h>
 #include <phat/common/dualize.h>
 
-#include <phat/stack_access/boundary_matrix.h>
-#include <phat/stack_access/reducers/standard.h>
+#include <phat/auto_reducing/boundary_matrix.h>
+#include <phat/auto_reducing/reducers/straight_twist.h>
 
-namespace phat { namespace stack_access {
+namespace phat { namespace auto_reducing {
 
     template< typename ReductionAlgorithm, typename Representation >
-    void compute_persistence_pairs( common::persistence_pairs& pairs, boundary_matrix< Representation>& boundary_matrix ) {
+    void compute_persistence_pairs( common::persistence_pairs& pairs, boundary_matrix< Representation >& boundary_matrix ) {
         ReductionAlgorithm reduce;
-        phat::stack_access::boundary_matrix< Representation> reduced_matrix;
+        phat::auto_reducing::boundary_matrix< Representation> reduced_matrix;
         reduced_matrix.init( boundary_matrix.get_num_cols() );
         reduce( boundary_matrix, reduced_matrix );
-        pairs.clear();
-        for( index idx = 0; idx < reduced_matrix.get_num_cols(); idx++ ) {
-            if( !reduced_matrix.is_empty( idx ) ) {
-                index birth = reduced_matrix.get_max_index( idx );
-                index death = idx;
-                pairs.append_pair( birth, death );
-            }
-        }
+        pairs.read_off_pairs( reduced_matrix );
     }
     
     template< typename ReductionAlgorithm, typename Representation >
@@ -51,13 +44,13 @@ namespace phat { namespace stack_access {
     
     template< typename Representation >
     void compute_persistence_pairs( common::persistence_pairs& pairs, boundary_matrix< Representation >& boundary_matrix ) {
-        compute_persistence_pairs< reducers::standard >( pairs, boundary_matrix );
+        compute_persistence_pairs< reducers::straight_twist >( pairs, boundary_matrix );
     }
     
     
     template< typename Representation >
     void compute_persistence_pairs_dualized( common::persistence_pairs& pairs, boundary_matrix< Representation >& boundary_matrix ) {
-        compute_persistence_pairs_dualized< reducers::standard >( pairs, boundary_matrix );
+        compute_persistence_pairs_dualized< reducers::straight_twist >( pairs, boundary_matrix );
     }
 } }
 

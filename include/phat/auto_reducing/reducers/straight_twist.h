@@ -20,13 +20,14 @@
 
 #include <phat/common/basic_types.h>
 #include <phat/auto_reducing/boundary_matrix.h>
+#include <phat/common/const_boundary_matrix.h>
 
 namespace phat { namespace auto_reducing { namespace reducers {
     class straight_twist {
 
     public:
-        template< typename Representation >
-        void operator() ( boundary_matrix< Representation >& input_matrix, boundary_matrix< Representation >& reduced_matrix ) {
+        template< typename Representation, typename InputBoundaryMatrix >
+        void operator() ( const InputBoundaryMatrix& input_matrix, boundary_matrix< Representation >& reduced_matrix ) {
             reduced_matrix = input_matrix;
         }
     };

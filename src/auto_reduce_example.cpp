@@ -19,16 +19,16 @@
 // This file contains a simple example that demonstrates the usage of the library interface
 
 // interface of the main data structure
-#include <phat/auto_reducing/boundary_matrix.h>
+#include <phat/stack_access/boundary_matrix.h>
 
 // wrapper algorithm that computes the persistence pairs of a given boundary matrix using a specified algorithm
-#include <phat/auto_reducing/compute_persistence_pairs.h>
+#include <phat/stack_access/compute_persistence_pairs.h>
 
 // main data structure (choice affects performance)
-#include <phat/auto_reducing/representations/bit_tree_pivot.h>
+#include <phat/stack_access/representations/bit_tree_pivot.h>
 
 // algorithm (choice affects performance)
-#include <phat/auto_reducing/reducers/straight_twist.h>
+#include <phat/stack_access/reducers/standard.h>
 
 
 int main( int argc, char** argv ) 
@@ -49,10 +49,7 @@ int main( int argc, char** argv )
 
 
     // first define a boundary matrix with the chosen internal representation
-    phat::auto_reducing::boundary_matrix<> boundary_matrix;
-
-    // set the number of columns (has to be 7 since we have 7 simplices)
-    boundary_matrix.init( 7 );
+    phat::stack_access::boundary_matrix<> boundary_matrix;
 
     // set the respective columns -- the columns entries have to be sorted
     std::vector< phat::index > temp_col;
@@ -105,7 +102,7 @@ int main( int argc, char** argv )
     phat::common::persistence_pairs pairs;
 
     // choose an algorithm (choice affects performance) and compute the persistence pair (modifies boundary_matrix)
-    phat::auto_reducing::compute_persistence_pairs<>( pairs, boundary_matrix );
+    phat::stack_access::compute_persistence_pairs<>( pairs, boundary_matrix );
     
     // sort the persistence pairs by birth index 
     pairs.sort();

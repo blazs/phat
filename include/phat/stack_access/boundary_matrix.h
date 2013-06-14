@@ -48,12 +48,14 @@ namespace phat { namespace stack_access {
         template< typename OtherRepresentation >
         boundary_matrix< Representation >& operator=( const common::const_boundary_matrix< OtherRepresentation >& other )
         {
-            const index nr_of_columns = other.get_num_cols();
-            init( nr_of_columns );
-            column temp_col;
-            for( index cur_col = 0; cur_col <  nr_of_columns; cur_col++ ) {
-                other.get_col( cur_col, temp_col );
-                this->push_col( temp_col, other.get_dim( cur_col ) );
+            if( (void*)this != (void*)&other ) {
+                const index nr_of_columns = other.get_num_cols();
+                init( nr_of_columns );
+                column temp_col;
+                for( index cur_col = 0; cur_col <  nr_of_columns; cur_col++ ) {
+                    other.get_col( cur_col, temp_col );
+                    this->push_col( temp_col, other.get_dim( cur_col ) );
+                }
             }
 
             // by convention, always return *this

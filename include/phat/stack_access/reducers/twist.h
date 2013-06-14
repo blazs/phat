@@ -26,8 +26,8 @@ namespace phat { namespace stack_access { namespace reducers {
     class twist {
 
     public:
-        template< typename Representation >
-        void operator() ( const common::const_boundary_matrix< Representation >& input_matrix, boundary_matrix< Representation >& reduced_matrix ) {
+        template< typename Representation, typename InputBoundaryMatrix >
+        void operator() ( const InputBoundaryMatrix& input_matrix, boundary_matrix< Representation >& reduced_matrix ) {
 
             const index nr_columns = input_matrix.get_num_cols();
             reduced_matrix = input_matrix;
