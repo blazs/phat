@@ -27,6 +27,7 @@ namespace phat { namespace auto_reducing { namespace representations {
 
     protected: 
         std::vector< index > lowest_one_lookup;
+        column temp_col;
 
     public:
         void _init( index total_num_cols ) {
@@ -35,35 +36,39 @@ namespace phat { namespace auto_reducing { namespace representations {
         }
 
         void _push_col( const column& col, dimension dim ) {
-            
+            temp_col.clear();
             num_cols++;
             const index cur_col = _get_num_cols() - 1;
-            column temp_col;
-            if( lowest_one_lookup[ cur_col ] == -1 ) {
-                pivot_column.clear();
-                for( index idx = 0; idx < (index)col.size(); idx++ )
-                    pivot_column.add_index( col[ idx ] );
-                
-                index lowest_one = pivot_column.get_max_index();
-                while( lowest_one != -1 && lowest_one_lookup[ lowest_one ] != -1 ) {
-                    index column_to_add = lowest_one_lookup[ lowest_one ];
-                    for( index entry_idx = offsets[ column_to_add ]; entry_idx < (index)offsets[ column_to_add + 1 ]; entry_idx++ )
-                        pivot_column.add_index( entries[ entry_idx ] );
-                    lowest_one = pivot_column.get_max_index();
+            
+            if( lowest_one_lookup[ cur_col ] == -1 && !col.empty() ) {
+                index lowest_one = col.back();
+                if( lowest_one != -1 && lowest_one_lookup[ lowest_one ] != -1 ) {
+                    for( index idx = 0; idx < (index)col.size(); idx++ )
+                        pivot_column.add_index( col[ idx ] );
+                    while( lowest_one != -1 && lowest_one_lookup[ lowest_one ] != -1 ) {
+                        index column_to_add = lowest_one_lookup[ lowest_one ];
+                        for( index entry_idx = offsets[ column_to_add ]; entry_idx < offsets[ column_to_add + 1 ]; entry_idx++ )
+                            pivot_column.add_index( entries[ entry_idx ] );
+                        lowest_one = pivot_column.get_max_index();
+                    }
+                    // dump pivot_col into temp_col
+                    pivot_column.get_col_and_clear( temp_col );
+                } else {
+                    temp_col = col;
                 }
                 if( lowest_one != -1 )
                     lowest_one_lookup[ lowest_one ] = cur_col;
-
-                // dump pivot_col into temp_col
-                pivot_column.get_col_and_clear( temp_col );
             }
 
             // dump temp_col into matrix
+            index old_entries_size = entries.size();
+            index new_entries_size = entries.size() + temp_col.size();
             dims[ cur_col ] = dim;
-            offsets[ cur_col ] = entries.size();
+            offsets[ cur_col ] = old_entries_size;
+            offsets[ cur_col + 1 ] = new_entries_size;
+            entries.resize( new_entries_size );
             for( index idx = 0; idx < (index)temp_col.size(); idx++ )
-                entries.push_back( temp_col[ idx ] );
-            offsets[ cur_col + 1 ] = entries.size();
+                entries[ old_entries_size + idx ] = temp_col[ idx ];
         }
     };
 } } }

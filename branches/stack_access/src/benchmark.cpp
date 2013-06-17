@@ -104,6 +104,7 @@ void parse_command_line( int argc, char** argv, bool& use_binary, std::vector< R
             else if( argument == "--dual" ) ansaetze.push_back( DUAL );
             else if( argument == "--random_access" ) packages.push_back( RANDOM_ACCESS );
             else if( argument == "--stack_access" ) packages.push_back( STACK_ACCESS );
+            else if( argument == "--auto_reducing" ) packages.push_back( AUTO_REDUCING );
             else if( argument == "--help" ) print_help_and_exit();
             else print_help_and_exit();
         } else {
@@ -142,18 +143,7 @@ void parse_command_line( int argc, char** argv, bool& use_binary, std::vector< R
 }
 
 template<typename ReducedMatrix, typename Algorithm>
-void benchmark( std::string input_filename, bool use_binary, Ansatz_type ansatz ) {
-
-    phat::stack_access::boundary_matrix< phat::stack_access::representations::bit_tree_pivot > matrix;
-    bool read_successful = use_binary ? matrix.load_binary( input_filename ) : matrix.load_ascii( input_filename );
-   
-    if( !read_successful ) {
-        std::cerr << std::endl << " Error opening file " << input_filename << std::endl;
-        print_help_and_exit();
-    }
-
-    std::vector< phat::index > normalization_map;
-    matrix.normalize( normalization_map );
+void benchmark( phat::stack_access::boundary_matrix< phat::stack_access::representations::bit_tree_pivot > matrix, bool use_binary, Ansatz_type ansatz ) {
 
     ReducedMatrix reduced_matrix;
     Algorithm reduction_algorithm;
@@ -185,24 +175,24 @@ void benchmark( std::string input_filename, bool use_binary, Ansatz_type ansatz 
     typedef phat::random_access::boundary_matrix< phat::random_access::representations::Representation > ReducedMatrix##Representation;\
     switch( algorithm ) { \
     case STANDARD:         std::cout << input_filename << ", random_access, " << #Representation << ", standard,"; \
-                           benchmark< ReducedMatrix##Representation, phat::random_access::reducers::standard >( input_filename, use_binary, ansatz ); \
+                           benchmark< ReducedMatrix##Representation, phat::random_access::reducers::standard >( normalized_matrix, use_binary, ansatz ); \
                            break; \
     case TWIST:            std::cout << input_filename << ", random_access, " << #Representation << ", twist,"; \
-                           benchmark< ReducedMatrix##Representation, phat::random_access::reducers::twist >( input_filename, use_binary, ansatz ); \
+                           benchmark< ReducedMatrix##Representation, phat::random_access::reducers::twist >( normalized_matrix, use_binary, ansatz ); \
                            break; \
     case ROW:              std::cout << input_filename << ", random_access, " << #Representation << ", row,"; \
-                           benchmark< ReducedMatrix##Representation, phat::random_access::reducers::row >( input_filename, use_binary, ansatz ); \
+                           benchmark< ReducedMatrix##Representation, phat::random_access::reducers::row >( normalized_matrix, use_binary, ansatz ); \
                            break; \
     case CHUNK:            std::cout << input_filename << ", random_access, " << #Representation << ", chunk,"; \
-                           benchmark< ReducedMatrix##Representation, phat::random_access::reducers::chunk >( input_filename, use_binary, ansatz ); \
+                           benchmark< ReducedMatrix##Representation, phat::random_access::reducers::chunk >( input_matrix, use_binary, ansatz ); \
                            break; \
     case STRAIGHT_TWIST:   std::cout << input_filename << ", random_access, " << #Representation << ", straight_twist,"; \
-                           benchmark< ReducedMatrix##Representation, phat::random_access::reducers::straight_twist >( input_filename, use_binary, ansatz ); \
+                           benchmark< ReducedMatrix##Representation, phat::random_access::reducers::straight_twist >( normalized_matrix, use_binary, ansatz ); \
                            break; \
     case CHUNK_SEQUENTIAL: std::cout << input_filename << ", random_access, " << #Representation << ", chunk_sequential,"; \
                            int num_threads = omp_get_max_threads(); \
                            omp_set_num_threads( 1 ); \
-                           benchmark< ReducedMatrix##Representation, phat::random_access::reducers::chunk >( input_filename, use_binary, ansatz ); \
+                           benchmark< ReducedMatrix##Representation, phat::random_access::reducers::chunk >( input_matrix, use_binary, ansatz ); \
                            omp_set_num_threads( num_threads ); \
                            break; \
     };
@@ -212,14 +202,14 @@ void benchmark( std::string input_filename, bool use_binary, Ansatz_type ansatz 
     switch( algorithm ) { \
     case STANDARD:         std::cout << input_filename << ", stack_access, " << #Representation << ", standard,"; \
                            typedef phat::stack_access::boundary_matrix< phat::stack_access::representations::Representation > ReducedMatrix;\
-                           benchmark< ReducedMatrix##Representation, phat::stack_access::reducers::standard >( input_filename, use_binary, ansatz ); \
+                           benchmark< ReducedMatrix##Representation, phat::stack_access::reducers::standard >( normalized_matrix, use_binary, ansatz ); \
                            break; \
     case TWIST:            std::cout << input_filename << ", stack_access, " << #Representation << ", twist,"; \
                            typedef phat::stack_access::boundary_matrix< phat::stack_access::representations::Representation > ReducedMatrix;\
-                           benchmark< ReducedMatrix##Representation, phat::stack_access::reducers::twist >( input_filename, use_binary, ansatz ); \
+                           benchmark< ReducedMatrix##Representation, phat::stack_access::reducers::twist >( normalized_matrix, use_binary, ansatz ); \
                            break; \
     case STRAIGHT_TWIST:   std::cout << input_filename << ", stack_access, " << #Representation << ", straight_twist,"; \
-                           benchmark< ReducedMatrix##Representation, phat::stack_access::reducers::straight_twist >( input_filename, use_binary, ansatz ); \
+                           benchmark< ReducedMatrix##Representation, phat::stack_access::reducers::straight_twist >( normalized_matrix, use_binary, ansatz ); \
                            break; \
     };
 
@@ -227,7 +217,7 @@ void benchmark( std::string input_filename, bool use_binary, Ansatz_type ansatz 
     typedef phat::auto_reducing::boundary_matrix< phat::auto_reducing::representations::Representation > ReducedMatrix##Representation;\
     switch( algorithm ) { \
     case STRAIGHT_TWIST:   std::cout << input_filename << ", auto_reducing, " << #Representation << ", straight_twist,"; \
-                           benchmark< ReducedMatrix##Representation, phat::auto_reducing::reducers::straight_twist >( input_filename, use_binary, ansatz ); \
+                           benchmark< ReducedMatrix##Representation, phat::auto_reducing::reducers::straight_twist >( normalized_matrix, use_binary, ansatz ); \
                            break; \
     };
 
@@ -245,6 +235,18 @@ int main( int argc, char** argv )
 
     for( int idx_input = 0; idx_input < input_filenames.size(); idx_input++ ) {
         std::string input_filename = input_filenames[ idx_input ];
+        phat::stack_access::boundary_matrix< phat::stack_access::representations::bit_tree_pivot > input_matrix;
+        bool read_successful = use_binary ? input_matrix.load_binary( input_filename ) : input_matrix.load_ascii( input_filename );
+   
+        if( !read_successful ) {
+            std::cerr << std::endl << " Error opening file " << input_filename << std::endl;
+            print_help_and_exit();
+        }
+        
+        phat::stack_access::boundary_matrix< phat::stack_access::representations::bit_tree_pivot > normalized_matrix = input_matrix;
+        std::vector< phat::index > normalization_map;
+        normalized_matrix.normalize( normalization_map );
+
         for( int idx_algorithm = 0; idx_algorithm < algorithms.size(); idx_algorithm++ ) {
             Algorithm_type algorithm = algorithms[ idx_algorithm ];
             for( int idx_representation = 0; idx_representation < representations.size(); idx_representation++ ) {

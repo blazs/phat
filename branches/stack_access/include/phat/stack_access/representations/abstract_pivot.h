@@ -34,8 +34,11 @@ namespace phat { namespace stack_access { namespace representations {
         mutable PivotColumn pivot_column;
         index num_cols;
 
+        column temp_col;
+
+
         void release_pivot_col() {
-            column temp_col;
+            temp_col.clear();
             pivot_column.get_col_and_clear( temp_col );
             entries.resize( offsets[ _get_num_cols() - 1 ] );
             for( index idx = 0; idx < (index)temp_col.size(); idx++ )
@@ -106,14 +109,20 @@ namespace phat { namespace stack_access { namespace representations {
             if( is_top_column_pivot )
                 release_pivot_col();
 
-            dims[ _get_num_cols() ] = dim;
-            
-            offsets[ _get_num_cols() ] = entries.size();
-            for( index idx = 0; idx < (index)col.size(); idx++ )
-                entries.push_back( col[ idx ] );
             num_cols++;
-            offsets[ _get_num_cols() ] =  entries.size();
+            const index cur_col = _get_num_cols() - 1;
+
+            dims[ cur_col ] = dim;
+
+            index old_entries_size = entries.size();
+            index new_entries_size = entries.size() + col.size();
             
+            offsets[ cur_col ] = old_entries_size;
+            entries.resize( new_entries_size );
+            for( index idx = 0; idx < (index)col.size(); idx++ )
+                entries[ old_entries_size + idx ] = col[ idx ];
+            
+            offsets[ cur_col + 1 ] =  new_entries_size;
         }
 
         void _add_to_top( index source ) {
