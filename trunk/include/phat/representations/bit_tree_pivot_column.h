@@ -36,8 +36,8 @@ namespace phat {
         typedef uint64_t block_type;
         std::vector< block_type > data;
 
-        // this static is not a problem with OMP, it's initialized just after program starts
-        static const size_t debrujin_magic_table[ 64 ];
+        
+        size_t debrujin_magic_table[ 64 ];
 
         enum { block_size_in_bits = 64 };
         enum { block_shift = 6 };
@@ -66,6 +66,18 @@ namespace phat {
 
             offset = upper_blocks;
             data.resize( upper_blocks + bottom_blocks_needed, 0 );
+
+            std::size_t temp_array[ 64 ] = {
+                    63,  0, 58,  1, 59, 47, 53,  2,
+                    60, 39, 48, 27, 54, 33, 42,  3,
+                    61, 51, 37, 40, 49, 18, 28, 20,
+                    55, 30, 34, 11, 43, 14, 22,  4,
+                    62, 57, 46, 52, 38, 26, 32, 41,
+                    50, 36, 17, 19, 29, 10, 13, 21,
+                    56, 45, 25, 31, 35, 16,  9, 12,
+                    44, 24, 15,  8, 23,  7,  6,  5 };
+
+            std::copy( &temp_array[ 0 ], &temp_array[ 64 ], &debrujin_magic_table[ 0 ] );
         }
 
         index get_max_index() const {
@@ -148,16 +160,6 @@ namespace phat {
             add_col( col );
         }
     };
-
-    const size_t bit_tree_column::debrujin_magic_table[ 64 ] = {
-                    63,  0, 58,  1, 59, 47, 53,  2,
-                    60, 39, 48, 27, 54, 33, 42,  3,
-                    61, 51, 37, 40, 49, 18, 28, 20,
-                    55, 30, 34, 11, 43, 14, 22,  4,
-                    62, 57, 46, 52, 38, 26, 32, 41,
-                    50, 36, 17, 19, 29, 10, 13, 21,
-                    56, 45, 25, 31, 35, 16,  9, 12,
-                    44, 24, 15,  8, 23,  7,  6,  5 };
 
     typedef abstract_pivot_column<bit_tree_column> bit_tree_pivot_column;
 }
