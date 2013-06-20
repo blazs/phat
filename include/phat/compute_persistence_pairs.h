@@ -43,7 +43,7 @@ namespace phat {
     void compute_persistence_pairs_dualized( persistence_pairs& pairs, boundary_matrix< Representation >& boundary_matrix ) {
 
         dualize( boundary_matrix );
-        compute_persistence_pairs( pairs, boundary_matrix );
+        compute_persistence_pairs< ReductionAlgorithm >( pairs, boundary_matrix );
         dualize_persistence_pairs( pairs, boundary_matrix.get_num_cols() );
     }
     
