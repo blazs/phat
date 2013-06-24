@@ -29,6 +29,7 @@
 #include <phat/algorithms/standard_reduction.h>
 #include <phat/algorithms/row_reduction.h>
 #include <phat/algorithms/chunk_reduction.h>
+#include <phat/algorithms/block_spectral_sequence_reduction.h>
 
 int main( int argc, char** argv )
 {
@@ -132,6 +133,11 @@ int main( int argc, char** argv )
         phat::boundary_matrix< BitTree > row_boundary_matrix = boundary_matrix;
         phat::compute_persistence_pairs< phat::row_reduction >( row_pairs, row_boundary_matrix );
 
+        std::cout << "Running Block spectral sequence - BitTree ..." << std::endl;
+        phat::persistence_pairs ss_pairs;
+        phat::boundary_matrix< BitTree > ss_boundary_matrix = boundary_matrix;
+        phat::compute_persistence_pairs< phat::block_spectral_sequence_reduction >( ss_pairs, ss_boundary_matrix );
+
         if( twist_pairs != std_pairs ) {
             std::cerr << "Error: twist and standard differ!" << std::endl;
             error = true;
@@ -144,8 +150,12 @@ int main( int argc, char** argv )
             std::cerr << "Error: chunk and row differ!" << std::endl;
             error = true;
         }
-        if( row_pairs != twist_pairs ) {
-            std::cerr << "Error: row and twist differ!" << std::endl;
+        if( row_pairs != ss_pairs ) {
+            std::cerr << "Error: row and block spectral sequence differ!" << std::endl;
+            error = true;
+        }
+        if( ss_pairs != twist_pairs ) {
+            std::cerr << "Error: block spectral sequence and twist differ!" << std::endl;
             error = true;
         }
 
