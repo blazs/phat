@@ -205,6 +205,7 @@ namespace phat {
             }
         }
 
+
         // Loads the boundary_matrix from given file in ascii format 
         // Format: each line represents a column, first number is dimension, other numbers are the content of the column.
         // Ignores empty lines and lines starting with a '#'.
@@ -277,53 +278,98 @@ namespace phat {
             return true;
         }
 
+        
+
+
         // Loads boundary_matrix from given file 
-        // Format: nr_columns % dim1 % N1 % row1 row2 % ...% rowN1 % dim2 % N2 % ...
+        // Format: version % num_cols (N) % max_dim % 0 % 0 % 0 % 0 % 0  % dim1 % ... % dimN % offset1 % ... % offsetN % num_entries (M) % entry1 % ... % entryM 
+        // [ Legacy Format: nr_columns % dim1 % N1 % row1 row2 % ...% rowN1 % dim2 % N2 % ... ]
         bool load_binary( std::string filename ) { 
             std::ifstream input_stream( filename.c_str(), std::ios_base::binary | std::ios_base::in );
             if( input_stream.fail() )
                 return false;
 
-            int64_t nr_columns;
-            input_stream.read( (char*)&nr_columns, sizeof( int64_t ) );
-            this->set_num_cols( (index)nr_columns );
-
-            column temp_col;
-            for( index cur_col = 0; cur_col < nr_columns; cur_col++ ) {
-                int64_t cur_dim;
-                input_stream.read( (char*)&cur_dim, sizeof( int64_t ) );
-                this->set_dim( cur_col, (dimension) cur_dim );
-                int64_t nr_rows;
-                input_stream.read( (char*)&nr_rows, sizeof( int64_t ) );
-                temp_col.resize( (std::size_t)nr_rows );
-                for( index idx = 0; idx < nr_rows; idx++ ) {
-                    int64_t cur_row;
-                    input_stream.read( (char*)&cur_row, sizeof( int64_t ) );
-                    temp_col[ idx ] = (index)cur_row;
+            int64_t version;
+            input_stream.read( (char*)&version, sizeof( int64_t ) );
+            if( version >= 0 ) {
+                int64_t nr_columns = version;
+                this->set_num_cols( (index)nr_columns );
+                column temp_col;
+                for( index cur_col = 0; cur_col < nr_columns; cur_col++ ) {
+                    int64_t cur_dim;
+                    input_stream.read( (char*)&cur_dim, sizeof( int64_t ) );
+                    this->set_dim( cur_col, (dimension) cur_dim );
+                    int64_t nr_rows;
+                    input_stream.read( (char*)&nr_rows, sizeof( int64_t ) );
+                    temp_col.resize( (std::size_t)nr_rows );
+                    for( index idx = 0; idx < nr_rows; idx++ ) {
+                        int64_t cur_row;
+                        input_stream.read( (char*)&cur_row, sizeof( int64_t ) );
+                        temp_col[ idx ] = (index)cur_row;
+                    }
+                    this->set_col( cur_col, temp_col );
                 }
-                this->set_col( cur_col, temp_col );
+            } else {
+                std::vector< int64_t > preamble( 7, 0 );
+                input_stream.read( (char*)&preamble[ 0 ], sizeof( int64_t ) * preamble.size() );
+                index num_cols = preamble[ 0 ];
+                set_num_cols( num_cols );
+
+                std::vector< int64_t > buffer( num_cols + 1, -1 );
+                
+                input_stream.read( (char*)&buffer[ 0 ], sizeof( int64_t ) * num_cols );
+                for( index cur_col = 0; cur_col < num_cols; cur_col++ )
+                    set_dim( cur_col, (dimension)buffer[ cur_col ] );
+
+                input_stream.read( (char*)&buffer[ 0 ], sizeof( int64_t ) * (num_cols + 1) );
+
+                column temp_col;
+                for( index cur_col = 0; cur_col < num_cols; cur_col++ ) {
+                    index num_rows = buffer[ cur_col + 1 ] - buffer[ cur_col ];
+                    temp_col.resize( num_rows );
+                    input_stream.read( (char*)&temp_col[ 0 ], sizeof( int64_t ) * temp_col.size() );
+                    set_col( cur_col, temp_col );
+                }
             }
 
             input_stream.close();
             return true;
         }
 
-        // Saves the boundary_matrix to given file in binary format 
-        // Format: nr_columns % dim1 % N1 % row1 row2 % ...% rowN1 % dim2 % N2 % ...
+        // Saves the boundary_matrix to given file in binary format -- all symbols are 64 bit wide
+        // Format: version % num_cols (N) % max_dim % 0 % 0 % 0 % 0 % 0 % dim1 % ... % dimN % offset1 % ... % offsetN % num_entries (M) % entry1 % ... % entryM 
         bool save_binary( std::string filename ) {
             std::ofstream output_stream( filename.c_str(), std::ios_base::binary | std::ios_base::out );
             if( output_stream.fail() )
                 return false;
 
-            const int64_t nr_columns = this->get_num_cols();
-            output_stream.write( (char*)&nr_columns, sizeof( int64_t ) );
-            column tempCol;
-            for( index cur_col = 0; cur_col < nr_columns; cur_col++ ) {
-                int64_t cur_dim = this->get_dim( cur_col );
+            int64_t version = -1;
+            output_stream.write( (char*)&version, sizeof( int64_t ) );
+
+            const index num_cols = get_num_cols();
+
+            std::vector< int64_t > preamble( 7, 0 );
+            preamble[ 0 ] = num_cols;
+            preamble[ 1 ] = get_max_dim();
+            output_stream.write( (char*)&preamble[ 0 ], sizeof( int64_t ) * preamble.size() );
+
+            for( index cur_col = 0; cur_col < num_cols; cur_col++ ) {
+                int64_t cur_dim = get_dim( cur_col );
                 output_stream.write( (char*)&cur_dim, sizeof( int64_t ) );
+            }
+
+            index cur_offset = 0;
+            for( index cur_col = 0; cur_col < num_cols; cur_col++ ) {
+                output_stream.write( (char*)&cur_offset, sizeof( int64_t ) );
+                cur_offset += get_num_rows( cur_col );
+            }
+
+            const index num_entries = get_num_entries();
+            output_stream.write( (char*)&num_entries, sizeof( int64_t ) );
+
+            column tempCol;
+            for( index cur_col = 0; cur_col < num_cols; cur_col++ ) {
                 this->get_col( cur_col, tempCol );
-                int64_t cur_nr_rows = tempCol.size();
-                output_stream.write( (char*)&cur_nr_rows, sizeof( int64_t ) );
                 for( index cur_row_idx = 0; cur_row_idx < (index)tempCol.size(); cur_row_idx++ ) {
                     int64_t cur_row = tempCol[ cur_row_idx ];
                     output_stream.write( (char*)&cur_row, sizeof( int64_t ) );
