@@ -78,7 +78,7 @@ int main( int argc, char** argv )
     if( use_dualize )
         dualize( matrix );
 
-    if( use_binary )
+    if( use_save_binary )
         matrix.save_binary( output_filename );
     else
         matrix.save_ascii( output_filename );
