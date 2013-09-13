@@ -63,7 +63,7 @@ int main( int argc, char** argv )
 {
     bool use_binary = true; // interpret input as binary or ascii file
     bool use_save_binary = true; // write output as binary or ascii file
-    bool use_dualize = true; // dualize filtration
+    bool use_dualize = false; // dualize filtration
     std::string input_filename; // name of file that contains the boundary matrix
     std::string output_filename; // name of file that will contain the boundary matrix in the new binary format
 
