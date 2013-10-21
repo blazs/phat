@@ -25,53 +25,38 @@ namespace phat {
     class sparse_column {
 
     protected:
-        std::set< index > data;
-
-        void add_index( const index idx ) {
-            std::pair< std::set< index >::iterator, bool > result = data.insert( idx );
-            if( result.second == false )
-                data.erase( result.first );
-        }
+        std::set< index > m_data;
 
     public:
+        typedef _column_t column;
+        
         void init( const index total_size ) {
-            data.clear(); 
+            m_data.clear(); 
         }
 
-        void add_col( const column& col ) {
+        void add_column( const column& col ) {
             for( index idx = 0; idx < (index) col.size(); idx++ )
                 add_index( col[ idx ] );
         }
 
-        index get_max_index() {
-            return data.empty() ? -1 : *data.rbegin();
+        void add_index( const index idx ) {
+            std::pair< std::set< index >::iterator, bool > result = m_data.insert( idx );
+            if( result.second == false )
+                m_data.erase( result.first );
         }
 
-        void get_col_and_clear( column& col ) {
-            col.assign( data.begin(), data.end() );
-            data.clear();
+        index max_index() {
+            return m_data.empty() ? -1 : *m_data.rbegin();
         }
 
-        bool is_empty() {
-            return data.empty();
+        void get_column_and_clear( column& col ) {
+            col.clear();
+            col.assign( m_data.begin(), m_data.end() );
+            m_data.clear();
         }
 
-		void clear() {
-			data.clear();
-		}
-
-		void remove_max() {
-            add_index( get_max_index() );
-        }
-
-        void set_col( const column& col  ) {
-            clear();
-            add_col( col );
-        }
-
-        void get_col( column& col  ) {
-            get_col_and_clear( col );
-            add_col( col );
+        bool empty() {
+            return m_data.empty();
         }
     };
 
