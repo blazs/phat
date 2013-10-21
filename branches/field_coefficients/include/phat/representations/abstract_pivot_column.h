@@ -28,72 +28,130 @@ namespace phat {
     //       make sense
     template< typename PivotColumn >
     class abstract_pivot_column : public vector_vector {
+    public:
         
     protected:
         typedef vector_vector Base;
-        typedef PivotColumn pivot_col;
+        typedef PivotColumn pivot_column;
 
         // For parallization purposes, it could be more than one full column
-        mutable thread_local_storage< pivot_col > pivot_cols;
-        mutable thread_local_storage< index > idx_of_pivot_cols;
+        mutable thread_local_storage< pivot_column > _pivot_columns;
+        mutable thread_local_storage< index > pos_of_pivot_columns;
 
-        pivot_col& get_pivot_col() const {
-            return pivot_cols();
+        pivot_column& get_pivot_column() const {
+            return _pivot_columns();
         }
 
-        bool is_pivot_col( index idx ) const {
-            return idx_of_pivot_cols() == idx;
+        bool is_represented_by_pivot_column( index idx ) const {
+            return pos_of_pivot_columns() == idx;
         }
       
-        void release_pivot_col() {
-            index idx = idx_of_pivot_cols();
+        void unset_pos_of_pivot_column() {
+            index idx = pos_of_pivot_columns();
             if( idx != -1 ) {
-                this->matrix[ idx ].clear();
-                pivot_cols().get_col_and_clear( this->matrix[ idx ] );
+                _pivot_columns().get_column_and_clear( this->matrix[ idx ] );
             }
-            idx_of_pivot_cols() = -1;
+            pos_of_pivot_columns() = -1;
         }
         
-        void make_pivot_col( index idx ) {
-            release_pivot_col();
-            idx_of_pivot_cols() = idx;
-            get_pivot_col().add_col( matrix[ idx ] );
+        void represent_by_pivot_column( index idx ) {
+            pos_of_pivot_columns() = idx;
+            get_pivot_column().add_column( matrix[ idx ] );
         }
 
     public:  
 
-        void _set_num_cols( index nr_of_cols ) {
+        void _set_num_cols( index nr_of_columns ) {
             #pragma omp parallel for
             for( int tid = 0; tid < omp_get_num_threads(); tid++ ) {
-                pivot_cols[ tid ].init( nr_of_cols );
-                idx_of_pivot_cols[ tid ] = -1;
+                _pivot_columns[ tid ].init( nr_of_columns );
+                pos_of_pivot_columns[ tid ] = -1;
             }
-            Base::_set_num_cols( nr_of_cols );
+            Base::_set_num_cols( nr_of_columns );
+        }
+        // replaces(!) content of 'col' with boundary of given index
+        void _get_col( index idx, column& col  ) const {
+            col.clear();
+            if( is_represented_by_pivot_column( idx ) ) {
+                pivot_column& pivot_column = get_pivot_column();
+                pivot_column.get_column_and_clear( col );
+                pivot_column.add_column( col );
+            } else {
+                Base::_get_col( idx, col );
+            }
+        }
+        
+        // true iff boundary of given idx is empty
+        bool _is_empty( index idx ) const {
+            return is_represented_by_pivot_column( idx ) ? get_pivot_column().empty() : Base::_is_empty( idx );
         }
 
+        // largest row index of given column idx (new name for lowestOne())
+        index _get_max_index( index idx ) const {
+            if( is_represented_by_pivot_column( idx ) ) {
+                pivot_column& pivot_column = get_pivot_column();
+                if( pivot_column.empty() ) {
+                    return -1;
+                } else {
+                    return pivot_column.max_index();
+                }
+            } else {
+                return Base::_get_max_index( idx );
+            }
+        }
+
+        // adds column 'source' to column 'target'
         void _add_to( index source, index target ) {
-            if( !is_pivot_col( target ) )
-                make_pivot_col( target );
-            get_pivot_col().add_col( matrix[source] );
+            if( !is_represented_by_pivot_column( target ) ) {
+                unset_pos_of_pivot_column();
+                represent_by_pivot_column( target );
+            } 
+            get_pivot_column().add_column( matrix[source] );
         }
 
+        // clears given column
+        void _clear( index idx ) {
+            if( is_represented_by_pivot_column( idx ) ) {
+                column dummy;
+                get_pivot_column().get_column_and_clear(dummy);
+            } else {
+                Base::_clear( idx );
+            }
+        }
+
+        void _set_col( index idx, const column& col  ) {
+            if( is_represented_by_pivot_column( idx ) ) {
+                column dummy;
+                pivot_column& pivot_column = get_pivot_column();
+                pivot_column.get_column_and_clear( dummy );
+                pivot_column.add_column( col );
+            } else {
+                Base::_set_col( idx, col );
+            }
+        }
+
+        // removes the maximal index of a column
+        void _remove_max( index idx ) {
+            _toggle( idx, _get_max_index( idx ) );
+        }
+
+        //// toggles given index pair
+        void _toggle( index col_idx, index row_idx ) {
+            if( !is_represented_by_pivot_column( col_idx ) ) {
+                unset_pos_of_pivot_column();
+                represent_by_pivot_column( col_idx );
+            } 
+            get_pivot_column().add_index( row_idx );
+        }
+
+        // syncronizes all data structures (essential for openmp stuff)
+        // has to be called before and after any multithreaded access!
         void _sync() { 
             #pragma omp parallel for
             for( int tid = 0; tid < omp_get_num_threads(); tid++ )
-                release_pivot_col();
+                unset_pos_of_pivot_column();
         } 
 
-        void _get_col( index idx, column& col  ) const { is_pivot_col( idx ) ? get_pivot_col().get_col( col ) : Base::_get_col( idx, col ); }
-        
-        bool _is_empty( index idx ) const { return is_pivot_col( idx ) ? get_pivot_col().is_empty() : Base::_is_empty( idx ); }
-
-        index _get_max_index( index idx ) const { return is_pivot_col( idx ) ? get_pivot_col().get_max_index() : Base::_get_max_index( idx ); }
-
-        void _clear( index idx ) { is_pivot_col( idx ) ? get_pivot_col().clear() : Base::_clear( idx ); }
-
-        void _set_col( index idx, const column& col  ) { is_pivot_col( idx ) ? get_pivot_col().set_col( col ) : Base::_set_col( idx, col ); }
-
-        void _remove_max( index idx ) {	is_pivot_col( idx ) ? get_pivot_col().remove_max() : Base::_remove_max( idx ); }
     };
 }
 

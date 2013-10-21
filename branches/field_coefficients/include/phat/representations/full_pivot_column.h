@@ -25,74 +25,57 @@ namespace phat {
     class full_column {
 
     protected:
-        std::priority_queue< index > history;
-        std::vector< char > is_in_history;
-        std::vector< char > col_bit_field;
+        std::priority_queue< index > m_history;
+        std::vector< char > m_isInHistory;
+        std::vector< char > m_data;
 
     public:
+        typedef _column_t column;
+        
         void init( const index total_size ) {
-            col_bit_field.resize( total_size, false );
-            is_in_history.resize( total_size, false );
+            m_data.resize( total_size, false );
+            m_isInHistory.resize( total_size, false );
         }
 
-        void add_col( const column& col ) {
+        void add_column( const column& col ) {
             for( index idx = 0; idx < (index) col.size(); idx++ ) {
                 add_index( col[ idx ] );
             }
         }
-
         void add_index( const index idx ) {
-            if( !is_in_history[ idx ] ) {
-                history.push( idx );
-                is_in_history[ idx ] = true; 
+            if( !m_isInHistory[ idx ] ) {
+                m_history.push( idx );
+                m_isInHistory[ idx ] = true; 
             }
 
-            col_bit_field[ idx ] = !col_bit_field[ idx ];
+            m_data[ idx ] = !m_data[ idx ];
         }
 
-        index get_max_index() {
-            while( history.size() > 0 ) {
-                index topIndex = history.top();
-                if( col_bit_field[ topIndex ] ) {
+        index max_index() {
+            while( m_history.size() > 0 ) {
+                index topIndex = m_history.top();
+                if( m_data[ topIndex ] ) {
                     return topIndex;
                 } else {
-                    history.pop();
-                    is_in_history[ topIndex ] = false;
+                    m_history.pop();
+                    m_isInHistory[ topIndex ] = false;
                 }
             }
     
             return -1;
         }
 
-        void get_col_and_clear( column& col ) {
-            while( !is_empty() ) {
-                col.push_back( get_max_index() );
-                add_index( get_max_index() );
+        void get_column_and_clear( column& col ) {
+            col.clear();
+            while( !empty() ) {
+                col.push_back( max_index() );
+                add_index( max_index() );
             }
             std::reverse( col.begin(), col.end() );
         }
 
-        bool is_empty() {
-            return (get_max_index() == -1);   
-        }
-
-		void clear() {
-			while( !is_empty() )
-				add_index( get_max_index() );
-		}
-
-		void remove_max() {
-            add_index( get_max_index() );
-        }
-
-        void set_col( const column& col  ) {
-            clear();
-            add_col( col );
-        }
-
-        void get_col( column& col  ) {
-            get_col_and_clear( col );
-            add_col( col );
+        bool empty() {
+            return (max_index() == -1);   
         }
     };
 

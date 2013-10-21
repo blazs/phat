@@ -23,11 +23,18 @@
 namespace phat {
     class vector_set {
 
+        
+    public:
+        typedef _column_t column;
+        
     protected:
+        typedef std::set< index > internal_column; 
         std::vector< dimension > dims;
-        std::vector< std::set< index > > matrix;
+        std::vector< internal_column > matrix;
 
     public:
+        
+        
         // overall number of cells in boundary_matrix
         index _get_num_cols() const {
             return (index)matrix.size(); 
@@ -68,7 +75,7 @@ namespace phat {
 
         // removes the maximal index of a column
         void _remove_max( index idx ) {
-            std::set< index >::iterator it = matrix[ idx ].end();
+            internal_column::iterator it = matrix[ idx ].end();
             it--;
             matrix[ idx ].erase( it );
         }
@@ -83,12 +90,17 @@ namespace phat {
 
         // adds column 'source' to column 'target'
         void _add_to( index source, index target ) {
-            for( std::set< index >::iterator it = matrix[ source ].begin(); it != matrix[ source ].end(); it++ ) {
-				std::set< index >& col = matrix[ target ];
-				std::pair< std::set< index >::iterator, bool > result = col.insert( *it );
-				if( !result.second ) 
-					col.erase( result.first );
-			}
+            for( internal_column::iterator it = matrix[ source ].begin(); it != matrix[ source ].end(); it++ )
+                _toggle( target, *it );
+        }
+
+        //// toggles given index pair
+        void _toggle( index col_idx, index row_idx ) {
+            internal_column& col = matrix[ col_idx ];
+            std::pair< internal_column::iterator, bool > result = col.insert( row_idx );
+            if( !result.second ) {
+                col.erase( result.first );
+            }
         }
     };
 }

@@ -23,6 +23,9 @@
 namespace phat {
     class vector_vector {
 
+    public:
+        typedef _column_t column;
+        
     protected:
         std::vector< dimension > dims;
         std::vector< column > matrix;
@@ -30,6 +33,7 @@ namespace phat {
         thread_local_storage< column > temp_column_buffer;
 
     public:
+        
         // overall number of cells in boundary_matrix
         index _get_num_cols() const {
             return (index)matrix.size(); 
@@ -48,10 +52,10 @@ namespace phat {
         }
 
         // replaces(!) content of 'col' with boundary of given index
-        void _get_col( index idx, column& col  ) const { 
+        void _get_col( index idx, column& col  ) const {
             col = matrix[ idx ]; 
         }
-        void _set_col( index idx, const column& col  ) { 
+        void _set_col( index idx, const column& col  ) {
             matrix[ idx ] = col; 
         }
 

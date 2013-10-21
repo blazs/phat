@@ -34,7 +34,11 @@
 #include <iomanip>
 #include <cmath>
 #include <cstdlib>
-     
+
+#ifndef ZP_PRIME
+#define ZP_PRIME 11
+#endif
+
 // VS2008 and below unfortunately do not support stdint.h
 #if defined(_MSC_VER)&& _MSC_VER < 1600
     typedef __int8 int8_t;
@@ -49,11 +53,52 @@
     #include <stdint.h>
 #endif
 
+ 
 // basic types. index can be changed to int32_t to save memory on small instances
 namespace phat {
+    typedef int8_t zp;
     typedef int64_t index;
     typedef int8_t dimension;
-    typedef std::vector< index > column;
+    typedef std::vector< index > _column_t;
+
+    class _f_column_t{
+    protected:
+        std::vector< std::pair<index,zp> > data;
+    public:
+        typedef std::vector< std::pair<index,zp> >::iterator iterator;
+        typedef std::vector< std::pair<index,zp> >::reverse_iterator reverse_iterator;
+        
+        index& operator[] (const index x) {
+            return data[x].first;
+        }
+        void push_back(const index x){
+            data.push_back(std::pair<index,zp>(x,1));
+        }
+        void resize(const index num_rows ){
+            data.resize(num_rows);
+        }
+        index size(){
+            return data.size();
+        }
+        void clear(){
+            data.clear();
+        }
+        iterator  begin(){
+            return data.begin();
+        }
+        iterator  end(){
+            return data.end();
+        }
+        
+        reverse_iterator  rbegin(){
+            return data.rbegin();
+        }
+        reverse_iterator  rend(){
+            return data.rend();
+        }
+        
+
+    };
 }
 
 // OpenMP (proxy) functions
