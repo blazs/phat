@@ -327,7 +327,8 @@ namespace phat {
                 for( index cur_col = 0; cur_col < num_cols; cur_col++ ) {
                     index num_rows = buffer[ cur_col + 1 ] - buffer[ cur_col ];
                     temp_col.resize( num_rows );
-                    input_stream.read( (char*)&temp_col[ 0 ], sizeof( int64_t ) * temp_col.size() );
+                     if( num_rows > 0 )
+                        input_stream.read( (char*)&temp_col[ 0 ], sizeof( int64_t ) * temp_col.size() );
                     set_col( cur_col, temp_col );
                 }
             }
