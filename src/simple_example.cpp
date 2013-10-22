@@ -25,9 +25,6 @@
 #include <phat/representations/vector_vector.h>
 
 // algorithm (choice affects performance)
-#include <phat/algorithms/standard_reduction.h>
-#include <phat/algorithms/chunk_reduction.h>
-#include <phat/algorithms/row_reduction.h>
 #include <phat/algorithms/twist_reduction.h>
 
 int main( int argc, char** argv ) 

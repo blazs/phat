@@ -30,7 +30,7 @@ namespace phat {
         std::vector< dimension > dims;
         std::vector< column > matrix;
 
-        thread_local_storage< column > temp_column_buffer;
+        column temp_column_buffer;
 
     public:
         
@@ -86,7 +86,7 @@ namespace phat {
         void _add_to( index source, index target ) {
             column& source_col = matrix[ source ];
             column& target_col = matrix[ target ];
-            column& temp_col = temp_column_buffer();
+            column& temp_col = temp_column_buffer;
             temp_col.clear();
             std::set_symmetric_difference( target_col.begin(), target_col.end(),
                                            source_col.begin(), source_col.end(),

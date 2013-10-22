@@ -19,16 +19,16 @@
 #pragma once
 
 #include <phat/helpers/misc.h>
-#include <phat/representations/bit_tree_pivot_column.h>
 
 // interface class for the main data structure -- implementations of the interface can be found in ./representations
 namespace phat {
-    template< class Representation = bit_tree_pivot_column >
+    template< class Representation >
     class boundary_matrix
     {
         
     protected:
         Representation rep;
+        typedef _column_t column;
 
     // interface functions -- actual implementation and complexity depends on chosen @Representation template
     public:
