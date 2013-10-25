@@ -34,7 +34,8 @@
 #include <iomanip>
 #include <cmath>
 #include <cstdlib>
-     
+#include <iterator>
+
 // VS2008 and below unfortunately do not support stdint.h
 #if defined(_MSC_VER)&& _MSC_VER < 1600
     typedef __int8 int8_t;
