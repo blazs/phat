@@ -25,7 +25,8 @@ namespace phat {
 
     public:
         typedef _column_t column;
-        
+	typedef index entry;
+
     protected:
         std::vector< dimension > dims;
         std::vector< column > matrix;
@@ -33,7 +34,10 @@ namespace phat {
         column temp_column_buffer;
 
     public:
-        
+
+        inline entry _create_entry(index k) const { return k; }
+
+
         // overall number of cells in boundary_matrix
         index _get_num_cols() const {
             return (index)matrix.size(); 
