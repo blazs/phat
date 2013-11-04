@@ -28,10 +28,22 @@ namespace phat {
         
     protected:
         Representation rep;
-        typedef _column_t column;
+      
 
     // interface functions -- actual implementation and complexity depends on chosen @Representation template
     public:
+	typedef typename Representation::column column;
+	typedef typename Representation::entry entry;
+	
+	
+	
+	// initialize entry
+        entry create_entry(index k) const { return rep._create_entry(k); }
+
+	// initialize entry
+        void orient() { return rep.orient(); }
+
+
         // get overall number of columns in boundary_matrix
         index get_num_cols() const { return rep._get_num_cols(); }
 
@@ -169,6 +181,10 @@ namespace phat {
 
     // I/O -- independent of chosen 'Representation'
     public:
+	// code change -- primoz -- change orientations after the fact
+ 
+	//----------------------
+
 
         // initializes boundary_matrix from (vector<vector>, vector) pair -- untested
         template< typename index_type, typename dimemsion_type >
@@ -182,8 +198,9 @@ namespace phat {
                 
                 index num_rows = input_matrix[ cur_col ].size();
                 temp_col.resize( num_rows );
-                for( index cur_row = 0; cur_row <  num_rows; cur_row++ )
-                    temp_col[ cur_row ] = (index)input_matrix[ cur_col ][ cur_row ];
+                for( index cur_row = 0; cur_row <  num_rows; cur_row++ ){
+		  temp_col[ cur_row ] = create_entry((index)input_matrix[ cur_col ][ cur_row ]);
+		}
                 this->set_col( cur_col, temp_col );
             }
         }
@@ -201,7 +218,7 @@ namespace phat {
                 output_matrix[ cur_col ].clear();
                 output_matrix[ cur_col ].resize( num_rows );
                 for( index cur_row = 0; cur_row <  num_rows; cur_row++ )
-                    output_matrix[ cur_col ][ cur_row ] = (index_type)temp_col[ cur_row ];
+		  output_matrix[ cur_col ][ cur_row ] = create_entry((index_type)temp_col[ cur_row ]);
             }
         }
 
@@ -246,7 +263,7 @@ namespace phat {
                     temp_col.clear();
                     while( ss.good() ) {
                         ss >> temp_index;
-                        temp_col.push_back( (index)temp_index );
+                        temp_col.push_back(entry((index)temp_index,1) );
                     }
                     std::sort( temp_col.begin(), temp_col.end() );
                     this->set_col( cur_col, temp_col );
