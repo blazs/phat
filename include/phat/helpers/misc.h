@@ -28,6 +28,7 @@
 #include <map>
 #include <algorithm>
 #include <queue>
+#include <iterator>
 #include <cassert>
 #include <sstream>
 #include <algorithm>
