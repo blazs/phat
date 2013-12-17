@@ -22,6 +22,7 @@
 #include <phat/representations/vector_set.h>
 #include <phat/representations/vector_list.h>
 #include <phat/representations/sparse_pivot_column.h>
+#include <phat/representations/heap_pivot_column.h>
 #include <phat/representations/full_pivot_column.h>
 #include <phat/representations/bit_tree_pivot_column.h>
 
@@ -36,6 +37,7 @@ int main( int argc, char** argv )
     std::string test_data = argc > 1 ? argv[ 1 ] : "examples/torus.bin";
 
     typedef phat::sparse_pivot_column Sparse;
+    typedef phat::heap_pivot_column Heap;
     typedef phat::full_pivot_column Full;
     typedef phat::bit_tree_pivot_column BitTree;
     typedef phat::vector_vector Vec_vec;
@@ -56,6 +58,11 @@ int main( int argc, char** argv )
         phat::persistence_pairs sparse_pairs;
         phat::boundary_matrix< Sparse > sparse_boundary_matrix = boundary_matrix;
         phat::compute_persistence_pairs< phat::chunk_reduction >( sparse_pairs, sparse_boundary_matrix );
+
+        std::cout << "Running Chunk - Heap ..." << std::endl;
+        phat::persistence_pairs heap_pairs;
+        phat::boundary_matrix< Heap > heap_boundary_matrix = boundary_matrix;
+        phat::compute_persistence_pairs< phat::chunk_reduction >( heap_pairs, heap_boundary_matrix );
 
         std::cout << "Running Chunk - Full ..." << std::endl;
         phat::persistence_pairs full_pairs;
@@ -82,8 +89,12 @@ int main( int argc, char** argv )
         phat::boundary_matrix< Vec_list > vec_list_boundary_matrix = boundary_matrix;
         phat::compute_persistence_pairs< phat::chunk_reduction >( vec_list_pairs, vec_list_boundary_matrix );
 
-        if( sparse_pairs != full_pairs ) {
-            std::cerr << "Error: sparse and full differ!" << std::endl;
+        if( sparse_pairs != heap_pairs ) {
+            std::cerr << "Error: sparse and heap differ!" << std::endl;
+            error = true;
+        }
+        if( heap_pairs != full_pairs ) {
+            std::cerr << "Error: heap and full differ!" << std::endl;
             error = true;
         }
         if( full_pairs != vec_vec_pairs ) {
