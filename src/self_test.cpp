@@ -30,7 +30,7 @@
 #include <phat/algorithms/standard_reduction.h>
 #include <phat/algorithms/row_reduction.h>
 #include <phat/algorithms/chunk_reduction.h>
-#include <phat/algorithms/block_spectral_sequence_reduction.h>
+#include <phat/algorithms/spectral_sequence_reduction.h>
 
 int main( int argc, char** argv )
 {
