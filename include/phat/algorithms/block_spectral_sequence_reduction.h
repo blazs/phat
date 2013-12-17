@@ -22,7 +22,7 @@
 #include <phat/boundary_matrix.h>
 
 namespace phat {
-    class block_spectral_sequence_reduction {
+    class spectral_sequence_reduction {
     public:
         template< typename Representation >
         void operator () ( boundary_matrix< Representation >& boundary_matrix ) {

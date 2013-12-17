@@ -35,7 +35,7 @@
 #include <phat/helpers/dualize.h>
 
 enum Representation_type  {VECTOR_VECTOR, VECTOR_SET, SPARSE_PIVOT_COLUMN, FULL_PIVOT_COLUMN, BIT_TREE_PIVOT_COLUMN, VECTOR_LIST, HEAP_PIVOT_COLUMN};
-enum Algorithm_type  {STANDARD, TWIST, ROW, CHUNK, CHUNK_SEQUENTIAL, BLOCK_SPECTRAL_SEQUENCE };
+enum Algorithm_type  {STANDARD, TWIST, ROW, CHUNK, CHUNK_SEQUENTIAL, SPECTRAL_SEQUENCE };
 
 void print_help() {
     std::cerr << "Usage: " << "phat " << "[options] input_filename output_filename" << std::endl;
@@ -48,7 +48,7 @@ void print_help() {
     std::cerr << "--verbose --  verbose output" << std::endl;
     std::cerr << "--dualize   --  use dualization approach" << std::endl;
     std::cerr << "--vector_vector, --vector_set, --vector_list, --full_pivot_column, --sparse_pivot_column, --heap_pivot_column, --bit_tree_pivot_column  --  selects a representation data structure for boundary matrices (default is '--bit_tree_pivot_column')" << std::endl;
-    std::cerr << "--standard, --twist, --chunk, --chunk_sequential, --block_spectral_sequence, --row  --  selects a reduction algorithm (default is '--twist')" << std::endl;
+    std::cerr << "--standard, --twist, --chunk, --chunk_sequential, --spectral_sequence, --row  --  selects a reduction algorithm (default is '--twist')" << std::endl;
 }
 
 void print_help_and_exit() {
@@ -82,7 +82,7 @@ void parse_command_line( int argc, char** argv, bool& use_binary, Representation
         else if( option == "--row" ) algorithm = ROW;
         else if( option == "--chunk" ) algorithm = CHUNK;
         else if( option == "--chunk_sequential" ) algorithm = CHUNK_SEQUENTIAL;
-        else if( option == "--block_spectral_sequence" ) algorithm = BLOCK_SPECTRAL_SEQUENCE;
+        else if( option == "--spectral_sequence" ) algorithm = SPECTRAL_SEQUENCE;
         else if( option == "--verbose" ) verbose = true;
         else if( option == "--help" ) print_help_and_exit();
         else print_help_and_exit();
@@ -154,7 +154,7 @@ void compute_pairing( std::string input_filename, std::string output_filename, b
     case STANDARD: compute_pairing< phat::Representation, phat::standard_reduction> ( input_filename, output_filename, use_binary, verbose, dualize ); break; \
     case TWIST: compute_pairing< phat::Representation, phat::twist_reduction> ( input_filename, output_filename, use_binary, verbose, dualize ); break; \
     case ROW: compute_pairing< phat::Representation, phat::row_reduction >( input_filename, output_filename, use_binary, verbose, dualize ); break; \
-    case BLOCK_SPECTRAL_SEQUENCE: compute_pairing< phat::Representation, phat::block_spectral_sequence_reduction >( input_filename, output_filename, use_binary, verbose, dualize ); break; \
+    case SPECTRAL_SEQUENCE: compute_pairing< phat::Representation, phat::spectral_sequence_reduction >( input_filename, output_filename, use_binary, verbose, dualize ); break; \
     case CHUNK: compute_pairing< phat::Representation, phat::chunk_reduction >( input_filename, output_filename, use_binary, verbose, dualize ); break; \
     case CHUNK_SEQUENTIAL: int num_threads = omp_get_max_threads(); \
                            omp_set_num_threads( 1 ); \
