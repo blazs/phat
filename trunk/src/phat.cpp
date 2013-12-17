@@ -22,6 +22,7 @@
 #include <phat/representations/vector_set.h>
 #include <phat/representations/vector_list.h>
 #include <phat/representations/sparse_pivot_column.h>
+#include <phat/representations/heap_pivot_column.h>
 #include <phat/representations/full_pivot_column.h>
 #include <phat/representations/bit_tree_pivot_column.h>
 
@@ -33,7 +34,7 @@
 
 #include <phat/helpers/dualize.h>
 
-enum Representation_type  {VECTOR_VECTOR, VECTOR_SET, SPARSE_PIVOT_COLUMN, FULL_PIVOT_COLUMN, BIT_TREE_PIVOT_COLUMN, VECTOR_LIST};
+enum Representation_type  {VECTOR_VECTOR, VECTOR_SET, SPARSE_PIVOT_COLUMN, FULL_PIVOT_COLUMN, BIT_TREE_PIVOT_COLUMN, VECTOR_LIST, HEAP_PIVOT_COLUMN};
 enum Algorithm_type  {STANDARD, TWIST, ROW, CHUNK, CHUNK_SEQUENTIAL, BLOCK_SPECTRAL_SEQUENCE };
 
 void print_help() {
@@ -46,7 +47,7 @@ void print_help() {
     std::cerr << "--help    --  prints this screen" << std::endl;
     std::cerr << "--verbose --  verbose output" << std::endl;
     std::cerr << "--dualize   --  use dualization approach" << std::endl;
-    std::cerr << "--vector_vector, --vector_set, --vector_list, --full_pivot_column, --sparse_pivot_column, --bit_tree_pivot_column  --  selects a representation data structure for boundary matrices (default is '--bit_tree_pivot_column')" << std::endl;
+    std::cerr << "--vector_vector, --vector_set, --vector_list, --full_pivot_column, --sparse_pivot_column, --heap_pivot_column, --bit_tree_pivot_column  --  selects a representation data structure for boundary matrices (default is '--bit_tree_pivot_column')" << std::endl;
     std::cerr << "--standard, --twist, --chunk, --chunk_sequential, --block_spectral_sequence, --row  --  selects a reduction algorithm (default is '--twist')" << std::endl;
 }
 
@@ -75,6 +76,7 @@ void parse_command_line( int argc, char** argv, bool& use_binary, Representation
         else if( option == "--full_pivot_column" )  representation = FULL_PIVOT_COLUMN;
         else if( option == "--bit_tree_pivot_column" )  representation = BIT_TREE_PIVOT_COLUMN;
         else if( option == "--sparse_pivot_column" ) representation = SPARSE_PIVOT_COLUMN;
+        else if( option == "--heap_pivot_column" ) representation = HEAP_PIVOT_COLUMN;
         else if( option == "--standard" ) algorithm = STANDARD;
         else if( option == "--twist" ) algorithm = TWIST;
         else if( option == "--row" ) algorithm = ROW;
@@ -180,5 +182,6 @@ int main( int argc, char** argv )
     case FULL_PIVOT_COLUMN: COMPUTE_PAIRING(full_pivot_column) break;
     case BIT_TREE_PIVOT_COLUMN: COMPUTE_PAIRING(bit_tree_pivot_column) break;
     case SPARSE_PIVOT_COLUMN: COMPUTE_PAIRING(sparse_pivot_column) break;
+    case HEAP_PIVOT_COLUMN: COMPUTE_PAIRING(heap_pivot_column) break;
     }
 }
