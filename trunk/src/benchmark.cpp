@@ -39,7 +39,7 @@
 
 
 enum Representation_type  {VECTOR_VECTOR, VECTOR_SET, SPARSE_PIVOT_COLUMN, HEAP_PIVOT_COLUMN, FULL_PIVOT_COLUMN, BIT_TREE_PIVOT_COLUMN, VECTOR_LIST};
-enum Algorithm_type  {STANDARD, TWIST, ROW, CHUNK, CHUNK_SEQUENTIAL, BLOCK_SPECTRAL_SEQUENCE};
+enum Algorithm_type  {STANDARD, TWIST, ROW, CHUNK, CHUNK_SEQUENTIAL, SPECTRAL_SEQUENCE};
 enum Ansatz_type  {PRIMAL, DUAL};
 
 void print_help() {
@@ -53,7 +53,7 @@ void print_help() {
     std::cerr << "--dualize   --  use only dualization approach" << std::endl;
     std::cerr << "--primal   --  use only primal approach" << std::endl;
     std::cerr << "--vector_vector, --vector_set, --vector_list, --full_pivot_column, --sparse_pivot_column, --heap_pivot_column, --bit_tree_pivot_column  --  use only a subset of representation data structures for boundary matrices" << std::endl;
-    std::cerr << "--standard, --twist, --chunk, --chunk_sequential, --block_spectral_sequence, --row  --  use only a subset of reduction algorithms" << std::endl;
+    std::cerr << "--standard, --twist, --chunk, --chunk_sequential, --spectral_sequence, --row  --  use only a subset of reduction algorithms" << std::endl;
 }
 
 void print_help_and_exit() {
@@ -83,7 +83,7 @@ void parse_command_line( int argc, char** argv, bool& use_binary, std::vector< R
             else if( argument == "--twist" ) algorithms.push_back( TWIST );
             else if( argument == "--row" ) algorithms.push_back( ROW );
             else if( argument == "--chunk_sequential" ) algorithms.push_back( CHUNK_SEQUENTIAL );
-            else if( argument == "--block_spectral_sequence" ) algorithms.push_back( BLOCK_SPECTRAL_SEQUENCE );
+            else if( argument == "--spectral_sequence" ) algorithms.push_back( SPECTRAL_SEQUENCE );
             else if( argument == "--chunk" ) algorithms.push_back( CHUNK );
             else if( argument == "--primal" ) ansaetze.push_back( PRIMAL );
             else if( argument == "--dual" ) ansaetze.push_back( DUAL );
@@ -157,7 +157,7 @@ void benchmark( std::string input_filename, bool use_binary, Ansatz_type ansatz 
     case TWIST: std::cout << " twist,"; benchmark< phat::Representation, phat::twist_reduction >( input_filename, use_binary, ansatz ); break; \
     case ROW: std::cout << " row,"; benchmark< phat::Representation, phat::row_reduction >( input_filename, use_binary, ansatz ); break; \
     case CHUNK: std::cout << " chunk,"; benchmark< phat::Representation, phat::chunk_reduction >( input_filename, use_binary, ansatz ); break; \
-    case BLOCK_SPECTRAL_SEQUENCE: std::cout << " block spectral sequence,"; benchmark< phat::Representation, phat::block_spectral_sequence_reduction >( input_filename, use_binary, ansatz ); break; \
+    case SPECTRAL_SEQUENCE: std::cout << " spectral sequence,"; benchmark< phat::Representation, phat::spectral_sequence_reduction >( input_filename, use_binary, ansatz ); break; \
     case CHUNK_SEQUENTIAL: std::cout << " chunk_sequential,"; \
                            int num_threads = omp_get_max_threads(); \
                            omp_set_num_threads( 1 ); \

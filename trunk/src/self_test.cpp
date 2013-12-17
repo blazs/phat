@@ -144,10 +144,10 @@ int main( int argc, char** argv )
         phat::boundary_matrix< BitTree > row_boundary_matrix = boundary_matrix;
         phat::compute_persistence_pairs< phat::row_reduction >( row_pairs, row_boundary_matrix );
 
-        std::cout << "Running Block spectral sequence - BitTree ..." << std::endl;
+        std::cout << "Running Spectral sequence - BitTree ..." << std::endl;
         phat::persistence_pairs ss_pairs;
         phat::boundary_matrix< BitTree > ss_boundary_matrix = boundary_matrix;
-        phat::compute_persistence_pairs< phat::block_spectral_sequence_reduction >( ss_pairs, ss_boundary_matrix );
+        phat::compute_persistence_pairs< phat::spectral_sequence_reduction >( ss_pairs, ss_boundary_matrix );
 
         if( twist_pairs != std_pairs ) {
             std::cerr << "Error: twist and standard differ!" << std::endl;
@@ -162,11 +162,11 @@ int main( int argc, char** argv )
             error = true;
         }
         if( row_pairs != ss_pairs ) {
-            std::cerr << "Error: row and block spectral sequence differ!" << std::endl;
+            std::cerr << "Error: row and spectral sequence differ!" << std::endl;
             error = true;
         }
         if( ss_pairs != twist_pairs ) {
-            std::cerr << "Error: block spectral sequence and twist differ!" << std::endl;
+            std::cerr << "Error: spectral sequence and twist differ!" << std::endl;
             error = true;
         }
 
