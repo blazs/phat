@@ -54,7 +54,7 @@ namespace phat {
                         index row_begin = (cur_stripe - cur_pass) * block_size;
                         index row_end = row_begin + block_size;
                         unreduced_cols_next_pass[ cur_stripe ].clear();
-                        for( index idx = 0; idx < unreduced_cols_cur_pass[ cur_stripe ].size(); idx++ ) {
+                        for( index idx = 0; idx < (index)unreduced_cols_cur_pass[ cur_stripe ].size(); idx++ ) {
                             index cur_col = unreduced_cols_cur_pass[ cur_stripe ][ idx ];
                             index lowest_one = boundary_matrix.get_max_index( cur_col );
                             while( lowest_one != -1 && lowest_one >= row_begin && lowest_one < row_end  && lowest_one_lookup[ lowest_one ] != -1 ) {
