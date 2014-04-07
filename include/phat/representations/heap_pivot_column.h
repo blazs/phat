@@ -80,7 +80,7 @@ namespace phat {
         }
 
         bool is_empty() {
-            return data.empty();
+            return get_max_index() == -1;
         }
 
 		void clear() {
