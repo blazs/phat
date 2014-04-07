@@ -101,6 +101,7 @@ void parse_command_line( int argc, char** argv, bool& use_binary, std::vector< R
         representations.push_back( FULL_PIVOT_COLUMN );
         representations.push_back( BIT_TREE_PIVOT_COLUMN );
         representations.push_back( SPARSE_PIVOT_COLUMN );
+        representations.push_back( HEAP_PIVOT_COLUMN );
     }
 
     if( algorithms.empty() == true ) {
