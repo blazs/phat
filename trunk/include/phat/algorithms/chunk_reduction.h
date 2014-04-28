@@ -39,22 +39,32 @@ namespace phat {
             std::vector < column_type > column_type( nr_columns, GLOBAL );
             std::vector< char > is_active( nr_columns, false );
 
+            //const index chunk_size = (index) sqrt( (float)nr_columns ); 
+            const index chunk_size = nr_columns / omp_get_max_threads( ); 
+
+            index cur_boundary = 0;
             std::vector<index> chunk_boundaries;
-            _get_chunks( boundary_matrix, chunk_boundaries );
+            for( cur_boundary = 0; cur_boundary < nr_columns; cur_boundary += chunk_size )
+                chunk_boundaries.push_back( cur_boundary );
+            chunk_boundaries.push_back( nr_columns );
 
             // Phase 1: Reduce chunks locally -- 1st pass
-            #pragma omp parallel for schedule( guided, 1 )
-            for( index chunk_id = 0; chunk_id < (index) chunk_boundaries.size() - 2; chunk_id += 2 ) 
-                _local_chunk_reduction( boundary_matrix, lowest_one_lookup, column_type, max_dim,
-                                        chunk_boundaries[chunk_id], chunk_boundaries[chunk_id+2] - 1 );
-            boundary_matrix.sync();
+            for( dimension cur_dim = max_dim; cur_dim >= 1; cur_dim-- ) {
+                #pragma omp parallel for schedule( guided, 1 )
+                for( index chunk_id = 0; chunk_id < (index)chunk_boundaries.size() - 1; chunk_id++ )
+                    _local_chunk_reduction( boundary_matrix, lowest_one_lookup, column_type, cur_dim,
+                                            chunk_boundaries[ chunk_id ], chunk_boundaries[ chunk_id + 1 ], chunk_boundaries[ chunk_id ] );
+                boundary_matrix.sync();
+            }
 
             // Phase 1: Reduce chunks locally -- 2nd pass
-            #pragma omp parallel for schedule( guided, 1 )
-            for( index chunk_id = 1; chunk_id < (index) chunk_boundaries.size() - 2; chunk_id += 2 )
-                _local_chunk_reduction( boundary_matrix, lowest_one_lookup, column_type, max_dim,
-                                        chunk_boundaries[chunk_id], chunk_boundaries[chunk_id+2] - 1 );
-            boundary_matrix.sync();
+            for( dimension cur_dim = max_dim; cur_dim >= 1; cur_dim-- ) {
+                #pragma omp parallel for schedule( guided, 1 )
+                for( index chunk_id = 1; chunk_id < (index)chunk_boundaries.size( ) - 1; chunk_id++ )
+                    _local_chunk_reduction( boundary_matrix, lowest_one_lookup, column_type, cur_dim,
+                                            chunk_boundaries[ chunk_id ], chunk_boundaries[ chunk_id + 1 ], chunk_boundaries[ chunk_id - 1 ] );
+                boundary_matrix.sync( );
+            }
 
             // get global columns
             std::vector< index > global_columns;
@@ -100,55 +110,26 @@ namespace phat {
     
     protected:
         template< typename Representation >
-        void _get_chunks( const boundary_matrix< Representation >& boundary_matrix
-                        , std::vector< index >& chunk_boundaries) 
-        {
-            chunk_boundaries.clear();
-            std::vector<index> temp_chunk_boundaries;
-            const index nr_columns = boundary_matrix.get_num_cols();
-            
-            // size of chuks = sqrt(N)
-            const index chunk_size = (index) sqrt( (float)nr_columns );
-
-            // size of chunks = N / num_threads
-            //const index chunk_size = nr_columns / omp_get_max_threads();
-            
-            for ( index cur_col = 0; cur_col < nr_columns; cur_col++ )
-                if( cur_col % chunk_size == 0 )
-                    temp_chunk_boundaries.push_back( cur_col );
-            temp_chunk_boundaries.push_back( nr_columns );
-            
-            // subdivide chunks for interleaved 2 pass appraoch
-            for( index chunk_id = 0; chunk_id < (index) temp_chunk_boundaries.size(); chunk_id ++ ) {
-                chunk_boundaries.push_back( temp_chunk_boundaries[ chunk_id ] );
-                if( chunk_id < (index) temp_chunk_boundaries.size() - 1 ) {
-                    index midPoint = ( temp_chunk_boundaries[ chunk_id ] + temp_chunk_boundaries[ chunk_id + 1 ] ) / 2;
-                    chunk_boundaries.push_back( midPoint );
-                }
-            }
-        }
-    
-        template< typename Representation >
         void _local_chunk_reduction( boundary_matrix< Representation >& boundary_matrix
                                    , std::vector<index>& lowest_one_lookup
                                    , std::vector< column_type >& column_type
-                                   , const dimension max_dim
+                                   , const dimension cur_dim
                                    , const index chunk_begin
-                                   , const index chunk_end ) {
-            for( dimension cur_dim = max_dim; cur_dim >= 1; cur_dim-- ) {
-                for( index cur_col = chunk_begin; cur_col <= chunk_end; cur_col++ ) {
-                    if( column_type[ cur_col ] == GLOBAL && boundary_matrix.get_dim( cur_col ) == cur_dim ) {
-                        index lowest_one = boundary_matrix.get_max_index( cur_col );
-                        while( lowest_one != -1 && lowest_one >= chunk_begin && lowest_one_lookup[ lowest_one ] != -1  ) {
-                            boundary_matrix.add_to( lowest_one_lookup[ lowest_one ], cur_col );
-                            lowest_one = boundary_matrix.get_max_index( cur_col );
-                        }
-                        if( lowest_one >= chunk_begin ) {
-                            lowest_one_lookup[ lowest_one ] = cur_col;
-                            column_type[ cur_col ] = LOCAL_NEGATIVE;
-                            column_type[ lowest_one ] = LOCAL_POSITIVE;
-                            boundary_matrix.clear( lowest_one );
-                        }
+                                   , const index chunk_end
+                                   , const index row_begin ) {
+
+            for( index cur_col = chunk_begin; cur_col < chunk_end; cur_col++ ) {
+                if( column_type[ cur_col ] == GLOBAL && boundary_matrix.get_dim( cur_col ) == cur_dim ) {
+                    index lowest_one = boundary_matrix.get_max_index( cur_col );
+                    while( lowest_one != -1 && lowest_one >= row_begin && lowest_one_lookup[ lowest_one ] != -1 ) {
+                        boundary_matrix.add_to( lowest_one_lookup[ lowest_one ], cur_col );
+                        lowest_one = boundary_matrix.get_max_index( cur_col );
+                    }
+                    if( lowest_one >= row_begin ) {
+                        lowest_one_lookup[ lowest_one ] = cur_col;
+                        column_type[ cur_col ] = LOCAL_NEGATIVE;
+                        column_type[ lowest_one ] = LOCAL_POSITIVE;
+                        boundary_matrix.clear( lowest_one );
                     }
                 }
             }
