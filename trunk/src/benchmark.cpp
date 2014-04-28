@@ -47,6 +47,7 @@ void print_help() {
     std::cerr << std::endl;
     std::cerr << "Options:" << std::endl;
     std::cerr << std::endl;
+    std::cerr << "--latex  --  produces Latex tables" << std::endl;
     std::cerr << "--ascii   --  use ascii file format" << std::endl;
     std::cerr << "--binary  --  use binary file format (default)" << std::endl;
     std::cerr << "--help    --  prints this screen" << std::endl;
@@ -61,7 +62,7 @@ void print_help_and_exit() {
     exit( EXIT_FAILURE );
 }
 
-void parse_command_line( int argc, char** argv, bool& use_binary, std::vector< Representation_type >& representations, std::vector< Algorithm_type >& algorithms
+void parse_command_line( int argc, char** argv, bool& latex_tables_output, bool& use_binary, std::vector< Representation_type >& representations, std::vector< Algorithm_type >& algorithms
                        , std::vector< Ansatz_type >& ansaetze, std::vector< std::string >& input_filenames ) {
 
     if( argc < 2 ) print_help_and_exit();
@@ -71,6 +72,7 @@ void parse_command_line( int argc, char** argv, bool& use_binary, std::vector< R
         const std::string argument = argv[ idx ];
         if( argument.size() > 2 && argument[ 0 ] == '-' && argument[ 1 ] == '-' ) {
             if( argument == "--ascii" ) use_binary = false;
+            else if( argument == "--latex" ) latex_tables_output = true;
             else if( argument == "--binary" ) use_binary = true;
             else if( argument == "--vector_vector" ) representations.push_back( VECTOR_VECTOR );
             else if( argument == "--vector_set" ) representations.push_back( VECTOR_SET );
@@ -151,6 +153,37 @@ void benchmark( std::string input_filename, bool use_binary, Ansatz_type ansatz 
     std::cout << " Reduction time: " << setiosflags( std::ios::fixed ) << setiosflags( std::ios::showpoint ) << std::setprecision( 1 ) << running_time_rounded <<"s" << std::endl;
 }
 
+template<typename Representation, typename Algorithm>
+void benchmark_latex( std::string input_filename, bool use_binary, Ansatz_type ansatz )
+{
+    phat::boundary_matrix< Representation > matrix;
+    bool read_successful = use_binary ? matrix.load_binary( input_filename ) : matrix.load_ascii( input_filename );
+
+    if( !read_successful ) {
+        std::cerr << std::endl << " Error opening file " << input_filename << std::endl;
+        print_help_and_exit( );
+    }
+
+    Algorithm reduction_algorithm;
+    double dualization_time = 0.0;
+    double reduction_timer = -1;
+    if( ansatz == PRIMAL ) {
+        reduction_timer = omp_get_wtime( );
+        reduction_algorithm( matrix );
+    } else {
+        double dualization_timer = omp_get_wtime( );
+        dualize( matrix );
+        dualization_time = omp_get_wtime( ) - dualization_timer;
+        reduction_timer = omp_get_wtime( );
+        reduction_algorithm( matrix );
+    }
+
+    double running_time = omp_get_wtime() - reduction_timer + dualization_time;
+    //double running_time = omp_get_wtime( ) - reduction_timer; 
+    double running_time_rounded = floor( running_time * 10.0 + 0.5 ) / 10.0;
+    std::cout << "& "<< setiosflags( std::ios::fixed ) << setiosflags( std::ios::showpoint ) << std::setprecision( 1 ) << running_time_rounded << " ";
+}
+
 #define COMPUTE(Representation) \
     std::cout << " " << #Representation << ","; \
     switch( algorithm ) { \
@@ -167,8 +200,23 @@ void benchmark( std::string input_filename, bool use_binary, Ansatz_type ansatz 
                            break; \
     };
 
+#define COMPUTE_LATEX(Representation) \
+    switch( algorithm ) { \
+    case STANDARD: benchmark_latex< phat::Representation, phat::standard_reduction >( input_filename, use_binary, ansatz ); break; \
+    case TWIST: benchmark_latex< phat::Representation, phat::twist_reduction >( input_filename, use_binary, ansatz ); break; \
+    case ROW: benchmark_latex< phat::Representation, phat::row_reduction >( input_filename, use_binary, ansatz ); break; \
+    case CHUNK: benchmark_latex< phat::Representation, phat::chunk_reduction >( input_filename, use_binary, ansatz ); break; \
+    case SPECTRAL_SEQUENCE: benchmark_latex< phat::Representation, phat::spectral_sequence_reduction >( input_filename, use_binary, ansatz ); break; \
+    case CHUNK_SEQUENTIAL:  int num_threads = omp_get_max_threads( ); \
+                            omp_set_num_threads( 1 ); \
+                            benchmark_latex< phat::Representation, phat::chunk_reduction >( input_filename, use_binary, ansatz ); \
+                            omp_set_num_threads( num_threads ); \
+                            break; \
+    };
+
 int main( int argc, char** argv )
 {
+    bool latex_tables_output = false; // produces output in latex format
     bool use_binary = true; // interpret inputs as binary or ascii files
     std::vector< std::string > input_filenames; // name of file that contains the boundary matrix
 
@@ -176,28 +224,94 @@ int main( int argc, char** argv )
     std::vector< Algorithm_type > algorithms; // reduction algorithm
     std::vector< Ansatz_type > ansaetze; // primal / dual
 
-    parse_command_line( argc, argv, use_binary, representations, algorithms, ansaetze, input_filenames );
+    parse_command_line( argc, argv, latex_tables_output, use_binary, representations, algorithms, ansaetze, input_filenames );
 
-    for( int idx_input = 0; idx_input < input_filenames.size(); idx_input++ ) {
-        std::string input_filename = input_filenames[ idx_input ];
-        for( int idx_algorithm = 0; idx_algorithm < algorithms.size(); idx_algorithm++ ) {
-            Algorithm_type algorithm = algorithms[ idx_algorithm ];
-            for( int idx_representation = 0; idx_representation < representations.size(); idx_representation++ ) {
-                Representation_type representation = representations[ idx_representation ];
-                for( int idx_ansatz = 0; idx_ansatz < ansaetze.size(); idx_ansatz++ ) {
-                    Ansatz_type ansatz = ansaetze[ idx_ansatz ];
-                    std::cout << input_filename << ",";
-                    switch( representation ) {
-                    case VECTOR_VECTOR: COMPUTE(vector_vector) break;
-                    case VECTOR_SET: COMPUTE(vector_set) break;
-                    case VECTOR_LIST: COMPUTE(vector_list) break;
-                    case FULL_PIVOT_COLUMN: COMPUTE(full_pivot_column) break;
-                    case BIT_TREE_PIVOT_COLUMN: COMPUTE(bit_tree_pivot_column) break;
-                    case SPARSE_PIVOT_COLUMN: COMPUTE(sparse_pivot_column) break;
-                    case HEAP_PIVOT_COLUMN: COMPUTE(heap_pivot_column) break;
+    if( !latex_tables_output ) {
+        for( int idx_input = 0; idx_input < input_filenames.size(); idx_input++ ) {
+            std::string input_filename = input_filenames[ idx_input ];
+            for( int idx_algorithm = 0; idx_algorithm < algorithms.size(); idx_algorithm++ ) {
+                Algorithm_type algorithm = algorithms[ idx_algorithm ];
+                for( int idx_representation = 0; idx_representation < representations.size(); idx_representation++ ) {
+                    Representation_type representation = representations[ idx_representation ];
+                    for( int idx_ansatz = 0; idx_ansatz < ansaetze.size(); idx_ansatz++ ) {
+                        Ansatz_type ansatz = ansaetze[ idx_ansatz ];
+                        std::cout << input_filename << ",";
+                        switch( representation ) {
+                        case VECTOR_VECTOR: COMPUTE(vector_vector) break;
+                        case VECTOR_SET: COMPUTE(vector_set) break;
+                        case VECTOR_LIST: COMPUTE(vector_list) break;
+                        case FULL_PIVOT_COLUMN: COMPUTE(full_pivot_column) break;
+                        case BIT_TREE_PIVOT_COLUMN: COMPUTE(bit_tree_pivot_column) break;
+                        case SPARSE_PIVOT_COLUMN: COMPUTE(sparse_pivot_column) break;
+                        case HEAP_PIVOT_COLUMN: COMPUTE(heap_pivot_column) break;
+                        }
                     }
                 }
             }
         }
+    } else {
+        for( int idx_input = 0; idx_input < input_filenames.size( ); idx_input++ ) {
+            std::cout << "\\begin{table}[ h ]" << std::endl;
+            std::cout << "\\begin{center}" << std::endl;
+            std::cout << "\\begin{tabular}{";
+            for( int idx = 0; idx < representations.size( ) + 1; idx++ )
+                std::cout << "r";
+            std::cout << "}" << std::endl;
+
+            for( int idx_representation = 0; idx_representation < representations.size( ); idx_representation++ ) {
+                Representation_type representation = representations[ idx_representation ];
+                switch( representation ) {
+                case VECTOR_VECTOR: std::cout << "& V "; break;
+                case VECTOR_SET: std::cout << "& S "; break;
+                case VECTOR_LIST: std::cout << "& L "; break;
+                case FULL_PIVOT_COLUMN: std::cout << "& P-F "; break;
+                case BIT_TREE_PIVOT_COLUMN: std::cout << "& P-BT "; break;
+                case SPARSE_PIVOT_COLUMN: std::cout << "& P-S "; break;
+                case HEAP_PIVOT_COLUMN: std::cout << "& P-H "; break;
+                }
+            }
+            std::cout << "\\\\" << std::endl;
+            std::cout << "\\hline" << std::endl;
+
+            std::string input_filename = input_filenames[ idx_input ];
+            for( int idx_algorithm = 0; idx_algorithm < algorithms.size( ); idx_algorithm++ ) {
+                Algorithm_type algorithm = algorithms[ idx_algorithm ];
+                for( int idx_ansatz = 0; idx_ansatz < ansaetze.size(); idx_ansatz++ ) {
+                    switch( algorithm ) {
+                    case STANDARD: std::cout << "standard"; break;
+                    case TWIST: std::cout << "twist"; break;
+                    case ROW: std::cout << "row"; break;
+                    case CHUNK: std::cout << "chunk"; break;
+                    case SPECTRAL_SEQUENCE: std::cout << "spectral sequence"; break;
+                    case CHUNK_SEQUENTIAL: std::cout << "chunk-sequential"; break;
+                    }
+                    Ansatz_type ansatz = ansaetze[ idx_ansatz ];
+                    if( ansatz == DUAL )
+                        std::cout << "$^*$";
+                    std::cout << " ";
+                    for( int idx_representation = 0; idx_representation < representations.size(); idx_representation++ ) {
+                        Representation_type representation = representations[ idx_representation ];
+                        switch( representation ) {
+                        case VECTOR_VECTOR: COMPUTE_LATEX( vector_vector ) break;
+                        case VECTOR_SET: COMPUTE_LATEX( vector_set ) break;
+                        case VECTOR_LIST: COMPUTE_LATEX( vector_list ) break;
+                        case FULL_PIVOT_COLUMN: COMPUTE_LATEX( full_pivot_column ) break;
+                        case BIT_TREE_PIVOT_COLUMN: COMPUTE_LATEX( bit_tree_pivot_column ) break;
+                        case SPARSE_PIVOT_COLUMN: COMPUTE_LATEX( sparse_pivot_column ) break;
+                        case HEAP_PIVOT_COLUMN: COMPUTE_LATEX( heap_pivot_column ) break;
+                        }
+                    }
+                    std::cout << "\\\\" << std::endl;
+                }
+            }
+
+            std::cout << "\\end{tabular}" << std::endl;
+            std::cout << "\\end{center}" << std::endl;
+            std::cout << "\\caption{ " << input_filename << " }" << std::endl;
+            std::cout << "\\label{ phat: " << input_filename << " }" << std::endl;
+            std::cout << "\\end{table}" << std::endl << std::endl;
+        }
     }
 }
+
+
