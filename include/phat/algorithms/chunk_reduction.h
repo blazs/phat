@@ -39,26 +39,23 @@ namespace phat {
             std::vector < column_type > column_type( nr_columns, GLOBAL );
             std::vector< char > is_active( nr_columns, false );
 
-            //const index chunk_size = (index) sqrt( (float)nr_columns ); 
-            const index chunk_size = nr_columns / omp_get_max_threads( ); 
+            const index chunk_size = (index) sqrt( (double)nr_columns ); 
+            //const index chunk_size = nr_columns / omp_get_max_threads( ); 
 
-            index cur_boundary = 0;
-            std::vector<index> chunk_boundaries;
-            for( cur_boundary = 0; cur_boundary < nr_columns; cur_boundary += chunk_size )
+            std::vector< index > chunk_boundaries;
+            for( index cur_boundary = 0; cur_boundary < nr_columns; cur_boundary += chunk_size )
                 chunk_boundaries.push_back( cur_boundary );
             chunk_boundaries.push_back( nr_columns );
 
-            // Phase 1: Reduce chunks locally -- 1st pass
             for( dimension cur_dim = max_dim; cur_dim >= 1; cur_dim-- ) {
+                // Phase 1: Reduce chunks locally -- 1st pass
                 #pragma omp parallel for schedule( guided, 1 )
                 for( index chunk_id = 0; chunk_id < (index)chunk_boundaries.size() - 1; chunk_id++ )
                     _local_chunk_reduction( boundary_matrix, lowest_one_lookup, column_type, cur_dim,
                                             chunk_boundaries[ chunk_id ], chunk_boundaries[ chunk_id + 1 ], chunk_boundaries[ chunk_id ] );
                 boundary_matrix.sync();
-            }
 
-            // Phase 1: Reduce chunks locally -- 2nd pass
-            for( dimension cur_dim = max_dim; cur_dim >= 1; cur_dim-- ) {
+                // Phase 1: Reduce chunks locally -- 2nd pass
                 #pragma omp parallel for schedule( guided, 1 )
                 for( index chunk_id = 1; chunk_id < (index)chunk_boundaries.size( ) - 1; chunk_id++ )
                     _local_chunk_reduction( boundary_matrix, lowest_one_lookup, column_type, cur_dim,
