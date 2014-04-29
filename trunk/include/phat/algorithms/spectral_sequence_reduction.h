@@ -30,7 +30,7 @@ namespace phat {
             const index nr_columns = boundary_matrix.get_num_cols();
             std::vector< index > lowest_one_lookup( nr_columns, -1 );
 
-            //const index num_stripes = sqrt( nr_columns );
+            //const index num_stripes = (index) sqrt( (double)nr_columns );
             const index num_stripes = omp_get_max_threads();
 
             index block_size = ( nr_columns % num_stripes == 0 ) ? nr_columns / num_stripes : block_size = nr_columns / num_stripes + 1;
