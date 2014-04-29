@@ -39,8 +39,8 @@ namespace phat {
             std::vector < column_type > column_type( nr_columns, GLOBAL );
             std::vector< char > is_active( nr_columns, false );
 
-            const index chunk_size = (index) sqrt( (double)nr_columns ); 
-            //const index chunk_size = nr_columns / omp_get_max_threads( ); 
+            //const index chunk_size = (index) sqrt( (double)nr_columns ); 
+            const index chunk_size = nr_columns / omp_get_max_threads( ); 
 
             std::vector< index > chunk_boundaries;
             for( index cur_boundary = 0; cur_boundary < nr_columns; cur_boundary += chunk_size )
