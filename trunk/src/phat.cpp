@@ -19,6 +19,7 @@
 #include <phat/compute_persistence_pairs.h>
 
 #include <phat/representations/vector_vector.h>
+#include <phat/representations/vector_heap.h>
 #include <phat/representations/vector_set.h>
 #include <phat/representations/vector_list.h>
 #include <phat/representations/sparse_pivot_column.h>
@@ -34,7 +35,7 @@
 
 #include <phat/helpers/dualize.h>
 
-enum Representation_type  {VECTOR_VECTOR, VECTOR_SET, SPARSE_PIVOT_COLUMN, FULL_PIVOT_COLUMN, BIT_TREE_PIVOT_COLUMN, VECTOR_LIST, HEAP_PIVOT_COLUMN};
+enum Representation_type { VECTOR_VECTOR, VECTOR_HEAP, VECTOR_SET, SPARSE_PIVOT_COLUMN, FULL_PIVOT_COLUMN, BIT_TREE_PIVOT_COLUMN, VECTOR_LIST, HEAP_PIVOT_COLUMN };
 enum Algorithm_type  {STANDARD, TWIST, ROW, CHUNK, CHUNK_SEQUENTIAL, SPECTRAL_SEQUENCE };
 
 void print_help() {
@@ -47,7 +48,7 @@ void print_help() {
     std::cerr << "--help    --  prints this screen" << std::endl;
     std::cerr << "--verbose --  verbose output" << std::endl;
     std::cerr << "--dualize   --  use dualization approach" << std::endl;
-    std::cerr << "--vector_vector, --vector_set, --vector_list, --full_pivot_column, --sparse_pivot_column, --heap_pivot_column, --bit_tree_pivot_column  --  selects a representation data structure for boundary matrices (default is '--bit_tree_pivot_column')" << std::endl;
+    std::cerr << "--vector_vector, --vector_heap, --vector_set, --vector_list, --full_pivot_column, --sparse_pivot_column, --heap_pivot_column, --bit_tree_pivot_column  --  selects a representation data structure for boundary matrices (default is '--bit_tree_pivot_column')" << std::endl;
     std::cerr << "--standard, --twist, --chunk, --chunk_sequential, --spectral_sequence, --row  --  selects a reduction algorithm (default is '--twist')" << std::endl;
 }
 
@@ -71,6 +72,7 @@ void parse_command_line( int argc, char** argv, bool& use_binary, Representation
         else if( option == "--binary" ) use_binary = true;
         else if( option == "--dualize" ) dualize = true;
         else if( option == "--vector_vector" ) representation = VECTOR_VECTOR;
+        else if( option == "--vector_heap" ) representation = VECTOR_HEAP;
         else if( option == "--vector_set" ) representation = VECTOR_SET;
         else if( option == "--vector_list" ) representation = VECTOR_LIST;
         else if( option == "--full_pivot_column" )  representation = FULL_PIVOT_COLUMN;
@@ -177,6 +179,7 @@ int main( int argc, char** argv )
 
     switch( representation ) {
     case VECTOR_VECTOR: COMPUTE_PAIRING(vector_vector) break;
+    case VECTOR_HEAP: COMPUTE_PAIRING( vector_heap ) break;
     case VECTOR_SET: COMPUTE_PAIRING(vector_set) break;
     case VECTOR_LIST: COMPUTE_PAIRING(vector_list) break;
     case FULL_PIVOT_COLUMN: COMPUTE_PAIRING(full_pivot_column) break;
