@@ -32,15 +32,18 @@ namespace phat {
         template< typename Representation >
         void operator() ( boundary_matrix< Representation >& boundary_matrix ) {
 
+
             const index nr_columns = boundary_matrix.get_num_cols();
+            if( omp_get_max_threads( ) > nr_columns )
+                omp_set_num_threads( 1 );
+                
             const dimension max_dim = boundary_matrix.get_max_dim();
 
             std::vector< index > lowest_one_lookup( nr_columns, -1 );
             std::vector < column_type > column_type( nr_columns, GLOBAL );
             std::vector< char > is_active( nr_columns, false );
 
-            //const index chunk_size = (index) sqrt( (double)nr_columns ); 
-            const index chunk_size = nr_columns / omp_get_max_threads( ); 
+            const index chunk_size = omp_get_max_threads() == 1 ? (index)sqrt( (double)nr_columns ) : nr_columns / omp_get_max_threads();
 
             std::vector< index > chunk_boundaries;
             for( index cur_boundary = 0; cur_boundary < nr_columns; cur_boundary += chunk_size )
