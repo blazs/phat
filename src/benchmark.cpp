@@ -19,6 +19,7 @@
 #include <phat/compute_persistence_pairs.h>
 
 #include <phat/representations/vector_vector.h>
+#include <phat/representations/vector_heap.h>
 #include <phat/representations/vector_set.h>
 #include <phat/representations/vector_list.h>
 #include <phat/representations/sparse_pivot_column.h>
@@ -38,7 +39,7 @@
 #include <iomanip>
 
 
-enum Representation_type  {VECTOR_VECTOR, VECTOR_SET, SPARSE_PIVOT_COLUMN, HEAP_PIVOT_COLUMN, FULL_PIVOT_COLUMN, BIT_TREE_PIVOT_COLUMN, VECTOR_LIST};
+enum Representation_type { VECTOR_VECTOR, VECTOR_HEAP, VECTOR_SET, SPARSE_PIVOT_COLUMN, HEAP_PIVOT_COLUMN, FULL_PIVOT_COLUMN, BIT_TREE_PIVOT_COLUMN, VECTOR_LIST };
 enum Algorithm_type  {STANDARD, TWIST, ROW, CHUNK, CHUNK_SEQUENTIAL, SPECTRAL_SEQUENCE};
 enum Ansatz_type  {PRIMAL, DUAL};
 
@@ -53,7 +54,7 @@ void print_help() {
     std::cerr << "--help    --  prints this screen" << std::endl;
     std::cerr << "--dualize   --  use only dualization approach" << std::endl;
     std::cerr << "--primal   --  use only primal approach" << std::endl;
-    std::cerr << "--vector_vector, --vector_set, --vector_list, --full_pivot_column, --sparse_pivot_column, --heap_pivot_column, --bit_tree_pivot_column  --  use only a subset of representation data structures for boundary matrices" << std::endl;
+    std::cerr << "--vector_vector, --vector_heap, --vector_set, --vector_list, --full_pivot_column, --sparse_pivot_column, --heap_pivot_column, --bit_tree_pivot_column  --  use only a subset of representation data structures for boundary matrices" << std::endl;
     std::cerr << "--standard, --twist, --chunk, --chunk_sequential, --spectral_sequence, --row  --  use only a subset of reduction algorithms" << std::endl;
 }
 
@@ -75,6 +76,7 @@ void parse_command_line( int argc, char** argv, bool& latex_tables_output, bool&
             else if( argument == "--latex" ) latex_tables_output = true;
             else if( argument == "--binary" ) use_binary = true;
             else if( argument == "--vector_vector" ) representations.push_back( VECTOR_VECTOR );
+            else if( argument == "--vector_heap" ) representations.push_back( VECTOR_HEAP );
             else if( argument == "--vector_set" ) representations.push_back( VECTOR_SET );
             else if( argument == "--vector_list" ) representations.push_back( VECTOR_LIST );
             else if( argument == "--full_pivot_column" )  representations.push_back( FULL_PIVOT_COLUMN );
@@ -98,6 +100,7 @@ void parse_command_line( int argc, char** argv, bool& latex_tables_output, bool&
 
     if( representations.empty() == true ) {
         representations.push_back( VECTOR_VECTOR );
+        representations.push_back( VECTOR_HEAP );
         representations.push_back( VECTOR_SET );
         representations.push_back( VECTOR_LIST );
         representations.push_back( FULL_PIVOT_COLUMN );
@@ -238,6 +241,7 @@ int main( int argc, char** argv )
                         std::cout << input_filename << ",";
                         switch( representation ) {
                         case VECTOR_VECTOR: COMPUTE(vector_vector) break;
+                        case VECTOR_HEAP: COMPUTE( vector_heap ) break;
                         case VECTOR_SET: COMPUTE(vector_set) break;
                         case VECTOR_LIST: COMPUTE(vector_list) break;
                         case FULL_PIVOT_COLUMN: COMPUTE(full_pivot_column) break;
@@ -262,6 +266,7 @@ int main( int argc, char** argv )
                 Representation_type representation = representations[ idx_representation ];
                 switch( representation ) {
                 case VECTOR_VECTOR: std::cout << "& V "; break;
+                case VECTOR_HEAP: std::cout << "& H "; break;
                 case VECTOR_SET: std::cout << "& S "; break;
                 case VECTOR_LIST: std::cout << "& L "; break;
                 case FULL_PIVOT_COLUMN: std::cout << "& P-F "; break;
@@ -293,6 +298,7 @@ int main( int argc, char** argv )
                         Representation_type representation = representations[ idx_representation ];
                         switch( representation ) {
                         case VECTOR_VECTOR: COMPUTE_LATEX( vector_vector ) break;
+                        case VECTOR_HEAP: COMPUTE_LATEX( vector_heap ) break;
                         case VECTOR_SET: COMPUTE_LATEX( vector_set ) break;
                         case VECTOR_LIST: COMPUTE_LATEX( vector_list ) break;
                         case FULL_PIVOT_COLUMN: COMPUTE_LATEX( full_pivot_column ) break;

@@ -19,6 +19,7 @@
 #include <phat/compute_persistence_pairs.h>
 
 #include <phat/representations/vector_vector.h>
+#include <phat/representations/vector_heap.h>
 #include <phat/representations/vector_set.h>
 #include <phat/representations/vector_list.h>
 #include <phat/representations/sparse_pivot_column.h>
@@ -41,6 +42,7 @@ int main( int argc, char** argv )
     typedef phat::full_pivot_column Full;
     typedef phat::bit_tree_pivot_column BitTree;
     typedef phat::vector_vector Vec_vec;
+    typedef phat::vector_heap Vec_heap;
     typedef phat::vector_set Vec_set;
     typedef phat::vector_list Vec_list;
 
@@ -79,6 +81,11 @@ int main( int argc, char** argv )
         phat::boundary_matrix< Vec_vec > vec_vec_boundary_matrix = boundary_matrix;
         phat::compute_persistence_pairs< phat::chunk_reduction >( vec_vec_pairs, vec_vec_boundary_matrix );
 
+        std::cout << "Running Chunk - Vec_heap ..." << std::endl;
+        phat::persistence_pairs vec_heap_pairs;
+        phat::boundary_matrix< Vec_heap > vec_heap_boundary_matrix = boundary_matrix;
+        phat::compute_persistence_pairs< phat::chunk_reduction >( vec_heap_pairs, vec_heap_boundary_matrix );
+
         std::cout << "Running Chunk - Vec_set ..." << std::endl;
         phat::persistence_pairs vec_set_pairs;
         phat::boundary_matrix< Vec_set > vec_set_boundary_matrix = boundary_matrix;
@@ -101,8 +108,12 @@ int main( int argc, char** argv )
             std::cerr << "Error: full and vec_vec differ!" << std::endl;
             error = true;
         }
-        if( vec_vec_pairs != vec_set_pairs ) {
-            std::cerr << "Error: vec_vec and vec_set differ!" << std::endl;
+        if( vec_vec_pairs != vec_heap_pairs ) {
+            std::cerr << "Error: vec_vec and vec_heap differ!" << std::endl;
+            error = true;
+        }
+        if( vec_heap_pairs != vec_set_pairs ) {
+            std::cerr << "Error: vec_heap and vec_set differ!" << std::endl;
             error = true;
         }
         if( vec_set_pairs != bit_tree_pairs ) {
