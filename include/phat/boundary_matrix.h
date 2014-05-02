@@ -53,7 +53,7 @@ namespace phat {
         // true iff boundary of given column is empty
         bool is_empty( index idx ) const { return rep._is_empty( idx ); }
 
-        // largest index of given column (new name for lowestOne())
+        // largest index of given column (new name for lowestOne()) -- NOT thread-safe
         index get_max_index( index idx ) const { return rep._get_max_index( idx ); }
 
         // removes maximal index from given column 
