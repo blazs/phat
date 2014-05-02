@@ -27,16 +27,26 @@ namespace phat {
         std::vector< dimension > dims;
         std::vector< column > matrix;
 
+        std::vector< index > inserts_since_last_prune;
+
         mutable thread_local_storage< column > temp_column_buffer;
 
-//        std::vector< index > steps_since_last_prune;
-
     protected:
-        //void _prune( index idx )
-        //{
-        //    temp_column_buffer( ).clear( );
-        //    _get_col( idx, temp_column_buffer( ) );
-        //}
+        void _prune( index idx )
+        {
+            column& col = matrix[ idx ];
+            column& temp_col = temp_column_buffer();
+            temp_col.clear();
+            index max_index = _pop_max_index( col );
+            while( max_index != -1 ) {
+                temp_col.push_back( max_index );
+                max_index = _pop_max_index( col );
+            }
+            col = temp_col;
+            std::reverse( col.begin( ), col.end( ) );
+            std::make_heap( col.begin( ), col.end( ) );
+            inserts_since_last_prune[ idx ] = 0;
+        }
 
         index _pop_max_index( index idx )
         {
@@ -76,7 +86,7 @@ namespace phat {
         {
             dims.resize( nr_of_columns );
             matrix.resize( nr_of_columns );
-         //   steps_since_last_prune.assign( nr_of_columns, 0 );
+            inserts_since_last_prune.assign( nr_of_columns, 0 );
         }
 
         // dimension of given index
@@ -140,18 +150,15 @@ namespace phat {
 
         // adds column 'source' to column 'target'
         void _add_to( index source, index target )
-        {
+        {              
             for( index idx = 0; idx < (index)matrix[ source ].size( ); idx++ ) {
                 matrix[ target ].push_back( matrix[ source ][ idx ] );
-                std::push_heap( matrix[ target ].begin( ), matrix[ target ].end( ) );
+                std::push_heap( matrix[ target ].begin(), matrix[ target ].end() );
             }
-        //    steps_since_last_prune[ target ] += matrix[ source ].size();
-            //if( 2 * steps_since_last_prune[ target ] > matrix[ target ].size() ) {
-            // //   std::cout << "Prune" << std::endl;
-            //    _prune( target );
-            //    steps_since_last_prune[ target ] = 0;
-            //}
-                
+            inserts_since_last_prune[ target ] += matrix[ source ].size();
+
+            if( 2 * inserts_since_last_prune[ target ] > ( index )matrix[ target ].size() )
+                _prune( target );
         }
     };
 }
