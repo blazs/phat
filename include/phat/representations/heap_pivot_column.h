@@ -27,36 +27,63 @@ namespace phat {
     protected:
         std::priority_queue< index > data;
 
-        void add_index( const index idx ) {
-            data.push( idx );
+        column temp_col;
+        index inserts_since_last_prune;
+
+        void prune()
+        {
+            temp_col.clear( );
+            index max_index = pop_max_index( );
+            while( max_index != -1 ) {
+                temp_col.push_back( max_index );
+                max_index = pop_max_index( );
+            }
+
+            for( index idx = 0; idx < (index)temp_col.size( ); idx++ )
+                data.push( temp_col[ idx ] );
+
+            inserts_since_last_prune = 0;
+        }
+
+        index pop_max_index()
+        {
+            if( data.empty( ) )
+                return -1;
+            else {
+                index max_element = data.top( );
+                data.pop();
+                while( !data.empty( ) && data.top( ) == max_element ) {
+                    data.pop( );
+                    if( data.empty( ) )
+                        return -1;
+                    else {
+                        max_element = data.top( );
+                        data.pop( );
+                    }
+                }
+                return max_element;
+            }
         }
 
     public:
         void init( const index total_size ) {
+            inserts_since_last_prune = 0;
             clear();
         }
 
         void add_col( const column& col ) {
             for( index idx = 0; idx < (index) col.size(); idx++ )
-                add_index( col[ idx ] );
+                data.push( col[ idx ] );
+            inserts_since_last_prune += col.size( );
+            if( 2 * inserts_since_last_prune >( index ) data.size( ) )
+                prune();
         }
 
         index get_max_index() {
-            if( data.empty() )
+            index max_element = pop_max_index( );
+            if( max_element == -1 )
                 return -1;
             else {
-                index max_element = data.top();
-                data.pop();
-                while( !data.empty() && data.top() == max_element ) {
-                    data.pop();
-                    if( data.empty() )
-                        return -1;
-                    else {
-                        max_element = data.top();
-                        data.pop();
-                    }
-                }
-
                 data.push( max_element );
                 return max_element;
             }
@@ -64,17 +91,10 @@ namespace phat {
 
         void get_col_and_clear( column& col ) {
             col.clear();
-            while( !data.empty() ) {
-                index max_element = data.top();
-                data.pop();
-                if( data.empty() )
-                    col.push_back( max_element );
-                else {
-                    if( data.top() != max_element )
-                        col.push_back( max_element );
-                    else
-                        data.pop();
-                }
+            index max_index = pop_max_index( );
+            while( max_index != -1 ) {
+                col.push_back( max_index );
+                max_index = pop_max_index( );
             }
             std::reverse( col.begin(), col.end() );
         }
@@ -84,12 +104,11 @@ namespace phat {
         }
 
 		void clear() {
-			while( !data.empty() )
-                data.pop();
+            data = std::priority_queue< index >();
 		}
 
 		void remove_max() {
-            add_index( get_max_index() );
+            pop_max_index();
         }
 
         void set_col( const column& col  ) {
