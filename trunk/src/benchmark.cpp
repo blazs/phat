@@ -114,7 +114,8 @@ void parse_command_line( int argc, char** argv, bool& latex_tables_output, bool&
         algorithms.push_back( TWIST );
         algorithms.push_back( ROW );
         algorithms.push_back( CHUNK );
-        algorithms.push_back( CHUNK_SEQUENTIAL );
+        algorithms.push_back( SPECTRAL_SEQUENCE );
+       // algorithms.push_back( CHUNK_SEQUENTIAL );
     }
     
     if( ansaetze.empty() == true ) {
@@ -313,8 +314,10 @@ int main( int argc, char** argv )
 
             std::cout << "\\end{tabular}" << std::endl;
             std::cout << "\\end{center}" << std::endl;
-            std::cout << "\\caption{ " << input_filename << " }" << std::endl;
-            std::cout << "\\label{ phat: " << input_filename << " }" << std::endl;
+            std::string sanitized_input_filename( input_filename );
+            std::replace( sanitized_input_filename.begin( ), sanitized_input_filename.end( ), '_', '-' );
+            std::cout << "\\caption{ " << sanitized_input_filename << " }" << std::endl;
+            std::cout << "\\label{ phat: " << sanitized_input_filename << " }" << std::endl;
             std::cout << "\\end{table}" << std::endl << std::endl;
         }
     }
