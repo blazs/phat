@@ -181,8 +181,8 @@ void benchmark_latex( std::string input_filename, bool use_binary, Ansatz_type a
         reduction_algorithm( matrix );
     }
 
-    double running_time = omp_get_wtime() - reduction_timer + dualization_time;
-    //double running_time = omp_get_wtime( ) - reduction_timer; 
+    //double running_time = omp_get_wtime() - reduction_timer + dualization_time;
+    double running_time = omp_get_wtime( ) - reduction_timer; 
     double running_time_rounded = floor( running_time * 10.0 + 0.5 ) / 10.0;
     std::cout << "& "<< setiosflags( std::ios::fixed ) << setiosflags( std::ios::showpoint ) << std::setprecision( 1 ) << running_time_rounded << " ";
 }
