@@ -99,14 +99,14 @@ void parse_command_line( int argc, char** argv, bool& latex_tables_output, bool&
     }
 
     if( representations.empty() == true ) {
-        representations.push_back( VECTOR_VECTOR );
-        representations.push_back( VECTOR_HEAP );
-        representations.push_back( VECTOR_SET );
         representations.push_back( VECTOR_LIST );
+        representations.push_back( VECTOR_VECTOR );
+        representations.push_back( VECTOR_SET );
+        representations.push_back( VECTOR_HEAP );
+        representations.push_back( HEAP_PIVOT_COLUMN );
+        representations.push_back( SPARSE_PIVOT_COLUMN );
         representations.push_back( FULL_PIVOT_COLUMN );
         representations.push_back( BIT_TREE_PIVOT_COLUMN );
-        representations.push_back( SPARSE_PIVOT_COLUMN );
-        representations.push_back( HEAP_PIVOT_COLUMN );
     }
 
     if( algorithms.empty() == true ) {
@@ -267,14 +267,14 @@ int main( int argc, char** argv )
             for( int idx_representation = 0; idx_representation < representations.size( ); idx_representation++ ) {
                 Representation_type representation = representations[ idx_representation ];
                 switch( representation ) {
-                case VECTOR_VECTOR: std::cout << "&& V "; break;
-                case VECTOR_HEAP: std::cout << "&& H "; break;
-                case VECTOR_SET: std::cout << "&& S "; break;
-                case VECTOR_LIST: std::cout << "&& L "; break;
-                case FULL_PIVOT_COLUMN: std::cout << "&& P-F "; break;
-                case BIT_TREE_PIVOT_COLUMN: std::cout << "&& P-BT "; break;
-                case SPARSE_PIVOT_COLUMN: std::cout << "&& P-S "; break;
-                case HEAP_PIVOT_COLUMN: std::cout << "&& P-H "; break;
+                case VECTOR_VECTOR: std::cout << "&& Vector "; break;
+                case VECTOR_HEAP: std::cout << "&& Heap "; break;
+                case VECTOR_SET: std::cout << "&& Set "; break;
+                case VECTOR_LIST: std::cout << "&& List "; break;
+                case FULL_PIVOT_COLUMN: std::cout << "&& P-Full "; break;
+                case BIT_TREE_PIVOT_COLUMN: std::cout << "&& P-Bit-Tree "; break;
+                case SPARSE_PIVOT_COLUMN: std::cout << "&& P-Set "; break;
+                case HEAP_PIVOT_COLUMN: std::cout << "&& P-Heap "; break;
                 }
             }
             std::cout << "\\\\" << std::endl;
