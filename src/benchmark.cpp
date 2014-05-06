@@ -185,7 +185,7 @@ void benchmark_latex( std::string input_filename, bool use_binary, Ansatz_type a
     //double running_time = omp_get_wtime() - reduction_timer + dualization_time;
     double running_time = omp_get_wtime( ) - reduction_timer; 
     double running_time_rounded = floor( running_time * 10.0 + 0.5 ) / 10.0;
-    std::cout << "& "<< setiosflags( std::ios::fixed ) << setiosflags( std::ios::showpoint ) << std::setprecision( 1 ) << running_time_rounded << " ";
+    std::cout << "&& "<< setiosflags( std::ios::fixed ) << setiosflags( std::ios::showpoint ) << std::setprecision( 1 ) << running_time_rounded << " ";
 }
 
 #define COMPUTE(Representation) \
@@ -258,22 +258,23 @@ int main( int argc, char** argv )
         for( int idx_input = 0; idx_input < input_filenames.size( ); idx_input++ ) {
             std::cout << "\\begin{table}[ h ]" << std::endl;
             std::cout << "\\begin{center}" << std::endl;
-            std::cout << "\\begin{tabular}{";
-            for( int idx = 0; idx < representations.size( ) + 1; idx++ )
-                std::cout << "r";
+            std::cout << "\\begin{tabularx}{\\textwidth}{";
+            std::cout << "r";
+            for( int idx = 0; idx < representations.size( ); idx++ )
+                std::cout << "Xr";
             std::cout << "}" << std::endl;
 
             for( int idx_representation = 0; idx_representation < representations.size( ); idx_representation++ ) {
                 Representation_type representation = representations[ idx_representation ];
                 switch( representation ) {
-                case VECTOR_VECTOR: std::cout << "& V "; break;
-                case VECTOR_HEAP: std::cout << "& H "; break;
-                case VECTOR_SET: std::cout << "& S "; break;
-                case VECTOR_LIST: std::cout << "& L "; break;
-                case FULL_PIVOT_COLUMN: std::cout << "& P-F "; break;
-                case BIT_TREE_PIVOT_COLUMN: std::cout << "& P-BT "; break;
-                case SPARSE_PIVOT_COLUMN: std::cout << "& P-S "; break;
-                case HEAP_PIVOT_COLUMN: std::cout << "& P-H "; break;
+                case VECTOR_VECTOR: std::cout << "&& V "; break;
+                case VECTOR_HEAP: std::cout << "&& H "; break;
+                case VECTOR_SET: std::cout << "&& S "; break;
+                case VECTOR_LIST: std::cout << "&& L "; break;
+                case FULL_PIVOT_COLUMN: std::cout << "&& P-F "; break;
+                case BIT_TREE_PIVOT_COLUMN: std::cout << "&& P-BT "; break;
+                case SPARSE_PIVOT_COLUMN: std::cout << "&& P-S "; break;
+                case HEAP_PIVOT_COLUMN: std::cout << "&& P-H "; break;
                 }
             }
             std::cout << "\\\\" << std::endl;
@@ -312,7 +313,7 @@ int main( int argc, char** argv )
                 }
             }
 
-            std::cout << "\\end{tabular}" << std::endl;
+            std::cout << "\\end{tabularx}" << std::endl;
             std::cout << "\\end{center}" << std::endl;
             std::string sanitized_input_filename( input_filename );
             std::replace( sanitized_input_filename.begin( ), sanitized_input_filename.end( ), '_', '-' );
