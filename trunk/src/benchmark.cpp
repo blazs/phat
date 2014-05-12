@@ -185,7 +185,7 @@ void benchmark_latex( std::string input_filename, bool use_binary, Ansatz_type a
     //double running_time = omp_get_wtime() - reduction_timer + dualization_time;
     double running_time = omp_get_wtime( ) - reduction_timer; 
     double running_time_rounded = floor( running_time * 10.0 + 0.5 ) / 10.0;
-    std::cout << "&& "<< setiosflags( std::ios::fixed ) << setiosflags( std::ios::showpoint ) << std::setprecision( 1 ) << running_time_rounded << " ";
+    std::cout << " && " << setiosflags( std::ios::fixed ) << setiosflags( std::ios::showpoint ) << std::setprecision( 1 ) << std::setw( 12 ) << running_time_rounded << std::setw( 1 );
 }
 
 #define COMPUTE(Representation) \
@@ -264,38 +264,54 @@ int main( int argc, char** argv )
                 std::cout << "Xr";
             std::cout << "}" << std::endl;
 
+            std::cout << std::setw( 23 ) << " " << std::setw( 1 );
+
             for( int idx_representation = 0; idx_representation < representations.size( ); idx_representation++ ) {
                 Representation_type representation = representations[ idx_representation ];
+                std::cout << " && " << std::setw( 12 );
                 switch( representation ) {
-                case VECTOR_VECTOR: std::cout << "&& Vector "; break;
-                case VECTOR_HEAP: std::cout << "&& Heap "; break;
-                case VECTOR_SET: std::cout << "&& Set "; break;
-                case VECTOR_LIST: std::cout << "&& List "; break;
-                case FULL_PIVOT_COLUMN: std::cout << "&& P-Full "; break;
-                case BIT_TREE_PIVOT_COLUMN: std::cout << "&& P-Bit-Tree "; break;
-                case SPARSE_PIVOT_COLUMN: std::cout << "&& P-Set "; break;
-                case HEAP_PIVOT_COLUMN: std::cout << "&& P-Heap "; break;
+                case VECTOR_VECTOR: std::cout << "Vector"; break;
+                case VECTOR_HEAP: std::cout << "Heap"; break;
+                case VECTOR_SET: std::cout << "Set"; break;
+                case VECTOR_LIST: std::cout << "List"; break;
+                case FULL_PIVOT_COLUMN: std::cout << "P-Full"; break;
+                case BIT_TREE_PIVOT_COLUMN: std::cout << "P-Bit-Tree"; break;
+                case SPARSE_PIVOT_COLUMN: std::cout << "P-Set"; break;
+                case HEAP_PIVOT_COLUMN: std::cout << "P-Heap"; break;
                 }
+                std::cout << std::setw( 1 );
             }
-            std::cout << "\\\\" << std::endl;
+            std::cout << " \\\\" << std::endl;
             std::cout << "\\hline" << std::endl;
 
             std::string input_filename = input_filenames[ idx_input ];
             for( int idx_algorithm = 0; idx_algorithm < algorithms.size( ); idx_algorithm++ ) {
                 Algorithm_type algorithm = algorithms[ idx_algorithm ];
                 for( int idx_ansatz = 0; idx_ansatz < ansaetze.size(); idx_ansatz++ ) {
-                    switch( algorithm ) {
-                    case STANDARD: std::cout << "standard"; break;
-                    case TWIST: std::cout << "twist"; break;
-                    case ROW: std::cout << "row"; break;
-                    case CHUNK: std::cout << "chunk"; break;
-                    case SPECTRAL_SEQUENCE: std::cout << "spectral sequence"; break;
-                    case CHUNK_SEQUENTIAL: std::cout << "chunk-sequential"; break;
-                    }
                     Ansatz_type ansatz = ansaetze[ idx_ansatz ];
-                    if( ansatz == DUAL )
-                        std::cout << "$^*$";
-                    std::cout << " ";
+                    std::cout << std::setw( 23 );
+                    if( ansatz == DUAL ) {
+                        switch( algorithm ) {
+                        case STANDARD: std::cout << "standard"; break;
+                        case TWIST: std::cout << "twist"; break;
+                        case ROW: std::cout << "row"; break;
+                        case CHUNK: std::cout << "chunk"; break;
+                        case SPECTRAL_SEQUENCE: std::cout << "spectral sequence"; break;
+                        case CHUNK_SEQUENTIAL: std::cout << "chunk-sequential"; break;
+                        }
+                    } else {
+                        switch( algorithm ) {
+                        case STANDARD: std::cout << "standard$^*$"; break;
+                        case TWIST: std::cout << "twist$^*$"; break;
+                        case ROW: std::cout << "row$^*$"; break;
+                        case CHUNK: std::cout << "chunk$^*$"; break;
+                        case SPECTRAL_SEQUENCE: std::cout << "spectral sequence$^*$"; break;
+                        case CHUNK_SEQUENTIAL: std::cout << "chunk-sequential$^*$"; break;
+                        }
+                    }
+                    std::cout << std::setw( 1 );
+
+
                     for( int idx_representation = 0; idx_representation < representations.size(); idx_representation++ ) {
                         Representation_type representation = representations[ idx_representation ];
                         switch( representation ) {
@@ -309,7 +325,7 @@ int main( int argc, char** argv )
                         case HEAP_PIVOT_COLUMN: COMPUTE_LATEX( heap_pivot_column ) break;
                         }
                     }
-                    std::cout << "\\\\" << std::endl;
+                    std::cout << " \\\\" << std::endl;
                 }
             }
 
