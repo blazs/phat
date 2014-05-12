@@ -290,7 +290,7 @@ int main( int argc, char** argv )
                 for( int idx_ansatz = 0; idx_ansatz < ansaetze.size(); idx_ansatz++ ) {
                     Ansatz_type ansatz = ansaetze[ idx_ansatz ];
                     std::cout << std::setw( 23 );
-                    if( ansatz == DUAL ) {
+                    if( ansatz == PRIMAL ) {
                         switch( algorithm ) {
                         case STANDARD: std::cout << "standard"; break;
                         case TWIST: std::cout << "twist"; break;
