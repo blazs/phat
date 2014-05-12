@@ -87,7 +87,9 @@ namespace phat {
             std::set_symmetric_difference( target_col.begin(), target_col.end(),
                                            source_col.begin(), source_col.end(),
                                            std::back_inserter( temp_col ) );
-            target_col.swap( temp_col );
+            //target_col.swap( temp_col );
+            target_col = temp_col;
+            temp_col.clear();
         }
     };
 }
