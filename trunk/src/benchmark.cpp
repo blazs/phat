@@ -52,7 +52,7 @@ void print_help() {
     std::cerr << "--ascii   --  use ascii file format" << std::endl;
     std::cerr << "--binary  --  use binary file format (default)" << std::endl;
     std::cerr << "--help    --  prints this screen" << std::endl;
-    std::cerr << "--dualize   --  use only dualization approach" << std::endl;
+    std::cerr << "--dual   --  use only dualization approach" << std::endl;
     std::cerr << "--primal   --  use only primal approach" << std::endl;
     std::cerr << "--vector_vector, --vector_heap, --vector_set, --vector_list, --full_pivot_column, --sparse_pivot_column, --heap_pivot_column, --bit_tree_pivot_column  --  use only a subset of representation data structures for boundary matrices" << std::endl;
     std::cerr << "--standard, --twist, --chunk, --chunk_sequential, --spectral_sequence, --row  --  use only a subset of reduction algorithms" << std::endl;
