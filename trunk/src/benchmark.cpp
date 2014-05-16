@@ -334,7 +334,7 @@ int main( int argc, char** argv )
             std::string sanitized_input_filename( input_filename );
             std::replace( sanitized_input_filename.begin( ), sanitized_input_filename.end( ), '_', '-' );
             std::cout << "\\caption{ " << sanitized_input_filename << " }" << std::endl;
-            std::cout << "\\label{ phat: " << sanitized_input_filename << " }" << std::endl;
+            std::cout << "\\label{phat:" << sanitized_input_filename << "}" << std::endl;
             std::cout << "\\end{table}" << std::endl << std::endl;
         }
     }
