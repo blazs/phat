@@ -1,5 +1,5 @@
-=PHAT (Persistent Homology Algorithm Toolbox), v1.3.0=
-Copyright 2013 IST Austria
+=PHAT (Persistent Homology Algorithm Toolbox), v1.4.0=
+Copyright 2013, 2014 IST Austria
 
 ==Project Founders:==
 
@@ -8,6 +8,11 @@ Ulrich Bauer, Michael Kerber, Jan Reininghaus
 ==Contributors:==
 
 Hubert Wagner, Primoz Skraba
+
+==Downloads:==
+  * [https://drive.google.com/uc?id=0B7Yz6TPEpiGEMGFNQ3FPX3ltelk&export=download PHAT, v1.3.0]
+  * [https://drive.google.com/uc?id=0B7Yz6TPEpiGENE9KUnhUSFdFQUk&export=download PHAT, v1.2.1]
+  * [https://drive.google.com/uc?id=0B7Yz6TPEpiGERGZFbjlXaUt1ZWM&export=download benchmark data]
 
 ==Description:==
 
@@ -36,6 +41,7 @@ class can be as important for the performance of the program as choosing the
 algorithm. We provide the following choices of representation classes:
 
   * {{{vector_vector}}}: Each column is represented as a sorted {{{std::vector}}} of integers, containing the indices of the non-zero entries of the column. The matrix itself is a {{{std::vector}}} of such columns.
+  * {{{vector_heap}}}: Each column is represented as a heapified {{{std::vector}}} of integers, containing the indices of the non-zero entries of the column. The matrix itself is a {{{std::vector}}} of such columns.
   * {{{vector_set}}}: Each column is a {{{std::set}}} of integers, with the same meaning as above. The matrix is stored as a {{{std::vector}}} of such columns.
   * {{{vector_list}}}: Each column is a sorted {{{std::list}}} of integers, with the same meaning as above. The matrix is stored as a {{{std::vector}}} of such columns.
   * {{{sparse_pivot_column}}}: The matrix is stored as in the vector_vector representation. However, when a column is manipulated, it is first  converted into a {{{std::set}}}, using an extra data field called the "pivot column".  When another column is manipulated later, the pivot column is converted back to  the {{{std::vector}}} representation. This can lead to significant speed improvements when many columns  are added to a given pivot column consecutively. In a multicore setup, there is one pivot column per thread.
