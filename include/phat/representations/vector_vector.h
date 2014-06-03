@@ -83,11 +83,18 @@ namespace phat {
             column& source_col = matrix[ source ];
             column& target_col = matrix[ target ];
             column& temp_col = temp_column_buffer();
-            temp_col.clear();
-            std::set_symmetric_difference( target_col.begin(), target_col.end(),
+            
+            
+            size_t new_size = source_col.size() + target_col.size();
+            
+            if (new_size > temp_col.size()) temp_col.resize(new_size);
+            
+            std::vector<index>::iterator col_end = std::set_symmetric_difference( target_col.begin(), target_col.end(),
                                            source_col.begin(), source_col.end(),
-                                           std::back_inserter( temp_col ) );
-            //target_col.swap( temp_col );
+                                                                                 temp_col.begin() );
+            temp_col.erase(col_end, temp_col.end());
+
+            
             target_col = temp_col;
             temp_col.clear();
         }
