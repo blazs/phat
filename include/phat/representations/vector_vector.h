@@ -97,5 +97,11 @@ namespace phat {
             
             target_col.swap(temp_col);
         }
+        
+        // finalizes given column
+        void _finalize( index idx ) {
+            column& col = matrix[ idx ];
+            column(col.begin(), col.end()).swap(col);
+        }
     };
 }

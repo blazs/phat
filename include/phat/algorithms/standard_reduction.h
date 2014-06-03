@@ -39,6 +39,7 @@ namespace phat {
                 if( lowest_one != -1 ) {
                     lowest_one_lookup[ lowest_one ] = cur_col;
                 }
+                boundary_matrix.finalize( cur_col );
             }
         }
     };

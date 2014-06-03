@@ -93,5 +93,9 @@ namespace phat {
                                            source_col.begin(), source_col.end(),
                                            std::back_inserter( target_col ) );
         }
+        
+        // finalizes given column
+        void _finalize( index idx ) {
+        }
     };
 }
