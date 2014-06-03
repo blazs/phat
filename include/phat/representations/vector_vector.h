@@ -95,8 +95,7 @@ namespace phat {
             temp_col.erase(col_end, temp_col.end());
 
             
-            target_col = temp_col;
-            temp_col.clear();
+            target_col.swap(temp_col);
         }
     };
 }
