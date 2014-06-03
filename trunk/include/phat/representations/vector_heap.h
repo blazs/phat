@@ -160,5 +160,11 @@ namespace phat {
             if( 2 * inserts_since_last_prune[ target ] > ( index )matrix[ target ].size() )
                 _prune( target );
         }
+        
+        // finalizes given column
+        void _finalize( index idx ) {
+            _prune( idx );
+        }
+
     };
 }

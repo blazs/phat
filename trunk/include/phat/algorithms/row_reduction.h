@@ -36,6 +36,7 @@ namespace phat {
                 
                 if( !lowest_one_lookup[ cur_col ].empty() ) {
                     boundary_matrix.clear( cur_col );
+                    boundary_matrix.finalize( cur_col );
                     std::vector< index >& cols_with_cur_lowest = lowest_one_lookup[ cur_col ];
                     index source = *min_element( cols_with_cur_lowest.begin(), cols_with_cur_lowest.end() );
                     for( index idx = 0; idx < (index)cols_with_cur_lowest.size(); idx++ ) {

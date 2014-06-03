@@ -101,6 +101,7 @@ namespace phat {
                             lowest_one_lookup[ lowest_one ] = cur_col;
                             boundary_matrix.clear( lowest_one );
                         }
+                        boundary_matrix.finalize( cur_col );
                     }
                 }
             }
@@ -130,6 +131,7 @@ namespace phat {
                         column_type[ cur_col ] = LOCAL_NEGATIVE;
                         column_type[ lowest_one ] = LOCAL_POSITIVE;
                         boundary_matrix.clear( lowest_one );
+                        boundary_matrix.finalize( cur_col );
                     }
                 }
             }

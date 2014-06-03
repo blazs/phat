@@ -64,7 +64,10 @@ namespace phat {
 
         // clears given column
         void clear( index idx ) { rep._clear( idx ); }
-
+        
+        // finalizes given column
+        void finalize( index idx ) { rep._finalize( idx ); }
+        
         // syncronizes all internal data structures -- has to be called before and after any multithreaded access!
         void sync() { rep._sync(); }
 

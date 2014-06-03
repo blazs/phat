@@ -90,5 +90,10 @@ namespace phat {
 					col.erase( result.first );
 			}
         }
+        
+        // finalizes given column
+        void _finalize( index idx ) {
+        }
+
     };
 }
