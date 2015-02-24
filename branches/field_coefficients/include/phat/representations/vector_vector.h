@@ -22,22 +22,18 @@
 
 namespace phat {
     class vector_vector {
-
+  
     public:
         typedef _column_t column;
-	typedef index entry;
+        
 
     protected:
         std::vector< dimension > dims;
         std::vector< column > matrix;
 
-        column temp_column_buffer;
-
+	//        thread_local_storage< column > temp_column_buffer;
+	column temp_column_buffer;
     public:
-
-        inline entry _create_entry(index k) const { return k; }
-
-
         // overall number of cells in boundary_matrix
         index _get_num_cols() const {
             return (index)matrix.size(); 
@@ -56,10 +52,10 @@ namespace phat {
         }
 
         // replaces(!) content of 'col' with boundary of given index
-        void _get_col( index idx, column& col  ) const {
+        void _get_col( index idx, column& col  ) const { 
             col = matrix[ idx ]; 
         }
-        void _set_col( index idx, const column& col  ) {
+        void _set_col( index idx, const column& col  ) { 
             matrix[ idx ] = col; 
         }
 
@@ -91,11 +87,25 @@ namespace phat {
             column& source_col = matrix[ source ];
             column& target_col = matrix[ target ];
             column& temp_col = temp_column_buffer;
-            temp_col.clear();
-            std::set_symmetric_difference( target_col.begin(), target_col.end(),
+            
+            
+            size_t new_size = source_col.size() + target_col.size();
+            
+            if (new_size > temp_col.size()) temp_col.resize(new_size);
+            
+            std::vector<index>::iterator col_end = std::set_symmetric_difference( target_col.begin(), target_col.end(),
                                            source_col.begin(), source_col.end(),
-                                           std::back_inserter( temp_col ) );
-            target_col.swap( temp_col );
+                                                                                 temp_col.begin() );
+            temp_col.erase(col_end, temp_col.end());
+
+            
+            target_col.swap(temp_col);
+        }
+        
+        // finalizes given column
+        void _finalize( index idx ) {
+            column& col = matrix[ idx ];
+            column(col.begin(), col.end()).swap(col);
         }
     };
 }

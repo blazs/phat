@@ -57,10 +57,81 @@ namespace phat {
     typedef int64_t index;
     typedef int8_t dimension;
     typedef std::vector< index > _column_t;
-    typedef std::pair<index, zp> _entry_t;
-    typedef std::vector< _entry_t > _f_column_t;
-
-  
+    
+    class _f_column_t{
+    protected:
+        std::vector< std::pair<index,zp> > data;
+    public:
+        typedef std::vector< std::pair<index,zp> >::iterator iterator;
+        typedef std::vector< std::pair<index,zp> >::reverse_iterator reverse_iterator;
+        
+        _f_column_t(){}
+        
+        
+        _f_column_t(iterator a, iterator b){
+            data.insert(data.begin(),a,b);
+        }
+        
+        index& operator[] (const index x) {
+            return data[x].first;
+        }
+        
+        void push_back(const index x){
+            data.push_back(std::pair<index,zp>(x,1));
+        }
+        
+        void push_back(const index x, const zp z){
+            data.push_back(std::pair<index,zp>(x,z));
+        }
+        
+        
+        void resize(const index num_rows ){
+            data.resize(num_rows);
+        }
+        index size(){
+            return data.size();
+        }
+        void clear(){
+            data.clear();
+        }
+        iterator  begin(){
+            return data.begin();
+        }
+        iterator  end(){
+            return data.end();
+        }
+        
+        void  swap(_f_column_t &in){
+            return data.swap(in.data);
+        }
+        
+        bool empty() const{
+            return data.empty();
+        }
+        
+        reverse_iterator  rbegin(){
+            return data.rbegin();
+        }
+        reverse_iterator  rend(){
+            return data.rend();
+        }
+        
+        zp get(index idx){
+            return data[idx].second;
+        }
+        
+        index back() const{
+            return data.back().first;
+        }
+        
+        
+        zp backcoeff()      const{
+            return data.back().second;
+        }
+        
+        
+    };
+    
 }
 
 

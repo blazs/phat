@@ -31,85 +31,77 @@ int main( int argc, char** argv )
 {
     std::cout << "We will build an ordered boundary matrix of this simplicial complex consisting of a single triangle: " << std::endl;
     std::cout << std::endl;
-    std::cout << " 2" << std::endl;
+    std::cout << " 3" << std::endl;
     std::cout << " |\\" << std::endl;
     std::cout << " | \\" << std::endl;
     std::cout << " |  \\" << std::endl;
-    std::cout << " |   \\ 5" << std::endl;
-    std::cout << "4|    \\" << std::endl;
+    std::cout << " |   \\ 4" << std::endl;
+    std::cout << "5|    \\" << std::endl;
     std::cout << " |     \\" << std::endl;
     std::cout << " |  6   \\" << std::endl;
     std::cout << " |       \\" << std::endl;
     std::cout << " |________\\" << std::endl;
-    std::cout << " 0    3    1" << std::endl;
+    std::cout << " 0    2    1" << std::endl;
 
 
     // first define a boundary matrix with the chosen internal representation
     phat::boundary_matrix< phat::vector_vector_f<3> > boundary_matrix;
 
-    typedef phat::boundary_matrix< phat::vector_vector_f<3> >::entry entry;
     // set the number of columns (has to be 7 since we have 7 simplices)
     boundary_matrix.set_num_cols( 7 );
     
     // set the dimension of the cell that a column represents:
     boundary_matrix.set_dim( 0, 0 );
     boundary_matrix.set_dim( 1, 0 );
-    boundary_matrix.set_dim( 2, 0 );
-    boundary_matrix.set_dim( 3, 1 );
+    boundary_matrix.set_dim( 2, 1 );
+    boundary_matrix.set_dim( 3, 0 );
     boundary_matrix.set_dim( 4, 1 );
     boundary_matrix.set_dim( 5, 1 );
     boundary_matrix.set_dim( 6, 2 );
 
     // set the respective columns -- the columns entries have to be sorted
-    std::vector< entry > temp_col;
+    phat::vector_vector_f<3>::column temp_col;
 
     boundary_matrix.set_col( 0, temp_col );
-    boundary_matrix.set_col( 1, temp_col );
-    boundary_matrix.set_col( 2, temp_col );
 
-    temp_col.push_back( boundary_matrix.create_entry(0) );
-    temp_col.push_back( boundary_matrix.create_entry(1) );
-    boundary_matrix.set_col( 3, temp_col );
-    for (int i=0;i<temp_col.size();++i){
-      std::cout<<temp_col[i].first<<" "<<(int)temp_col[i].second<<std::endl; 
-    }
+    boundary_matrix.set_col( 1, temp_col );
+
+    temp_col.push_back( 0 );
+    temp_col.push_back( 1 );
+    boundary_matrix.set_col( 2, temp_col );
     temp_col.clear();
 
+    boundary_matrix.set_col( 3, temp_col );
 
-    temp_col.push_back( boundary_matrix.create_entry(0) ); 
-    temp_col.push_back( boundary_matrix.create_entry(2) );
+    temp_col.push_back( 1 );
+    temp_col.push_back( 3 );
     boundary_matrix.set_col( 4, temp_col );
     temp_col.clear();
 
-    temp_col.push_back( boundary_matrix.create_entry(1) );
-    temp_col.push_back(boundary_matrix.create_entry(2) );
+    temp_col.push_back( 0 );
+    temp_col.push_back( 3 );
     boundary_matrix.set_col( 5, temp_col );
     temp_col.clear();
 
-    temp_col.push_back( boundary_matrix.create_entry(3));
-    temp_col.push_back(boundary_matrix.create_entry(4) );
-    temp_col.push_back( boundary_matrix.create_entry(5) );
+    temp_col.push_back( 2 );
+    temp_col.push_back( 4 );
+    temp_col.push_back( 5 );
     boundary_matrix.set_col( 6, temp_col );
-   
     temp_col.clear();
-    
-    
-    // print some information of the boundary matrix:
-    boundary_matrix.orient();
- 
 
+    // print some information of the boundary matrix:
     std::cout << std::endl;
     std::cout << "The boundary matrix has " << boundary_matrix.get_num_cols() << " columns: " << std::endl;
     for( phat::index col_idx = 0; col_idx < boundary_matrix.get_num_cols(); col_idx++ ) {
-      std::cout << "Colum " << col_idx << " represents a cell of dimension " << (int)boundary_matrix.get_dim( col_idx ) << ". ";
-      if( !boundary_matrix.is_empty( col_idx ) ) {
-	std::vector< entry > temp_col;
-	boundary_matrix.get_col( col_idx, temp_col ); 
-	std::cout << "Its boundary consists of the cells";
-	for( phat::index idx = 0; idx < (phat::index)temp_col.size(); idx++ )
-	  std::cout << " ( " << temp_col[ idx ].first<<" "<<(int)temp_col[ idx ].second<<" ) ";
-      }
-      std::cout << std::endl;
+        std::cout << "Colum " << col_idx << " represents a cell of dimension " << (int)boundary_matrix.get_dim( col_idx ) << ". ";
+        if( !boundary_matrix.is_empty( col_idx ) ) {
+            phat::vector_vector_f<3>::column temp_col;
+            boundary_matrix.get_col( col_idx, temp_col ); 
+            std::cout << "Its boundary consists of the cells";
+            for( phat::index idx = 0; idx < (phat::index)temp_col.size(); idx++ )
+                std::cout << " " << temp_col[ idx ];
+        }
+        std::cout << std::endl;
     }
     std::cout << "Overall, the boundary matrix has " << boundary_matrix.get_num_entries() << " entries." << std::endl;  
     
@@ -128,6 +120,5 @@ int main( int argc, char** argv )
     std::cout << std::endl;
     std::cout << "There are " << pairs.get_num_pairs() << " persistence pairs: " << std::endl;
     for( phat::index idx = 0; idx < pairs.get_num_pairs(); idx++ )
-      std::cout << "Birth: " << pairs.get_pair( idx ).first << ", Death: " << pairs.get_pair( idx ).second << std::endl;
-    return 0;
+        std::cout << "Birth: " << pairs.get_pair( idx ).first << ", Death: " << pairs.get_pair( idx ).second << std::endl;
 }
