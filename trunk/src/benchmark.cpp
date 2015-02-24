@@ -147,14 +147,14 @@ void benchmark( std::string input_filename, bool use_binary, Ansatz_type ansatz 
         dualize( matrix );
         double dualization_time = omp_get_wtime() - dualization_timer;
         double dualization_time_rounded = floor( dualization_time * 10.0 + 0.5 ) / 10.0;
-        std::cout << " Dualization time: " << setiosflags( std::ios::fixed ) << setiosflags( std::ios::showpoint ) << std::setprecision( 1 ) << dualization_time_rounded <<"s,";
+        std::cout << " Dualization time: " << std::setiosflags( std::ios::fixed ) << std::setiosflags( std::ios::showpoint ) << std::setprecision( 1 ) << dualization_time_rounded <<"s,";
         reduction_timer = omp_get_wtime();
         reduction_algorithm( matrix );
     }
 
     double running_time = omp_get_wtime() - reduction_timer;
     double running_time_rounded = floor( running_time * 10.0 + 0.5 ) / 10.0;
-    std::cout << " Reduction time: " << setiosflags( std::ios::fixed ) << setiosflags( std::ios::showpoint ) << std::setprecision( 1 ) << running_time_rounded <<"s" << std::endl;
+    std::cout << " Reduction time: " << std::setiosflags( std::ios::fixed ) << std::setiosflags( std::ios::showpoint ) << std::setprecision( 1 ) << running_time_rounded <<"s" << std::endl;
 }
 
 template<typename Representation, typename Algorithm>
@@ -185,7 +185,7 @@ void benchmark_latex( std::string input_filename, bool use_binary, Ansatz_type a
     //double running_time = omp_get_wtime() - reduction_timer + dualization_time;
     double running_time = omp_get_wtime( ) - reduction_timer; 
     double running_time_rounded = floor( running_time * 10.0 + 0.5 ) / 10.0;
-    std::cout << " && " << setiosflags( std::ios::fixed ) << setiosflags( std::ios::showpoint ) << std::setprecision( 1 ) << std::setw( 12 ) << running_time_rounded << std::setw( 1 );
+    std::cout << " && " << std::setiosflags( std::ios::fixed ) << std::setiosflags( std::ios::showpoint ) << std::setprecision( 1 ) << std::setw( 12 ) << running_time_rounded << std::setw( 1 );
 }
 
 #define COMPUTE(Representation) \
