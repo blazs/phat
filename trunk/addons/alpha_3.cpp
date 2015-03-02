@@ -39,10 +39,11 @@ private:
 };
 
 
-template<typename Index_>
+template<typename Index_, typename FT_>
 struct Cell_info_3 {
 
-    typedef Index_ Index;
+    typedef Index_ Index; 
+    typedef FT_ FT;
     
     Cell_info_3() {
         for(std::size_t i=0; i<6; i++) {
@@ -92,7 +93,12 @@ struct Cell_info_3 {
         facet_index_[i]=I;
     }
 
+    FT filtration_value;
+    FT filtration_value_of_facet[4];
+
 private:
+
+
 
     boost::optional<Index> edge_index_[6];
     boost::optional<Index> facet_index_[4];
@@ -108,29 +114,29 @@ typedef std::vector<std::vector<Index> > Matrix;
 typedef CGAL::Exact_predicates_exact_constructions_kernel Gt;
 typedef Gt::FT FT;
 
-typedef CGAL::Triangulation_cell_base_with_info_3<Cell_info_3<Index>,Gt> Cb;
+typedef CGAL::Triangulation_cell_base_with_info_3<Cell_info_3<Index,FT>,Gt> Cb;
 typedef CGAL::Triangulation_vertex_base_with_info_3<Vertex_info_3<Index>,Gt> Vb;
-typedef CGAL::Triangulation_hierarchy_vertex_base_3<Vb>  Vbh;
-typedef CGAL::Triangulation_data_structure_3<Vbh,Cb>  Tds;
-typedef CGAL::Delaunay_triangulation_3<Gt,Tds>       Triangulation_3;
-typedef CGAL::Triangulation_hierarchy_3<Triangulation_3>       Triangulation_hierarchy;
-
+//typedef CGAL::Triangulation_hierarchy_vertex_base_3<Vb>  Vbh;
+typedef CGAL::Triangulation_data_structure_3<Vb,Cb>  Tds;
+typedef CGAL::Delaunay_triangulation_3<Gt,Tds>       DT_3;
 typedef Gt::Point_3                                  Point;
 
 
-typedef Triangulation_3::Vertex_handle Vertex_handle;
-typedef Triangulation_3::Edge Edge;
-typedef Triangulation_3::Facet Facet;
-typedef Triangulation_3::Cell_handle Cell_handle;
+typedef DT_3::Vertex_handle Vertex_handle;
+typedef DT_3::Edge Edge;
+typedef DT_3::Facet Facet;
+typedef DT_3::Cell_handle Cell_handle;
 
-typedef Triangulation_3::Cell_circulator Cell_circulator;
+typedef DT_3::Cell_circulator Cell_circulator;
+typedef DT_3::Facet_circulator Facet_circulator;
 
-void set_index_of_edge(const Triangulation_3& T, const Edge& e, Index I) {
+
+void set_index_of_edge(const DT_3& dt, const Edge& e, Index I) {
 
     Vertex_handle v1 = e.first->vertex(e.second);
     Vertex_handle v2 = e.first->vertex(e.third);
 
-    Cell_circulator ch=T.incident_cells(e);
+    Cell_circulator ch=dt.incident_cells(e);
     Cell_circulator ch_start=ch;
     int count=0;
     do {
@@ -141,10 +147,10 @@ void set_index_of_edge(const Triangulation_3& T, const Edge& e, Index I) {
     //std::cout << "Did " << count << " updates" << std::endl;
 }
 
-void set_index_of_facet(const Triangulation_3& T, const Facet& f, Index I) {
+void set_index_of_facet(const DT_3& dt, const Facet& f, Index I) {
 
     f.first->info().set_facet_index(f.second,I);
-    Facet mf = T.mirror_facet(f);
+    Facet mf = dt.mirror_facet(f);
     mf.first->info().set_facet_index(mf.second,I);    
     
 }
@@ -159,6 +165,58 @@ struct Sort_triples {
     }
 
 };
+
+// Returns whether the facet facet is attached to the cell
+// that is used to represent facet
+bool edge_attached_to(const DT_3& dt, const Edge& edge, const Facet& facet) {
+  
+  if(dt.is_infinite(facet)) {
+    return false;
+  }
+
+  Vertex_handle v1 = edge.first->vertex(edge.second);
+  Vertex_handle v2 = edge.first->vertex(edge.third);
+
+  Cell_handle cell = facet.first;
+  int i1 = facet.second;
+  int i2 = cell->index(v1);
+  int i3 = cell->index(v2);
+  CGAL_assertion(i1!=i2);
+  CGAL_assertion(i1!=i3);
+  CGAL_assertion(i2!=i3);
+  int j = 0;
+  
+  while(j==i1 || j==i2 || j==i3) {
+    j++;
+  }
+  // j is the index of the third point of the facet
+  Vertex_handle w = cell->vertex(j);
+  
+  return CGAL::side_of_bounded_sphere(v1->point(),v2->point(),w->point())==CGAL::ON_BOUNDED_SIDE;
+
+}
+
+
+// Returns whether the facet facet is attached to the cell
+// that is used to represent facet
+bool triangle_attached_to(const DT_3& dt, const Facet& facet) {
+  Cell_handle cell = facet.first;
+  int index = facet.second;
+
+  if(dt.is_infinite(cell)) {
+    return false;
+  }
+
+  Vertex_handle v1 = cell->vertex((index+1)%4);
+  Vertex_handle v2 = cell->vertex((index+2)%4);
+  Vertex_handle v3 = cell->vertex((index+3)%4);
+
+  Vertex_handle w = cell->vertex(facet.second); 
+
+  return CGAL::side_of_bounded_sphere(v1->point(),v2->point(),v3->point(),w->point())==CGAL::ON_BOUNDED_SIDE;
+}
+
+
 
 int main(int argc, char** argv)
 {
@@ -183,8 +241,10 @@ int main(int argc, char** argv)
         }
     }
 
+    std::cerr << "Read " << lp.size() << " points" << std::endl;
+
     std::cerr << "Compute Delaunay triangulation..." << std::endl;
-    Triangulation_hierarchy dt(lp.begin(),lp.end());
+    DT_3 dt(lp.begin(),lp.end());
 //    for (std::list<Point>::iterator it = lp.begin(); it != lp.end(); ++it) {
 //        dt.insert(*it);
 //    }/Users/uli/Downloads/neptune-raw.off/782_neptune-raw.pts.txt
@@ -195,33 +255,105 @@ int main(int argc, char** argv)
 
     std::vector<Triple > circumradii;
 
-    for (Triangulation_hierarchy::Finite_vertices_iterator vertex = dt.finite_vertices_begin();
-	vertex != dt.finite_vertices_end(); vertex++) {
-        Vertex_handle vh(vertex);
-        circumradii.push_back(CGAL::make_triple(FT(0),0,CGAL::make_object(vh)));
-    }
-    for (Triangulation_hierarchy::Finite_edges_iterator edge = dt.finite_edges_begin();
-	edge != dt.finite_edges_end(); edge++) {
-        Vertex_handle v1 = edge->first->vertex(edge->second);
-        Vertex_handle v2 = edge->first->vertex(edge->third);
-        circumradii.push_back(CGAL::make_triple(CGAL::squared_radius(v1->point(),v2->point()),1,CGAL::make_object(*edge)));
-    }
-    for (Triangulation_hierarchy::Finite_facets_iterator f = dt.finite_facets_begin();
-	f != dt.finite_facets_end(); f++) {
-        Vertex_handle v1 = f->first->vertex((f->second+1)%4);
-        Vertex_handle v2 = f->first->vertex((f->second+2)%4);
-        Vertex_handle v3 = f->first->vertex((f->second+3)%4);
-        circumradii.push_back(CGAL::make_triple(CGAL::squared_radius(v1->point(),v2->point(),v3->point()),2,CGAL::make_object(*f)));
-    }
-    for (Triangulation_hierarchy::Finite_cells_iterator cit = dt.finite_cells_begin(); 
+    for (DT_3::Finite_cells_iterator cit = dt.finite_cells_begin(); 
 	cit != dt.finite_cells_end(); cit++) {
         Cell_handle ch(cit);
         Vertex_handle v1 = cit->vertex(0);
         Vertex_handle v2 = cit->vertex(1);
         Vertex_handle v3 = cit->vertex(2);
         Vertex_handle v4 = cit->vertex(3);
-        circumradii.push_back(CGAL::make_triple(CGAL::squared_radius(v1->point(),v2->point(),v3->point(),v4->point()),3,CGAL::make_object(ch)));
+	FT circumradius = CGAL::squared_radius(v1->point(),v2->point(),v3->point(),v4->point());
+	circumradii.push_back(CGAL::make_triple(circumradius,3,CGAL::make_object(ch)));
+	ch->info().filtration_value = circumradius;
     }
+
+    for (DT_3::Finite_facets_iterator f = dt.finite_facets_begin();
+	f != dt.finite_facets_end(); f++) {
+
+	// Check Gabrielness (attachment) of the triangle to its incident tetrahedra
+	bool is_attached = false;
+	FT filtration_value;
+
+	{
+	  Cell_handle cell = f->first;
+	  int index = f->second;
+	  if( triangle_attached_to(dt,*f) ) {
+	    filtration_value = cell->info().filtration_value;
+	    is_attached=true;
+	  }
+	}
+
+	{
+	  if(! is_attached) {
+	    Facet g = dt.mirror_facet(*f);
+	    Cell_handle cell = g.first;
+	    int index = g.second;
+	    if( triangle_attached_to(dt,g) ) {
+	      filtration_value = cell->info().filtration_value;
+	      is_attached=true;
+	    }
+	  }
+	}
+	if(! is_attached) {
+	  Cell_handle cell = f->first;
+	  int index = f->second;
+	  filtration_value = CGAL::squared_radius(cell->vertex((index+1)%4)->point(),
+						  cell->vertex((index+2)%4)->point(),
+						  cell->vertex((index+3)%4)->point());
+	}
+	circumradii.push_back(CGAL::make_triple(filtration_value,2,CGAL::make_object(*f)));
+	// Store filtration values in info object for further use
+	f->first->info().filtration_value_of_facet[f->second] = filtration_value;
+	Facet g = dt.mirror_facet(*f);
+	g.first->info().filtration_value_of_facet[g.second] = filtration_value;
+    }
+
+
+    for (DT_3::Finite_edges_iterator edge = dt.finite_edges_begin();
+	edge != dt.finite_edges_end(); edge++) {
+
+        // Check Gabrielness of the edge
+        bool is_attached = false;
+	FT filtration_value;
+	
+	Facet_circulator f_start = dt.incident_facets(*edge);
+	Facet_circulator f_it = f_start;
+	f_it++;
+	while( f_it!=f_start ) {
+	  if(edge_attached_to(dt,*edge,*f_it)) {
+	    Cell_handle cell = f_it->first;
+	    int index = f_it->second;
+	    FT new_filtration_value = cell->info().filtration_value_of_facet[index];
+	    // Now, maybe the edge is already attached to another triangle (can this really happen?)
+	    if(is_attached) {
+	      filtration_value = CGAL::min(filtration_value,new_filtration_value);
+	    } else {
+	      filtration_value = new_filtration_value;
+	    }
+	    is_attached=true;
+	  }
+	  f_it++;
+	}
+	
+	
+	if(! is_attached) {
+	  Vertex_handle v1 = edge->first->vertex(edge->second);
+	  Vertex_handle v2 = edge->first->vertex(edge->third);
+	  filtration_value = CGAL::squared_radius(v1->point(),v2->point());
+	}
+
+        circumradii.push_back(CGAL::make_triple(filtration_value,1,CGAL::make_object(*edge)));
+    }
+
+
+
+
+    for (DT_3::Finite_vertices_iterator vertex = dt.finite_vertices_begin();
+	vertex != dt.finite_vertices_end(); vertex++) {
+        Vertex_handle vh(vertex);
+        circumradii.push_back(CGAL::make_triple(FT(0),0,CGAL::make_object(vh)));
+    }
+
     
     std::cerr << "Sort circumradii..." << std::endl;
 
@@ -308,7 +440,7 @@ int main(int argc, char** argv)
         curr_index++;
     }
 
-    boundary_matrix.save_binary("alpha_filtration.bin");
+    boundary_matrix.save_ascii("alpha_filtration.bin");
     
     //phat::write(std::cout,M,dim_container);
 
