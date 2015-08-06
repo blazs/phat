@@ -1,20 +1,20 @@
-* PHAT (Persistent Homology Algorithm Toolbox), v1.4.0 *
+**PHAT (Persistent Homology Algorithm Toolbox), v1.4.0**
 Copyright 2013, 2014 IST Austria
 
-==Project Founders:==
+*Project Founders:*
 
 Ulrich Bauer, Michael Kerber, Jan Reininghaus
 
-==Contributors:==
+*Contributors:*
 
 Hubert Wagner, Primoz Skraba
 
-==Downloads:==
+*Downloads:*
   * [https://drive.google.com/uc?id=0B7Yz6TPEpiGEMGFNQ3FPX3ltelk&export=download PHAT, v1.3.0]
   * [https://drive.google.com/uc?id=0B7Yz6TPEpiGENE9KUnhUSFdFQUk&export=download PHAT, v1.2.1]
   * [https://drive.google.com/uc?id=0B7Yz6TPEpiGERGZFbjlXaUt1ZWM&export=download benchmark data]
 
-==Description:==
+*Description:*
 
 This software library contains methods for computing the persistence pairs of a 
 filtered cell complex represented by an ordered boundary matrix with Z<sub>2</sub> coefficients. 
@@ -62,41 +62,37 @@ There are two ways to interface with the library:
   * using the C++ library interface:
     # include all headers found in `src/phat.cpp`
     # define a boundary matrix object, e.g. 
-`
-phat::boundary_matrix< bit_tree_pivot_column > boundary_matrix;
-`
+`phat::boundary_matrix< bit_tree_pivot_column > boundary_matrix;`
     # set the number of columns:
-{{{
-boundary_matrix.set_num_cols(...);
-}}}
+`boundary_matrix.set_num_cols(...);`
     # initialize each column using 
-{{{
-boundary_matrix.set_col(...)
-boundary_matrix.set_dim(...)
-}}}
-    # define an object to hold the result:
-{{{
-phat::persistence_pairs pairs;
-}}}
-    # run an algorithm like this:
-{{{
-phat::compute_persistence_pairs< phat::twist_reduction >( pairs, boundary_matrix );
-}}}
-    # examine the result: 
-{{{
-pairs.get_num_pairs()
-pairs.get_pair(...)
-}}} 
- 	
-    A simple example that demonstrates this functionality can be found in {{{src/simple_example.cpp}}}
 
-==File Formats:==
+`boundary_matrix.set_col(...)`
+`boundary_matrix.set_dim(...)`
+
+    # define an object to hold the result:
+
+`phat::persistence_pairs pairs;`
+
+    # run an algorithm like this:
+
+`phat::compute_persistence_pairs< phat::twist_reduction >( pairs, boundary_matrix );`
+
+    # examine the result: 
+
+`pairs.get_num_pairs()`
+`pairs.get_pair(...)`
+
+ 	
+    A simple example that demonstrates this functionality can be found in `src/simple_example.cpp`
+
+*File Formats:*
 
 The library supports input and output in ascii and binary format
 through the methods {{{[load|save]_[ascii|binary]}}} in the classes {{{boundary_matrix}}} 
 and {{{persistence_pairs}}}. The file formats are defined as follows:
 
-{{{boundary_matrix}}} - ascii:
+* `boundary_matrix` - ascii:
 	The file represents the filtration of the cell complex, containing one cell 
 	per line (empty lines and lines starting with "#" are ignored). A cell is given by 
 	a sequence of integers, separated by spaces, where the first integer denotes the
@@ -105,7 +101,7 @@ and {{{persistence_pairs}}}. The file formats are defined as follows:
 	in the filtration, starting with 0). 
 	A sample file {{{single_triangle.dat}}} can be found in the examples folder.
 
-{{{boundary_matrix}}} - binary:
+* `boundary_matrix` - binary:
 	In binary format, the file is simply interpreted as a sequence of 64 bit signed integer 
 	numbers. The first number is interpreted as the number of cells of the complex. The 	
 	descriptions of the cells is expected to follow, with the first number representing the 
@@ -113,23 +109,23 @@ and {{{persistence_pairs}}}. The file formats are defined as follows:
 	followed by N numbers denoting the indices of the boundary cells. 
 	A sample file {{{single_triangle.bin}}} can be found in the examples folder.
 
-{{{persistence_pairs}}} - ascii: 
+* `persistence_pairs` - ascii: 
 	The file contains the persistence pairs, sorted by birth index. The first integer in the
 	file is equal to the number of pairs. It is followed by pairs of integers encode the 
 	respective birth and death indices. 
 	A sample file {{{single_triangle_persistence_pairs.dat}}} can be found in the examples folder.
 
-{{{persistence_pairs}}} - binary: 
+* `persistence_pairs` - binary: 
 	Same as ascii format, see above. Only now the integers are encoded as 64bit signed integers.
-	A sample file {{{single_triangle_persistence_pairs.bin}}} can be found in the examples folder.
+	A sample file `single_triangle_persistence_pairs.bin` can be found in the examples folder.
 
-==Supported Platforms:==
+*Supported Platforms:*
   * Visual Studio 2008 and 2012 (2010 untested)
   * GCC version 4.4. and higher
 
-==References:==
+*References:*
 
-  # H.Edelsbrunner, J.Harer: Computational Topology, An Introduction. American Mathematical Society, 2010, ISBN 0-8218-4925-5
-  # V.de Silva, D.Morozov, M.Vejdemo-Johansson: Dualities in persistent (co)homology. Inverse Problems 27, 2011
-  # C.Chen, M.Kerber: Persistent Homology Computation With a Twist. 27th European Workshop on Computational Geometry, 2011.
-  # U.Bauer, M.Kerber, J.Reininghaus: Clear and Compress: Computing Persistent Homology in Chunks. [http://arxiv.org/pdf/1303.0477.pdf arXiv:1303.0477]
+  * H.Edelsbrunner, J.Harer: Computational Topology, An Introduction. American Mathematical Society, 2010, ISBN 0-8218-4925-5
+  * V.de Silva, D.Morozov, M.Vejdemo-Johansson: Dualities in persistent (co)homology. Inverse Problems 27, 2011
+  * C.Chen, M.Kerber: Persistent Homology Computation With a Twist. 27th European Workshop on Computational Geometry, 2011.
+  * U.Bauer, M.Kerber, J.Reininghaus: Clear and Compress: Computing Persistent Homology in Chunks. [http://arxiv.org/pdf/1303.0477.pdf arXiv:1303.0477]
