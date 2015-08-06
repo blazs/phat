@@ -14,7 +14,7 @@ Hubert Wagner, Primoz Skraba
   * [https://drive.google.com/uc?id=0B7Yz6TPEpiGENE9KUnhUSFdFQUk&export=download PHAT, v1.2.1]
   * [https://drive.google.com/uc?id=0B7Yz6TPEpiGERGZFbjlXaUt1ZWM&export=download benchmark data]
 
-###### Description:
+##### Description:
 
 This software library contains methods for computing the persistence pairs of a 
 filtered cell complex represented by an ordered boundary matrix with Z<sub>2</sub> coefficients. 
@@ -72,13 +72,16 @@ boundary_matrix.set_col(...);
 boundary_matrix.set_dim(...);
 ```
 
+
     define an object to hold the result:
 
 `phat::persistence_pairs pairs;`
 
+
     run an algorithm like this:
 
 `phat::compute_persistence_pairs< phat::twist_reduction >( pairs, boundary_matrix );`
+
 
     examine the result: 
 
@@ -88,7 +91,7 @@ boundary_matrix.set_dim(...);
  	
     A simple example that demonstrates this functionality can be found in `src/simple_example.cpp`
 
-###### File Formats:
+##### File Formats:
 
 The library supports input and output in ascii and binary format
 through the methods {{{[load|save]_[ascii|binary]}}} in the classes {{{boundary_matrix}}} 
@@ -121,11 +124,11 @@ and {{{persistence_pairs}}}. The file formats are defined as follows:
 	Same as ascii format, see above. Only now the integers are encoded as 64bit signed integers.
 	A sample file `single_triangle_persistence_pairs.bin` can be found in the examples folder.
 
-###### Supported Platforms:
+##### Supported Platforms:
   * Visual Studio 2008 and 2012 (2010 untested)
   * GCC version 4.4. and higher
 
-###### References:
+##### References:
 
   * H.Edelsbrunner, J.Harer: Computational Topology, An Introduction. American Mathematical Society, 2010, ISBN 0-8218-4925-5
   * V.de Silva, D.Morozov, M.Vejdemo-Johansson: Dualities in persistent (co)homology. Inverse Problems 27, 2011
