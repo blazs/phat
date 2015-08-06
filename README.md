@@ -73,23 +73,23 @@ boundary_matrix.set_dim(...);
 ```
 
 
-    define an object to hold the result:
+Define an object to hold the result:
 
 `phat::persistence_pairs pairs;`
 
 
-    run an algorithm like this:
+Run an algorithm like this:
 
 `phat::compute_persistence_pairs< phat::twist_reduction >( pairs, boundary_matrix );`
 
 
-    examine the result: 
+Examine the result: 
 
 `pairs.get_num_pairs()`
 `pairs.get_pair(...)`
 
  	
-    A simple example that demonstrates this functionality can be found in `src/simple_example.cpp`
+A simple example that demonstrates this functionality can be found in `src/simple_example.cpp`; another example, demonstrating how to compute persistent relative homology, can be found in `src/relative_example.cpp`.
 
 ##### File Formats
 
