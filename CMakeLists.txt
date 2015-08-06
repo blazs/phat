@@ -47,6 +47,7 @@ FILE(GLOB helpers_includes "include/phat/helpers/*.h")
 FILE(GLOB representations_includes "include/phat/representations/*.h")
 
 add_executable (simple_example src/simple_example.cpp ${all_headers})
+add_executable (relative_example src/relative_example.cpp ${all_headers})
 add_executable (self_test src/self_test.cpp ${all_headers})
 add_executable (phat src/phat.cpp ${all_headers})
 add_executable (info src/info.cpp ${all_headers})
