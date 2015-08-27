@@ -9,7 +9,58 @@
 #include <phat/algorithms/row_reduction.h>
 #include <phat/algorithms/twist_reduction.h>
 
+class Simplex {
+public:
+    Simplex(const int& i, const double& t, const int& d, const bool& L)
+        : idx_(i), time_(t), dim_(d), inL_(L)
+    { }
+
+    void add_bd(const int& idx) { boundary_.push_back(idx); }
+
+    int idx() const { return idx_; }
+    double time() const { return time_; }
+    int dim() const { return dim_; }
+    bool inL() const { return inL_; }
+    std::vector<int> bd() const { return boundary_; }
+
+    bool operator<(const Simplex& rhs) const {
+        bool returnP = (time() < rhs.time()) ||
+            (time() == rhs.time() && dim() < rhs.dim()) ||
+            (time() == rhs.time() && dim() == rhs.dim() && !inL() && rhs.inL());
+        return returnP;
+    }
+    bool operator<=(const Simplex& rhs) const {
+        return *this == rhs || *this < rhs;
+    }
+    bool operator==(const Simplex& rhs) const {
+        // It should suffice to only check whether idx()==rhs.idx()
+        return idx() == rhs.idx() && time() == rhs.time() && dim() == rhs.dim() && inL() == rhs.inL() && bd() == rhs.bd();
+    }
+    bool operator!=(const Simplex& rhs) const {
+        return !(*this == rhs);
+    }
+private:
+    int idx_; // index representing the simplex
+    double time_; // the time the simplex enters the filtration
+    int dim_; // the dimension of the simplex
+    bool inL_; // whether the simplex is in L; if false, it is in K
+    std::vector<int> boundary_; // boundary of the simplex
+};
+
+// Given a filtration in the vector simplices, construct the boundary matrix and compute relative persistence
+void compute_relative_persistence(std::vector<Simplex>& simplices, const std::map<int, int>& L, std::vector<phat::persistence_pairs>& pairs);
+
 int main(int argc, char** argv) {
+    std::vector<Simplex> v;
+    v.push_back(Simplex(0, 0.1, 0, true));
+    v.push_back(Simplex(1, 0.1, 0, false));
+    v.push_back(Simplex(2, 0.4, 0, false));
+    v.push_back(Simplex(3, 0.3, 0, true));
+    v.push_back(Simplex(4, 0.3, 1, false));
+    v.push_back(Simplex(5, 0.3, 0, false));
+    std::sort(v.begin(), v.end());
+    for (std::vector<Simplex>::iterator it = v.begin(); it != v.end(); ++it) { std::cout << "(" << it->idx() << ", " << it->time() << ", " << it->dim() << ") " << it->inL() << std::endl; }
+
     // first define a boundary matrix with the chosen internal representation
     phat::boundary_matrix< phat::vector_vector > bd_m;
 
@@ -96,5 +147,46 @@ int main(int argc, char** argv) {
     }
 
     return 0;
+}
+
+// simplices is a vector of simplices, which, when ordered, represents the filtration
+// L maps the label of each L-simplex to the label of the corresponding K-simplex
+// pairs is a vector of persistence_pairs, whose d-th component corresponds to d-dimensional persistence pairs
+void compute_relative_persistence(std::vector<Simplex>& simplices, const std::map<int, int>& L, std::vector<phat::persistence_pairs>& pairs) {
+    std::map<int, int> label_to_idx; // Maps each simplex to the column that represents that simplex
+    std::sort(simplices.begin(), simplices.end());
+    const int N = simplices.size();
+    int mx_dim = 0; // Dimension of the final complex
+
+    phat::boundary_matrix< phat::vector_vector > bd_m;
+    bd_m.set_num_cols(N);
+    // Set dimension of each of the simplices
+    for (int idx = 0; idx < simplices.size(); ++idx) {
+        bd_m.set_dim(idx, simplices[idx].dim());
+        label_to_idx[simplices[idx].idx()] = idx;
+        mx_dim = std::max(mx_dim, simplices[idx].dim());
+    }
+    // Set boundary for each simplex
+    std::vector< phat::index > tmp_col;
+    for (int idx = 0; idx < simplices.size(); ++idx) {
+        tmp_col.clear();
+        if (simplices[idx].dim() > 0) {
+            // The boudary consists of column indices---use label_to_idx for that
+            std::vector<int> tmp_bd = simplices[idx].bd();
+            for (int jdx = 0; jdx < tmp_bd.size(); ++jdx) {
+                tmp_col.push_back(label_to_idx[tmp_bd[jdx]]);
+            }
+        }
+        // If an L-simplex, add the corresponding K-simplex to its boundary
+        if (simplices[idx].inL()) {
+            // Need to find the corresponding K-simplex
+            const int idx_K = L.find(simplices[idx].idx())->second;
+            tmp_col.push_back(label_to_idx[idx_K]);
+        }
+        bd_m.set_col(idx, tmp_col);
+    }
+    // Compute persistence
+    std::vector<phat::persistence_pairs> pp_v(mx_dim);
+    phat::compute_relative_persistence_pairs<phat::standard_reduction>(pairs, bd_m, L);
 }
 
