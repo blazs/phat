@@ -49,18 +49,10 @@ private:
 
 // Given a filtration in the vector simplices, construct the boundary matrix and compute relative persistence
 void compute_relative_persistence(std::vector<Simplex>& simplices, const std::map<int, int>& L, std::vector<phat::persistence_pairs>& pairs);
+void example();
 
 int main(int argc, char** argv) {
-    std::vector<Simplex> v;
-    v.push_back(Simplex(0, 0.1, 0, true));
-    v.push_back(Simplex(1, 0.1, 0, false));
-    v.push_back(Simplex(2, 0.4, 0, false));
-    v.push_back(Simplex(3, 0.3, 0, true));
-    v.push_back(Simplex(4, 0.3, 1, false));
-    v.push_back(Simplex(5, 0.3, 0, false));
-    std::sort(v.begin(), v.end());
-    for (std::vector<Simplex>::iterator it = v.begin(); it != v.end(); ++it) { std::cout << "(" << it->idx() << ", " << it->time() << ", " << it->dim() << ") " << it->inL() << std::endl; }
-
+    example(); return 1;
     // first define a boundary matrix with the chosen internal representation
     phat::boundary_matrix< phat::vector_vector > bd_m;
 
@@ -187,6 +179,35 @@ void compute_relative_persistence(std::vector<Simplex>& simplices, const std::ma
     }
     // Compute persistence
     std::vector<phat::persistence_pairs> pp_v(mx_dim);
-    phat::compute_relative_persistence_pairs<phat::standard_reduction>(pairs, bd_m, L);
+    std::map<int, int> L2;
+    for (std::map<int, int>::const_iterator it = L.begin(); it != L.end(); ++it) { L2[label_to_idx[it->first]] = label_to_idx[it->second]; }
+    phat::compute_relative_persistence_pairs<phat::standard_reduction>(pairs, bd_m, L2);
+}
+
+void example() {
+    std::vector<Simplex> v;
+    v.push_back(Simplex(0, 0.1, 0, true)); // a_K
+    v.push_back(Simplex(1, 0.1, 0, false)); // a _L
+    v.push_back(Simplex(2, 0.4, 0, false)); // c_K
+    v.push_back(Simplex(3, 0.3, 0, true)); // b_L
+    v.push_back(Simplex(5, 0.3, 0, false)); // b_K
+    Simplex s(4, 0.3, 1, false); s.add_bd(1); s.add_bd(5); // ab_K
+    v.push_back(s);
+    std::sort(v.begin(), v.end());
+    for (std::vector<Simplex>::iterator it = v.begin(); it != v.end(); ++it) { std::cout << "(" << it->idx() << ", " << it->time() << ", " << it->dim() << ") " << it->inL() << std::endl; }
+
+    std::map<int, int> ml; ml[0]=1; ml[3]=5;
+    std::vector<phat::persistence_pairs> pp_v(2);
+
+    compute_relative_persistence(v, ml, pp_v);
+
+    for (int d = 0; d < pp_v.size(); ++d) {
+        std::cout << "Dimension " << d << std::endl;
+        for (int idx = 0; idx < pp_v[d].get_num_pairs(); ++idx) {
+            phat::index birth = pp_v[d].get_pair(idx).first;
+            phat::index death = pp_v[d].get_pair(idx).second;
+            std::cout << "(" << birth << ", " << death << ")" << std::endl;
+        }
+    }
 }
 
