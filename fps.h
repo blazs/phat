@@ -69,6 +69,5 @@ public:
     static void GetLandmarks(const TVec<TIntFltKdV>& S, const int& l, TVec<TInt>& L);
 };
 
-
 #endif
 

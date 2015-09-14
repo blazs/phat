@@ -29,7 +29,7 @@ namespace phat {
 
             const index nr_columns = boundary_matrix.get_num_cols();
             std::vector< index > lowest_one_lookup( nr_columns, -1 );
-            
+
             for( index cur_col = 0; cur_col < nr_columns; cur_col++ ) {
                 index lowest_one = boundary_matrix.get_max_index( cur_col );
                 while( lowest_one != -1 && lowest_one_lookup[ lowest_one ] != -1 ) {
@@ -44,3 +44,4 @@ namespace phat {
         }
     };
 }
+

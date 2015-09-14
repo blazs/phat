@@ -74,7 +74,7 @@ void TDimUtil::GetLandmarks(const TVec<TIntFltKdV>& S, const int& l, TVec<TInt>&
             auto It1 = V1.BegI();
             auto It2 = V2.BegI();
             while (It1 != V1.EndI() && It2 != V2.EndI() && It1->Key == It2->Key)
-                { /* printf("%d :: %d\n", It1->Key.Val, It2->Key.Val); */ ++It1; ++It2; }
+                { ++It1; ++It2; }
             IsOk = !(It1 == V1.EndI() && It2 == V2.EndI());
         }
         // printf("%d", IsOk);

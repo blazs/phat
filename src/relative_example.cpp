@@ -65,7 +65,10 @@ void build_bdm(std::vector<Simplex>& v, std::map<int, int>& L, phat::boundary_ma
 void test();
 
 int main(int argc, char** argv) {
-    experiments("hi_3_0p9");
+    // experiments("hi_3_0p9");
+    if (argc <= 1) { return 1; }
+    experiments(argv[1]);
+    // experiments("hi_0p94_0p9_0p5_3");
     // test();
     // experiments("test-2");
     return 1;
@@ -167,7 +170,6 @@ void compute_relative_persistence(std::vector<Simplex>& simplices, const std::ma
     std::sort(simplices.begin(), simplices.end());
     const int N = simplices.size();
     int mx_dim = 0; // Dimension of the final complex
-
     phat::boundary_matrix< phat::vector_vector > bd_m;
     bd_m.set_num_cols(N);
     // Set dimension of each of the simplices
@@ -197,7 +199,7 @@ void compute_relative_persistence(std::vector<Simplex>& simplices, const std::ma
         bd_m.set_col(idx, tmp_col);
     }
     // Compute persistence
-    std::vector<phat::persistence_pairs> pp_v(mx_dim);
+    //std::vector<phat::persistence_pairs> pp_v(mx_dim+1);
     std::map<int, int> L2;
     for (std::map<int, int>::const_iterator it = L.begin(); it != L.end(); ++it) { L2[label_to_idx[it->first]] = label_to_idx[it->second]; }
 
@@ -287,15 +289,15 @@ void experiments(std::string prefix) {
     std::vector<Simplex> v;
     std::map<int, int> L;
     int mx_dim;
-
+    std::cout << "Loading..." << std::endl;
     load(prefix, v, L, mx_dim);
 
-    std::vector<phat::persistence_pairs> pp_v(mx_dim+1);
-
+    std::vector<phat::persistence_pairs> pp_v(mx_dim+2);
+    std::cout << "Compuiting..." << std::endl;
     compute_relative_persistence(v, L, pp_v);
-
+    std::cout << "Writing out..." << std::endl;
     for (int d = 0; d < pp_v.size(); ++d) {
-        std::cout << "Dimension " << d << std::endl;
+        // std::cout << "Dimension " << d << std::endl;
         std::string fname = std::string("data/")+prefix+std::string("_pp_")+std::to_string(d)+std::string(".pp");
         std::ofstream fout(fname.c_str());
         fout << pp_v[d].get_num_pairs() << std::endl;
@@ -305,7 +307,7 @@ void experiments(std::string prefix) {
             double b_tm = v[birth].time();
             double d_tm = (death >= 0 ? v[death].time() : death);
             fout << b_tm << " " << d_tm << std::endl;
-            std::cout << "(" << b_tm << ", " << d_tm << ")" << std::endl;
+            // std::cout << "(" << b_tm << ", " << d_tm << ")" << std::endl;
         }
         fout.close();
     }
@@ -424,8 +426,6 @@ void test() {
     tmp_col.push_back(17);
     bd_m.set_col(18, tmp_col);
     tmp_col.clear();
-
-    bd_m.save_ascii("hi_test");
 
     // Now compute the homology via matrix reduction
     std::cout << "The boundary matrix has " << bd_m.get_num_cols() << " columns." << std::endl;

@@ -49,6 +49,7 @@ namespace phat {
             } else {
                 // This is an L-simplex and a (dimension+1)-dimensional cycle
                 if (L.find(idx) != L.end()) {
+                    assert(dimension < pairs.size());
                     pairs[dimension].append_pair(idx, -1);
                 }
             }
@@ -57,6 +58,7 @@ namespace phat {
             if (it->second) {
                 int dimension = boundary_matrix.get_dim(it->first);
                 if (invL.find(it->first) == invL.end() && L.find(it->first) == L.end()) {
+                    assert(dimension < pairs.size());
                     pairs[dimension].append_pair(it->first, -1);
                 }
             }
