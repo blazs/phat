@@ -29,7 +29,7 @@ namespace phat {
     // give persistent relative homology of the pair of filtrations.
     // TODO: Use it with standard reduction algorithm (no template option).
     template< typename ReductionAlgorithm, typename Representation >
-    void compute_relative_persistence_pairs(std::vector<persistence_pairs>& pairs, boundary_matrix<Representation>& boundary_matrix, const std::map<int, int>& L) {
+    inline void compute_relative_persistence_pairs(std::vector<persistence_pairs>& pairs, boundary_matrix<Representation>& boundary_matrix, const std::map<int, int>& L) {
         ReductionAlgorithm reduce;
         reduce(boundary_matrix);
         std::map<int, bool> free;
@@ -67,7 +67,7 @@ namespace phat {
 
     // Extracts persistence pairs in separate dimensions; expects a d-dimensional vector of persistent_pairs
     template< typename ReductionAlgorithm, typename Representation >
-    void compute_persistence_pairs(std::vector<persistence_pairs>& pairs, boundary_matrix<Representation>& boundary_matrix) {
+    inline void compute_persistence_pairs(std::vector<persistence_pairs>& pairs, boundary_matrix<Representation>& boundary_matrix) {
         ReductionAlgorithm reduce;
         reduce(boundary_matrix);
         std::map<int, bool> free;
@@ -93,7 +93,7 @@ namespace phat {
     }
 
     template< typename ReductionAlgorithm, typename Representation >
-    void compute_persistence_pairs( persistence_pairs& pairs, boundary_matrix< Representation >& boundary_matrix ) {
+    inline void compute_persistence_pairs( persistence_pairs& pairs, boundary_matrix< Representation >& boundary_matrix ) {
         ReductionAlgorithm reduce;
         reduce( boundary_matrix );
         pairs.clear();
@@ -107,7 +107,7 @@ namespace phat {
     }
     
     template< typename ReductionAlgorithm, typename Representation >
-    void compute_persistence_pairs_dualized( persistence_pairs& pairs, boundary_matrix< Representation >& boundary_matrix ) {
+    inline void compute_persistence_pairs_dualized( persistence_pairs& pairs, boundary_matrix< Representation >& boundary_matrix ) {
 
         dualize( boundary_matrix );
         compute_persistence_pairs< ReductionAlgorithm >( pairs, boundary_matrix );
@@ -115,13 +115,13 @@ namespace phat {
     }
     
     template< typename Representation >
-    void compute_persistence_pairs( persistence_pairs& pairs, boundary_matrix< Representation >& boundary_matrix ) {
+    inline void compute_persistence_pairs( persistence_pairs& pairs, boundary_matrix< Representation >& boundary_matrix ) {
         phat::compute_persistence_pairs< twist_reduction >( pairs, boundary_matrix );
     }
     
     
     template< typename Representation >
-    void compute_persistence_pairs_dualized( persistence_pairs& pairs, boundary_matrix< Representation >& boundary_matrix ) {
+    inline void compute_persistence_pairs_dualized( persistence_pairs& pairs, boundary_matrix< Representation >& boundary_matrix ) {
         compute_persistence_pairs_dualized< twist_reduction >( pairs, boundary_matrix );
     }
 
