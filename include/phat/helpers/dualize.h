@@ -25,7 +25,7 @@
 
 namespace phat {
     template< typename Representation >
-    void dualize( boundary_matrix< Representation >& boundary_matrix ) {
+    inline void dualize( boundary_matrix< Representation >& boundary_matrix ) {
 
         std::vector< dimension > dual_dims;
         std::vector< std::vector< index > > dual_matrix;
@@ -65,7 +65,7 @@ namespace phat {
         boundary_matrix.load_vector_vector( dual_matrix, dual_dims );
     }
     
-    void dualize_persistence_pairs( persistence_pairs& pairs, const index n ) {
+    inline void dualize_persistence_pairs( persistence_pairs& pairs, const index n ) {
         for (index i = 0; i < pairs.get_num_pairs(); ++i) {
             std::pair< index, index > pair = pairs.get_pair( i );
             pairs.set_pair( i , n - 1 - pair.second, n - 1 - pair.first);
