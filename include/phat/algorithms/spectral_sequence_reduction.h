@@ -75,6 +75,7 @@ namespace phat {
                     }
                 }
             }
+            boundary_matrix.sync();
         }
     };
 }
